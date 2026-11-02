@@ -52,7 +52,7 @@ const STAGES=[
  /* ---- things to find (§32): each a line of character or foreshadowing, no grind ---- */
  {id:'d-photo',when:a=>a.used('quarters-photo')&&a.usedAt('quarters-photo')!==a.flags.photo_t,repeat:true,fire:a=>{a.flags.photo_t=a.usedAt('quarters-photo');a.flag('found_photo');a.note(DRIFT.text('quarters-photo',a.drift()),10);rehint(a);}},
  {id:'d-nav',when:a=>a.used('nav-log'),fire:a=>{a.flag('found_nav');a.note('NAV LOG 2291.04 · HEADING HELD 41 DAYS · NO COURSE CHANGE ORDERED',10);rehint(a);}},
- {id:'d-patch',when:a=>a.used('mission-patch'),fire:a=>{a.flag('found_patch');a.note('MISSION PATCH · DSV-2291 · THREE NAMES STITCHED · THE PILOT\'S UNPICKED',10);rehint(a);}},
+ {id:'d-patch',when:a=>a.used('mission-patch'),fire:a=>{a.flag('found_patch');a.note('MISSION PATCH · DSV-0417 · THREE NAMES STITCHED · THE PILOT\'S UNPICKED',10);rehint(a);}},
  {id:'d-trace',when:a=>a.used('tunnel-trace'),fire:a=>{a.flag('found_trace');a.note('SCORCH MARK · THE SHAPE OF A PERSON · NOBODY IS LISTED MISSING HERE',10);rehint(a);}},
  {id:'d-eva',when:a=>a.used('eva-look'),fire:a=>{a.flag('found_eva');a.note('THE STARS DO NOT MOVE · HALCYON HAS NOT DRIFTED IN YEARS',10);rehint(a);}},
  /* ---- idle things (§33): sitting, looking, listening. They do nothing. That is the point ---- */

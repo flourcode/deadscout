@@ -23,7 +23,7 @@ function run(raw,X){const c=raw.trim().toUpperCase().replace(/\s+/g,' ');if(!c)r
   const found=X.found(),T=X.now();
   switch(w){
   case 'HELP':case '?':return ['AVAILABLE: STATUS  CREW  SCAN  DOORS  POWER  K9','           LOGS  LOG <N>  DATE  WHERE  CLEAR  EXIT'];
-  case 'STATUS':return ['HOS 4.1 · DSV HALCYON · DSV-2291','HULL INTEGRITY ......... 97%','LIFE SUPPORT ........... NOMINAL','OCCUPANCY .............. 0','LAST CREW TRANSMISSION . UNKNOWN','SIGNAL ................. ACTIVE · SOURCE INTERNAL'];
+  case 'STATUS':return ['HOS 4.1 · DSV HALCYON · DSV-0417','HULL INTEGRITY ......... 97%','LIFE SUPPORT ........... NOMINAL','OCCUPANCY .............. 0','LAST CREW TRANSMISSION . UNKNOWN','SIGNAL ................. ACTIVE · SOURCE INTERNAL'];
   case 'CREW':return ['PILOT ........ STATUS UNKNOWN','SYSTEMS ...... STATUS UNKNOWN','COMMANDER .... STATUS UNKNOWN','SVC UNIT K9-4  ACTIVE','CREW ABOARD: 0'];
   case 'WHO':case 'WHOAMI':if(w==='WHO'&&arg!=='AM I')return ['SPECIFY QUERY.'];return ['NO OPERATOR REGISTERED AT THIS CONSOLE.','SUBJECT ID: NULL'];
   case 'HELLO':case 'HI':return ['HELLO.','NO CREW MEMBERS ARE ABOARD.'];

@@ -3,7 +3,7 @@
    on the same timeline. Times in `events` are absolute from the start of the transmission. */
 window.DS_GAME={
  deadscout_plan:4,game:true,title:'DEADSCOUT',year:'2291',length_minutes:110,location:'research',
- ship:'DSV HALCYON',registry:'DSV-2291',
+ ship:'DSV HALCYON',registry:'DSV-0417',
  music:{style:'deadwave',tape:'orbital-cruise',vibe:'dark',drums:'low',synth:'mid',ambience:'high'}, /* deep.js: the ship dreaming */
  format:'cutaway',
  cutaway:{era:'past',start:{pilot:'bridge.helm',systems:'bridge.nav',commander:'bridge.command',deadscout:'quarters.bunk'},

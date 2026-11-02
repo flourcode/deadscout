@@ -284,7 +284,7 @@ function screenMode(C,id,t,W_){const s=screenAt(C,id,t);if(s.m)return s;if(id===
   if(r==='sensor'){if(id==='sensor.main')return {m:sig>.55?'signal':sig>.12?'waveform':'idle-grid'};if(id==='sensor.wave')return {m:sig>.3?'signal-bars':'waveform'};if(id==='sensor.archive')return {m:'text-terminal'};return {m:hash(id.length,9)<.5?'idle-grid':'signal-bars'};}
   if(id==='engineering.load')return {m:st==='load'||st==='load-spike'?'signal-bars':'idle-grid'};if(/status/.test(id))return {m:'text-terminal'};if(id==='bridge.nav')return {m:sig>.4?'waveform':'idle-grid'};if(id==='bridge.security')return {m:'idle-grid'};
   return {m:['idle-grid','text-terminal','signal-bars'][Math.floor(hash(id.length*7,id.charCodeAt(0))*3)]};}
-let TIGHT=false,evNow=null,FORCE=null,EXTF=null,LIT=false,FOCUS=null;const FOCUS_SCREENS=['sensor.small','bridge.left']; /* the wide sensor glass has room for the digits; the bridge one shows the level */ /* the Night Watch focus timer, on the bridge */
+const XR={},TOY={drive:1,dv:1,light:0,beacon:0};let TIGHT=false,evNow=null,FORCE=null,EXTF=null,LIT=false,FOCUS=null;const FOCUS_SCREENS=['sensor.small','bridge.left']; /* the wide sensor glass has room for the digits; the bridge one shows the level */ /* the Night Watch focus timer, on the bridge */
 /* ---------- the production lock: 384x216 internal frame, 2:1 world sampling in play, nearest both ways, one palette ---------- */
 const IR={w:640,h:360}; /* the visual lock: 640 × 360 logical, 3× to 1080p; one master pixel = one logical pixel = one sprite pixel */let LOWRES=true,PALON=true;
 const PALETTE=["#e9d7c2", "#c6ab92", "#3c3a40", "#c15c15", "#292a31", "#0b0e11", "#4d2613", "#8d4012", "#b6916a", "#2895a8", "#2e3134", "#14181c", "#3a2014", "#7b3f1c", "#907763", "#446d75", "#e39754", "#4e423c", "#224a5b", "#7ee3e5", "#e47a1e", "#147192", "#1fb4ce", "#eeb072", "#c37b43", "#649da1", "#99623b", "#ffb04a", "#d0442e", "#f6efe4", "#6b6a6e", "#9a9897"]; /* the visual lock (docs/palette-lock.json): 32 colours, all from the reference sheet */
@@ -398,11 +398,11 @@ function screenDraw1(id,r,mode,t,W_,camSnap){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y
   else if(mode==='manifest'){T('CREW',x0+2,y0+2,'#d8fff0');['PILOT','SYSTEMS','CMDR'].forEach((s,i)=>{if(y0+9+i*6<y1-4)T(s,x0+2,y0+9+i*6,i===0&&Math.floor(t*1.5)%2?'#ff8a5c':'#78d8b8');});}
   else if(mode==='registry'){/* the ship's card: pages on a screen wide enough, a ticker under the name on the small ones; it reads from the top when the screen wakes */
     const cols=Math.max(4,Math.floor((w-4)/4)),rows=Math.max(2,Math.floor((h-4)/7));
-    if(cols>=14){const L=['DSV HALCYON','REG DSV-2291','CLASS: DEEP','SURVEY VESSEL','AO: OUTER','HELIOSPHERE','RANGE 167 AU','CREW: 03','STATUS: LOST','CREW STATUS:','PRESUMED','DECEASED','LAST CONTACT','2291','RECOVERY:','NONE','SIGNAL:','ACTIVE','SOURCE:','INTERNAL'],pages=Math.ceil(L.length/rows),pg=Math.floor(t/2.8)%pages,off=pg*rows;
+    if(cols>=14){const L=['DSV HALCYON','REG DSV-0417','CLASS: DEEP','SURVEY VESSEL','AO: OUTER','HELIOSPHERE','RANGE 167 AU','CREW: 03','STATUS: LOST','CREW STATUS:','PRESUMED','DECEASED','LAST CONTACT','2291','RECOVERY:','NONE','SIGNAL:','ACTIVE','SOURCE:','INTERNAL'],pages=Math.ceil(L.length/rows),pg=Math.floor(t/2.8)%pages,off=pg*rows;
       for(let i=0;i<rows&&off+i<L.length;i++){const s=L[off+i],last=off+i>=L.length-2;T(s.slice(0,cols),x0+2,y0+2+i*7,off+i<2?'#d8fff0':last&&Math.floor(t*1.5)%2?'#ff8a5c':'#78d8b8');}
       px(x0+2,y1-3,Math.round((w-4)*((t/2.8)%1)),1,'#2f8a7c');}
-    else{const s='DSV-2291 / DEEP SURVEY VESSEL / OUTER HELIOSPHERE / 167 AU SOL / CREW 03 / STATUS LOST / CREW PRESUMED DECEASED / LAST CONTACT 2291 / RECOVERY NONE / SIGNAL ACTIVE / SOURCE INTERNAL / ',len=s.length*4,off=Math.floor(Math.max(0,t-1.2)*10)%len;
-      T('HALCYON',x0+2,y0+2,'#d8fff0');T(s+s,x0+2-off,y0+9,'#78d8b8');if(rows>2)T('DSV-2291',x0+2,y0+16,'#78d8b8');px(x0+2,y1-3,w-4,1,'#174a4a');}}
+    else{const s='DSV-0417 / DEEP SURVEY VESSEL / OUTER HELIOSPHERE / 167 AU SOL / CREW 03 / STATUS LOST / CREW PRESUMED DECEASED / LAST CONTACT 2291 / RECOVERY NONE / SIGNAL ACTIVE / SOURCE INTERNAL / ',len=s.length*4,off=Math.floor(Math.max(0,t-1.2)*10)%len;
+      T('HALCYON',x0+2,y0+2,'#d8fff0');T(s+s,x0+2-off,y0+9,'#78d8b8');if(rows>2)T('DSV-0417',x0+2,y0+16,'#78d8b8');px(x0+2,y1-3,w-4,1,'#174a4a');}}
   else if(mode==='hos'){/* HALCYON's own voice: terse, paged, and never once aware of her */
     const cols=Math.max(4,Math.floor((w-4)/4)),rows=Math.max(2,Math.floor((h-4)/7)),wr=DRIFTL>=2&&Math.floor(t*.6)%3===0,L=cols>=14?['HOS 4.1 READY',wr?'OCCUPANCY: 1':'OCCUPANCY: 0','CREW COMPL: 3',wr?'MOTION: ONE':'MOTION: NONE','SUBJECT ID:','NULL','SVC UNIT K9-4','ACTIVE','ARCHIVE:','DEGRADED','POWER: LOW']:['HOS 4.1',wr?'OCCUP 1':'OCCUP 0','CREW 3','MOTION',wr?'ONE':'NONE','SUBJECT','NULL','K9-4','ACTIVE','ARCHIVE','DEGRADED','POWER','LOW'];
     const pages=Math.ceil(L.length/rows),pg=Math.floor(t/2.6)%pages,off=pg*rows;for(let i=0;i<rows&&off+i<L.length;i++){const s=L[off+i];T(s.slice(0,cols),x0+2,y0+2+i*7,off+i===0?'#d8fff0':/NULL|NONE|^0$|OCCUP/.test(s)&&Math.floor(t*1.5)%2?'#ff8a5c':'#78d8b8');}
@@ -431,6 +431,19 @@ function focusDraw(r,t){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y1-y0+1,F=FOCUS,T=(s,X
 /* the view outside (Nov 2026): things pass in the dark, drawn only on open sky (skyMask), never over the hull.
    A comet's slow trail every few minutes, a dead satellite tumbling by, a beacon far off blinking its slow pattern, and very
    rarely the dim silhouette of another ship crossing the distance. All from the clock: the same time, the same sky. */
+/* an ion beam (Nov 2026): straight out of the nozzle at its full height, no cone. Near the nozzle it is solid and white-hot;
+   further out it breaks into pixels that thin away, flickering a little, like a stream of charged particles in the dark */
+function ionBeam(ex,ey,eh,len,amp,t){if(amp<=.01)return;const c=2*SS,rows=Math.max(3,Math.round(eh/c)),y0=Math.round(ey-rows*c/2),cols=Math.round(len/c),fr=Math.floor(t*14);
+  x.save();x.globalCompositeOperation='source-over';
+  for(let k=0;k<cols;k++){const d=k/cols,keep=Math.pow(1-d,1.35),flow=Math.floor(t*40)-k;
+    for(let j=0;j<rows;j++){const edge=Math.abs(j-(rows-1)/2)/((rows-1)/2||1),h=hash(k*131+j*17+fr*7,flow&1023);
+      if(h>keep*(1-.35*edge*edge))continue;
+      const a=amp*(d<.06?1:(.35+.65*(1-d)))*(edge>.8?.6:1),col=d<.05&&edge<.7?'230,255,250':d<.25?'126,227,229':d<.6?'31,180,206':'20,113,146';
+      x.fillStyle=`rgba(${col},${Math.min(1,a*1.15)})`;x.fillRect(Math.round(ex+k*c),y0+j*c,c,c);}}
+  x.restore();}
+/* the toys (game/toys.js): the drive on/off (eased, so the beams spool), the lighting mode, the EVA beacon strobe */
+function toysDraw(t){TOY.dv+=(TOY.drive-TOY.dv)*.04;if(TOY.beacon&&SC.navlights){const [bx,by]=SC.navlights[SC.navlights.length-1],ph=t%1.6;
+  if(ph<.12||(ph>.3&&ph<.42)){x.save();x.globalCompositeOperation='lighter';glow(bx,by,40*SS,'255,240,220',.55);glow(bx,by,90*SS,'255,90,60',.2);x.restore();px(bx-SS,by-SS,3*SS,3*SS,'#f6efe4');}}}
 function outside(t){const sky=skyMask();if(!sky)return;const ok=(X,Y)=>X>=0&&Y>=0&&X<W&&Y<H&&sky(X,Y);const O=outside;
   if(!O.mask){const k=8,mw=Math.ceil(W/k),mh=Math.ceil(H/k),mc=document.createElement('canvas');mc.width=mw;mc.height=mh;const g=mc.getContext('2d'),id=g.createImageData(mw,mh);
     for(let yy=0;yy<mh;yy++)for(let xx=0;xx<mw;xx++)if(ok(xx*k+k/2,yy*k+k/2))id.data[(yy*mw+xx)*4+3]=255;g.putImageData(id,0,0);O.mask=mc;
@@ -465,14 +478,16 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   if(SC.space){for(let i=0;i<70;i++){const R=SC.space[i%SC.space.length],sx=Math.floor(R[0]+hash(i,701)*(R[2]-R[0])),sy=Math.floor(R[1]+hash(i,702)*(R[3]-R[1])),tw=.5+.5*Math.sin(t*(.3+hash(i,703))+i*2);if(tw>.8)px(sx,sy,SS,SS,tw>.94?'#d2d0c6':'#5a74a6');}}
   else for(let i=0;i<50;i++){const sx=Math.floor(hash(i,701)*W),sy=Math.floor(hash(i,702)*H),tw=.5+.5*Math.sin(t*(.3+hash(i,703))+i*2);if(tw>.78)px(sx,sy,1,1,tw>.94?'#d2d0c6':'#5a74a6');}
   if(LP&&ready(LP))x.drawImage(LP,Math.round(-14*prog),Math.round(-6*prog));
-  outside(t);
+  outside(t);toysDraw(t);
   const ap=Wv.anomaly_proximity,drawAnomaly=(m)=>{if(ap<=.01)return;const F=SC.anomaly,ax=F.from[0]+(F.to[0]-F.from[0])*sm(ap),ay=F.from[1]+(F.to[1]-F.from[1])*sm(ap)+3*Math.sin(t/5.3);let st=ap<.5?'drift':ap<.85?'closed':'pulse';const la=C.anom.length?lastOf([{at:-1,state:null}].concat(C.anom),t).state:null;if(la)st=la;if(evNow&&evNow.type!=='power-drop')st='respond';
     x.save();x.globalCompositeOperation='lighter';glow(ax,ay-55,80+12*Math.sin(t*.7),'170,160,255',(.08+.06*ap)*ap*(1+evE)*m);x.restore();drawSprite('anomaly',st,ax,ay,false,t,3,clamp(ap*1.6,0,1)*m);};drawAnomaly(1);
   if(L1)x.drawImage(L1,0,0);
   /* PRESENT: decades of dirt; an echo lifts it from its room for a moment */
   if(present&&(ready(LG)||DARKART)){if(!DARKART)x.drawImage(LG,0,0,W,H);for(const [r,o] of Object.entries(ech)){x.save();x.clip(PATHS[r]||new Path2D());x.globalAlpha=o.e;x.drawImage(L1||L0,0,0,W,H);x.restore();}}
   const rs={};for(const r of Object.keys(SC.rooms))rs[r]=roomState(C,r,t);
-  const engineWash=(m)=>{x.save();x.globalCompositeOperation='lighter';for(const [ex,ey,eh] of SC.engines){const p=(.75+.15*Math.sin(t*1.7+ey)+.1*vn(t*3,ey))*(present?.25:1);for(let k=0;k<26;k++){const hh=(eh-18)*(1-k/30),a=.22*p*pw*(1-k/26)**1.6*m;x.fillStyle=`rgba(150,200,255,${a})`;x.fillRect(ex+k*2,Math.round(ey-hh/2),2,Math.round(hh));}}x.restore();};engineWash(1);
+  const engineWash=(m)=>{/* the same four beams in every view: same size, length, brightness and flow. Each art has its nozzles in a slightly different place, so the beams sit at the exterior's nozzles while the hull is up and at the cutaway's once it's peeled away */
+    const ext=clamp(exteriorAt(C,t),0,1),amp=(present&&FORCE!=='drift'?.3:1)*Math.max(pw,.6)*m*TOY.dv,X=SC.xnozzles||SC.engines,Cn=SC.engines;
+    for(let i=0;i<Cn.length;i++){const c=Cn[i],e=X[i]||c,ex=(e[0]-14)*ext+(c[0]-4)*(1-ext),ey=e[1]*ext+c[1]*(1-ext);ionBeam(Math.round(ex),Math.round(ey),64,150,amp,t);}} /* one set of beams, all alike: same nozzle height, same length, same flow */;engineWash(1-clamp(exteriorAt(C,t),0,1));
   if(SC.core){const [x0,y0,x1,y1]=SC.core,st=rs.engineering,F=STATES[st]||{},sp=(F.core||1)*(F.dead?.25:1),cont=Wv.contamination_level,base=st==='blackout'?.15:F.dead?.3:1;x.save();x.beginPath();x.rect(x0,y0,x1-x0+1,y1-y0+1);x.clip();x.globalCompositeOperation='lighter';
     for(let i=0;i<14;i++){const yy=y1-(((t*16*sp+i*9)%((y1-y0)+10))),w=(x1-x0)*(.4+.5*hash(i,77)),col=cont>2&&i%3===0?'120,240,210':'255,140,60';x.fillStyle=`rgba(${col},${(.35+.3*hash(i,78))*base*pw})`;x.fillRect(Math.round(x0+(x1-x0-w)/2),Math.round(yy),Math.round(w),2);}
     x.restore();x.save();x.globalCompositeOperation='lighter';glow((x0+x1)/2,(y0+y1)/2,64,'255,140,60',(.12+.05*Math.sin(t*1.3*sp))*base*pw);x.restore();
@@ -532,11 +547,12 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
     const want=present&&r===dsRoom?1:0,w0=WAKE[r]||0,w=w0+(want-w0)*(1-Math.exp(-dt/(want?.7:3.2)));WAKE[r]=w;
     if(w>.001){const s=C.act.deadscout.segs.find(q=>q.t0<=t&&q.t1>t),since=s?t-s.t0:9,stut=hash(Math.floor(t*10),3)<.1&&since<2?.6:1;L=L+(full-L)*.62*w*stut;}
     if(ech[r])L=L+((B.light!=null?B.light:1)-L)*ech[r].e;
+    if(TOY.light===1)L*=.6;else if(TOY.light===2)L*=.4;
     if(F.flicker&&hash(Math.floor(t*7),r.length*11)<.12)L*=.45;if(evNow&&evNow.type!=='signal-flash')L*=1-.45*evE*(evNow.type==='power-drop'?1.6:1);
     LREV[r]=L;x.save();x.clip(PATHS[r]);const dk=DARKART?clamp(.5-L,0,.6):clamp(1-L,0,.92);if(dk>.001){x.fillStyle=`rgba(4,3,8,${dk})`;x.fillRect(0,0,W,H);}
     x.globalCompositeOperation='lighter';const tint=(col,a)=>{if(a>0){x.fillStyle=`rgba(${col},${a})`;x.fillRect(0,0,W,H);}};const ec=ech[r]?ech[r].e:0;
     tint('90,220,200',(F.cyan||0)*(F.pulse?.6+.4*Math.sin(t*.9+r.length):1)+(B.cyan||0)+.05*ec);tint('255,150,70',(B.orange||0)*(present?.3:1));tint('255,170,110',(B.warm||0)*(present?.3:1));
-    tint('255,50,30',((F.red||0)+(al>0&&r!=='quarters'?.05*al:0))*(.5+.5*Math.sin(t*3.4)));tint('255,170,60',(F.amber||0)*(.5+.5*Math.sin(t*5)));x.restore();}
+    tint('255,50,30',((F.red||0)+(al>0&&r!=='quarters'?.05*al:0))*(.5+.5*Math.sin(t*3.4)));tint('255,170,60',(F.amber||0)*(.5+.5*Math.sin(t*5)));if(TOY.light===2)tint('255,40,30',.07+.03*Math.sin(t*2.2));x.restore();}
   x.save();x.globalCompositeOperation='lighter';for(const [i,Lp] of SC.lamps.entries()){const st=rs[Lp.room]||'normal',F=STATES[st]||{},col=PX.LCOL[Lp.type]||PX.LCOL.amber;let p=PX.irr(t,[4.7,7.3,11.1,5.9,9.4][i%5],i*31+7);
     const wk=WAKE[Lp.room]||0;if(F.lampsOff&&!Lp.warn&&!(ech[Lp.room]&&ech[Lp.room].e>.3)&&wk<.05){if(F.emergency&&i%3===0){glow(Lp.x,Lp.y+4*SS,22*SS,'255,90,50',.05+.03*Math.sin(t*.7+i));}continue;}
     if(Lp.warn){const on=F.warn||al>.3;p=on?(Math.floor(t*1.6+i*.5)%2?1:.1):F.emergency?.35:.12;}
@@ -553,11 +569,17 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
      outside the hull is drawn again on top of it: the engine wash, the anomaly, whoever stands on the EVA platform, the tether, the platform lamps */
   const ea=clamp(exteriorAt(C,t),0,1);
   const sw=scanAt(C,t),TITLE=FORCE==='drift';let sweepX=null; /* the title card shows her as she was */
-  if(ea>0&&LX&&ready(LX)){x.save();if(sw!=null){const B=8*SS,nx=Math.ceil(W/B),ny=Math.ceil(H/B),u=sm(sw)*1.05;x.beginPath();for(let by=0;by<ny;by++)for(let bx=0;bx<nx;bx++){if(hash(bx*7+3,by*13+5)*.7+(bx/nx)*.3>u)x.rect(bx*B,by*B,B,B);}x.clip();} /* the hull dissolves pixel by pixel, a little ahead at the bow */
-    x.globalAlpha=ea;x.drawImage(LX,0,0,W,H);x.globalAlpha=1;
+  if(ea>0&&LX&&ready(LX)){x.save();if(sw!=null){/* x-ray: the hull dissolves pixel by pixel only over the rooms, so we look into the ship; the plating, the stripes and the
+      name stay whole and give way at the very end */
+      const B=8*SS,nx=Math.ceil(W/B),ny=Math.ceil(H/B),u=sm(sw);if(!XR.m){XR.m=new Uint8Array(nx*ny);const g=document.createElement('canvas').getContext('2d');
+        for(let by=0;by<ny;by++)for(let bx=0;bx<nx;bx++){const cx=bx*B+B/2,cy=by*B+B/2;for(const r in PATHS)if(r!=='eva'&&g.isPointInPath(PATHS[r],cx,cy)){XR.m[by*nx+bx]=1;break;}}}
+      const pin=new Path2D(),pout=new Path2D(),ur=u/.78;for(let by=0;by<ny;by++)for(let bx=0;bx<nx;bx++){if(XR.m[by*nx+bx]){if(hash(bx*7+3,by*13+5)*.75+(bx/nx)*.25>ur)pin.rect(bx*B,by*B,B,B);}else pout.rect(bx*B,by*B,B,B);}
+      x.save();x.clip(pin);x.globalAlpha=ea;x.drawImage(LX,0,0,W,H);x.restore();
+      const ho=1-sm((u-.78)/.22);if(ho>0){x.save();x.clip(pout);x.globalAlpha=ea*ho;x.drawImage(LX,0,0,W,H);x.restore();}x.globalAlpha=1;}
+    else{x.globalAlpha=ea;x.drawImage(LX,0,0,W,H);x.globalAlpha=1;}
     /* depth: three layers of stars drift past at three speeds, only where the art is open sky */
     const SK=skyMask();if(SK){for(let L_=0;L_<3;L_++){const n=[70,40,18][L_],v=[1.2,3.4,8][L_],a0=[.35,.55,.85][L_];for(let i=0;i<n;i++){const sx=((hash(i,800+L_)*W+t*v)%W+W)%W,sy=hash(i,820+L_)*H;if(!SK(sx,sy))continue;const tw=.6+.4*Math.sin(t*(.4+hash(i,840))+i);x.fillStyle=L_===2?`rgba(230,224,204,${a0*tw*ea})`:`rgba(120,140,190,${a0*tw*ea})`;x.fillRect(Math.round(sx),Math.round(sy),L_===2?SS:SS/2*2,SS);}}}
-    if(!present||TITLE){/* alive: thin ion streams from the stern nozzles, dashes running aft, fading with distance */for(const [ex,ey,eh] of (SC.nozzles||SC.engines)){x.save();x.globalCompositeOperation='lighter';for(let j=0;j<5;j++){const yy=Math.round(ey+(j-2)*eh*.16);for(let k=0;k<26;k++){const d=((k*17+t*(140+j*13)+j*31)%440)/440,X=Math.round(ex+4+d*440),a=.6*(1-d)**1.4*(j===2?1:.65)*(TITLE?1:Math.max(pw,.6))*ea;x.fillStyle=`rgba(150,200,255,${a})`;x.fillRect(X,yy,Math.round(10+14*(1-d)),SS);}}x.restore();}
+    if(!present||TITLE){/* alive: thin ion streams from the stern nozzles, dashes running aft, fading with distance *//* the beams are drawn once, by engineWash */
       /* running lights: a slow red/green pair on the hull */const nl=Math.floor(t*.9)%3===0;if(nl){x.save();x.globalCompositeOperation='lighter';for(const [nx,ny,c] of NAVL)glow(nx,ny,10*SS,c,.5*ea);x.restore();}}
     else{x.fillStyle=`rgba(6,10,22,${.22*ea})`;x.fillRect(0,0,W,H);} /* dead: no trails, no lights, the whole picture a shade colder */
     if(pw<.999&&!TITLE){x.fillStyle=`rgba(2,3,8,${clamp((1-pw)*.7,0,.7)*ea})`;x.fillRect(0,0,W,H);} /* the running lights go with the power */
@@ -576,7 +598,7 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   else c.drawImage(cv,V[0],V[1],V[2],V[3],Math.round(box.x*scale),Math.round(box.y*scale),Math.round(box.w*scale),Math.round(box.h*scale));c.restore();
   return {x:box.x,y:box.y,w:box.w,h:box.h};}
 function report(P,times,t){const C=compile(P,times),o={};for(const a of ACTORS){if(!visible(C,a,t)){o[a]=a==='deadscout'?'—':'GONE';continue;}const s=actorAt(C,a,t);o[a]=s.walk?'WALKING':s.climb?'LADDER':s.lift?'HOIST':(ROOM_NAMES[(s.ref||'').split('.')[0]]||ROOM_NAMES[roomOf(s.x,s.y-20)]||'');}o.era=eraAt(C,t);return o;}
-window.CUT={_sky:()=>skyMask(),_hash:(a,b)=>hash(a,b),tight:v=>{TIGHT=!!v;},focus:f=>{FOCUS=f||null;},frame:()=>LOWRES&&ic?ic:null,_loc:{mkRun,evalRun,xyOf:p=>xyOf(p)},setTape:n=>{TAPE=n;},drift:v=>{DRIFTL=v;},roomOf,gait:(P,times,t,a)=>{const C=compile(P,times),st=actorAt(C,a||'deadscout',t);if(!st.walk||st.dist==null)return null;const S=A.sheets[SHEET[a]||a];if(!S||!S.animations.walk)return null;const an=S.animations.walk,tot=an.reduce((p,f)=>p+f[1],0),stride=Math.max(1,vWalk(a,st.sneak,false)*tot);let u=((st.dist/stride)%1+1)%1*tot,i=0;for(const [f,d] of an){if(u<d)break;u-=d;i++;}return {i:Math.min(i,an.length-1),n:an.length,fast:st.fast,v:st.v};},render,compile,parse,format,formatBeat,eventAt,report,view,pick,neighbor,wakeAt,hereRef,farTarget,roomAt,nearby,snapshot,travelTime,MAP:SC,SS,uses:(P,times)=>compile(P,times).uses,doorStates:(P,times,t)=>{const C=compile(P,times),o={};for(const d of DOORS)o[d]=lastOf(C.doors[d],t).state;return o;},roomStates:(P,times,t)=>{const C=compile(P,times),o={};for(const r of Object.keys(SC.rooms))o[r]=roomState(C,r,t);return o;},screenModeAt:(P,times,t,id)=>screenAt(compile(P,times),id,t).m,objCount:(P,times,id)=>compile(P,times).obj[id]||0,force:v=>{FORCE=v;},exterior:v=>{EXTF=v;},light:v=>{LIT=!!v;},lowres:v=>{LOWRES=!!v;},palette:v=>{PALON=!!v;},PALETTE,IR,hasExterior:()=>!!LX,actorAt:(P,times,t,a)=>actorAt(compile(P,times),a||'deadscout',t),command,play:PLAY,mmss,secs,
+window.CUT={toy:o=>{Object.assign(TOY,o||{});return TOY;},_sky:()=>skyMask(),_hash:(a,b)=>hash(a,b),tight:v=>{TIGHT=!!v;},focus:f=>{FOCUS=f||null;},frame:()=>LOWRES&&ic?ic:null,_loc:{mkRun,evalRun,xyOf:p=>xyOf(p)},setTape:n=>{TAPE=n;},drift:v=>{DRIFTL=v;},roomOf,gait:(P,times,t,a)=>{const C=compile(P,times),st=actorAt(C,a||'deadscout',t);if(!st.walk||st.dist==null)return null;const S=A.sheets[SHEET[a]||a];if(!S||!S.animations.walk)return null;const an=S.animations.walk,tot=an.reduce((p,f)=>p+f[1],0),stride=Math.max(1,vWalk(a,st.sneak,false)*tot);let u=((st.dist/stride)%1+1)%1*tot,i=0;for(const [f,d] of an){if(u<d)break;u-=d;i++;}return {i:Math.min(i,an.length-1),n:an.length,fast:st.fast,v:st.v};},render,compile,parse,format,formatBeat,eventAt,report,view,pick,neighbor,wakeAt,hereRef,farTarget,roomAt,nearby,snapshot,travelTime,MAP:SC,SS,uses:(P,times)=>compile(P,times).uses,doorStates:(P,times,t)=>{const C=compile(P,times),o={};for(const d of DOORS)o[d]=lastOf(C.doors[d],t).state;return o;},roomStates:(P,times,t)=>{const C=compile(P,times),o={};for(const r of Object.keys(SC.rooms))o[r]=roomState(C,r,t);return o;},screenModeAt:(P,times,t,id)=>screenAt(compile(P,times),id,t).m,objCount:(P,times,id)=>compile(P,times).obj[id]||0,force:v=>{FORCE=v;},exterior:v=>{EXTF=v;},light:v=>{LIT=!!v;},lowres:v=>{LOWRES=!!v;},palette:v=>{PALON=!!v;},PALETTE,IR,hasExterior:()=>!!LX,actorAt:(P,times,t,a)=>actorAt(compile(P,times),a||'deadscout',t),command,play:PLAY,mmss,secs,
   ROOMS:Object.fromEntries(Object.keys(SPOTS).map(r=>[r,{name:ROOM_NAMES[r]||r.toUpperCase(),spots:SPOTS[r]}])),ACTORS,NAMES,STORY_MODES,MODE_OF,STATES,WORLD,SCREEN_MODES,EVENTS,DOORS,ANOM,MYSTERIES:MYST,OBJECTS:OBJ,ECHO_PRESETS,ACTIONS,
   SCREENS:Object.keys(SC.screens),place,poses:AN,W,H};
 })();

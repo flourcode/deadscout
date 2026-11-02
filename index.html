@@ -21,7 +21,7 @@
 <div class="g" id="g">
  <div class="unit" id="unit">
   <header class="u-top">
-    <span class="u-id"><i class="bolt"></i>DSV-2291<em>·</em>RECOVERED FEED</span>
+    <span class="u-id"><i class="bolt"></i>DSV-0417<em>·</em>RECOVERED FEED</span>
     <span class="hud-hint" id="hHint" hidden></span>
     <span class="u-link"><i class="led" id="ledLink"></i>HALCYON LINK<i class="bolt"></i></span>
   </header>
@@ -107,7 +107,7 @@
     <p class="t-kicker">HALCYON // AUDIO DECK</p>
     <p class="r-note">CREW TAPES · SIX · ↑ ↓ CHOOSE · E PLAY · ESC CLOSE</p>
     <nav class="menu" id="kMenu"></nav>
-    <p class="t-foot">PROPERTY OF DSV-2291 · DO NOT REMOVE FROM QUARTERS</p>
+    <p class="t-foot">PROPERTY OF DSV-0417 · DO NOT REMOVE FROM QUARTERS</p>
   </section>
   <section class="controls route" id="chart" hidden>
     <p class="t-kicker">HALCYON // NAV CHART</p>
@@ -118,7 +118,7 @@
     <p class="t-kicker">SHIP REGISTRY</p>
     <h2 class="r-name">DSV HALCYON</h2>
     <dl class="keys reg">
-      <dt>REGISTRY</dt><dd>DSV-2291</dd>
+      <dt>REGISTRY</dt><dd>DSV-0417</dd>
       <dt>CLASS</dt><dd>Deep Survey Vessel</dd>
       <dt>MISSION</dt><dd>Long-range survey · signal reconnaissance</dd>
       <dt>AUTHORITY</dt><dd>Outer Systems Research Directorate</dd>
@@ -146,7 +146,9 @@
       <dt>🎮</dt><dd>a controller works: stick/d-pad move · A interact · B scanner · X flashlight · Y camera · START pause</dd>
       <dt>TAB</dt><dd>the whole ship (the default: HALCYON as an ant farm) / follow her up close</dd>
       <dt>SHIFT</dt><dd>move carefully</dd>
-      <dt>M</dt><dd>sound</dd>
+      <dt>M</dt><dd>music on / off</dd>
+      <dt>N</dt><dd>next tape</dd>
+      <dt>K</dt><dd>on-screen keys on / off</dd>
       <dt>C</dt><dd>in Night Watch: take or release control of the commander</dd>
     </dl>
     <p class="t-foot">W A S D work too · ESC or ENTER to go back</p>
@@ -168,12 +170,12 @@
 <script src="space.js?v=5"></script>
 <script src="music.js?v=10"></script>
 <script src="deep.js?v=4"></script>
-<script src="assets-core.js?v=19"></script>
+<script src="assets-core.js?v=23"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=36"></script>
+<script src="cut.js?v=43"></script>
 <script src="episode.js?v=3"></script>
-<script src="story/halcyon.js?v=10"></script>
-<script src="watch.js?v=6"></script>
+<script src="story/halcyon.js?v=11"></script>
+<script src="watch.js?v=7"></script>
 <script src="amb.js?v=1"></script>
 <script src="audio/sfx.js?v=4"></script>
 <script src="lc.js?v=11"></script>
@@ -183,11 +185,12 @@
 <script src="game/drift.js?v=2"></script>
 <script src="game/k9.js?v=3"></script>
 <script src="game/events.js?v=2"></script>
-<script src="game/story.js?v=12"></script>
-<script src="game/console.js?v=1"></script>
-<script src="game.js?v=31"></script>
-<script src="game/pad.js?v=9"></script>
+<script src="game/story.js?v=13"></script>
+<script src="game/console.js?v=2"></script>
+<script src="game.js?v=33"></script>
+<script src="game/pad.js?v=11"></script>
+<script src="game/toys.js?v=3"></script>
 <script>/* the rest of the ship arrives while the title is up (§50): the cutaway master and its overlays, then the crew */
-(function(){let n=0;for(const f of ['assets-world.js?v=6','assets-cast.js?v=7']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
+(function(){let n=0;for(const f of ['assets-world.js?v=10','assets-cast.js?v=7']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
 </body>
 </html>

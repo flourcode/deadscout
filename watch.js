@@ -98,7 +98,7 @@ function manifest(cfg){cfg=Object.assign({},DEFAULTS,cfg||{});if(cfg.seed==null)
     cutaway:{ship:'deadscout-2',v3:true,era:'past',start:Object.assign({},HOME)},
     music:{mode:'generated',style:mu.style,tape:mu.tape,vibe:mu.vibe,drums:mu.drums,synth:mu.synth,ambience:mu.ambience},
     chapters:Array.from({length:n},(_,k)=>({title:'WATCH '+(k+1),role:'ROUTINE',energy:cfg.activity==='quiet'?.22:cfg.activity==='strange'?.4:.32,beat:'The ship on its night watch.',story_mode:'EXPLORE',traffic:'off',nominal_minutes:per,beats:[]})),
-    events:schedule(cfg),ending:{type:'resolved',outro:'fade'},publish:{title:title(cfg),subtitle:'DSV HALCYON • '+mu.name+' • Living Spaceship • Ambient',series:'DeadScout Night Watch',ship:'DSV HALCYON',registry:'DSV-2291'}};}
+    events:schedule(cfg),ending:{type:'resolved',outro:'fade'},publish:{title:title(cfg),subtitle:'DSV HALCYON • '+mu.name+' • Living Spaceship • Ambient',series:'DeadScout Night Watch',ship:'DSV HALCYON',registry:'DSV-0417'}};}
 function title(cfg){cfg=Object.assign({},DEFAULTS,cfg||{});const A=ACTIVITY[cfg.activity]||ACTIVITY.routine,mu=MUSIC[cfg.music||A.music]||MUSIC.spacewave,V=VIEWS[cfg.view]||VIEWS['full-ship'],mins=+cfg.duration_minutes||30;
   const dur=mins>=300?'ENDLESS':mins>=120?Math.round(mins/60)+' HOURS':mins>=60?'1 HOUR':mins+' MINUTES';
   const where=cfg.view==='full-ship'||cfg.view==='auto'?'DEADSCOUT NIGHT WATCH':V.name+' WATCH';

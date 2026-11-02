@@ -62,6 +62,15 @@ const css=document.createElement('style');css.textContent=`
 .deckkeys button{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
 .deckkeys img{width:30px;height:26px;image-rendering:pixelated;display:block}
 .deckkeys button:focus-visible,.pad button:focus-visible,.softkey:focus-visible{outline:2px solid #1fb4ce;outline-offset:2px}
+.qbar{position:absolute;right:2%;top:3%;z-index:4;display:flex;align-items:flex-start;gap:6px;opacity:.38;transition:opacity .3s steps(3)}
+.qbar:hover,.qbar.show,.qbar:focus-within{opacity:1}
+.qbar[hidden]{display:none}
+.qbar button{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
+.qbar img{width:calc(30px*var(--tz,1));height:calc(26px*var(--tz,1));image-rendering:pixelated;display:block}
+.qbar button span{font-family:Silk,monospace;font-size:clamp(6px,.5vw,8px);letter-spacing:2px;color:#c6ab92;text-shadow:0 1px 0 #0b0e11;margin-top:2px}
+.qbar .qlab{position:absolute;right:0;top:calc(100% + 18px);font-family:Silk,monospace;font-size:clamp(8px,.7vw,10px);letter-spacing:3px;color:#7ee3e5;text-shadow:0 1px 0 #0b0e11;white-space:nowrap;opacity:0;transition:opacity .3s steps(3);margin-right:6px}
+.qbar.show .qlab{opacity:1}
+body.photo .qbar,body.bc .qbar{display:none!important}
 .softkey{position:absolute;left:16px;bottom:-1px;transform:translateY(100%);margin-top:3px;font-family:Silk,monospace;font-size:8px;letter-spacing:3px;color:#c6ab92;background:#2e3134;border:0;box-shadow:0 0 0 2px #0b0e11,inset 0 -2px 0 #14181c,inset 0 1px 0 #4e423c;padding:4px 10px 6px;cursor:pointer}
 .softkey:active{box-shadow:0 0 0 2px #0b0e11,inset 0 1px 0 #14181c;padding:5px 10px 5px}
 .softkey[hidden]{display:none}
@@ -85,17 +94,20 @@ function act(cls,legend,code,label,w,h,seed){const b=document.createElement('but
   bindHold(b,()=>{K.down=true;paint();ac.classList.add('act');send('keydown',code);},()=>{K.down=false;paint();ac.classList.remove('act');send('keyup',code);});KEYS.push(K);return K;}
 act('tune','Q','KeyQ','TUNE',15,15,53);act('light','F','KeyF','LIGHT',15,15,31);act('mk','menu','Escape','MENU',15,15,71);
 /* ---------- the deck keys (always, on the hardware) ---------- */
-const deck=document.getElementById('deckKeys'),hTrack=document.getElementById('hTrack');
+/* the quick bar (Nov 2026): next tape, music on/off, on-screen keys on/off. Top right of the picture, dim until you reach
+   for it; N, M and K do the same from the keyboard. A short break shouldn't need a menu. */
+const deck=document.createElement('div');deck.className='qbar';deck.setAttribute('aria-label','Quick controls');deck.innerHTML='<span class="qlab" id="qLab"></span>';scr.appendChild(deck);
+const hTrack=deck.querySelector('.qlab');
 function dkey(id,legend,label,tap){const b=document.createElement('button');b.type='button';b.dataset.id=id;b.setAttribute('aria-label',label);b.innerHTML='<img alt=""><span>'+label+'</span>';deck.appendChild(b);
   const K={b,img:b.querySelector('img'),legend,down:false,mark:null,seed:id.length*977};K.paint=()=>{K.img.src=cap(15,13,K.legend,K.down,K.seed,K.mark);};K.paint();
   b.addEventListener('pointerdown',e=>{e.preventDefault();K.down=true;K.paint();});const rel=()=>{if(K.down){K.down=false;K.paint();}};b.addEventListener('pointerup',rel);b.addEventListener('pointerleave',rel);
   b.addEventListener('click',()=>tap(K));return K;}
-let trackT=null;const flash=t=>{if(!hTrack)return;hTrack.textContent=t;hTrack.classList.add('on');clearTimeout(trackT);trackT=setTimeout(()=>hTrack.classList.remove('on'),5000);};
+let trackT=null;const flash=t=>{if(!hTrack)return;hTrack.textContent=t;deck.classList.add('show');clearTimeout(trackT);trackT=setTimeout(()=>deck.classList.remove('show'),3500);};window.__padFlash=flash;
 const tapeLine=r=>'▶ TAPE '+String(r.n).padStart(2,'0')+' · '+r.name;
-let mus=null;
-if(deck){dkey('prev','prev','PREV',()=>{const r=G.music.prev();if(r){if(!G.music.on()){G.music.set(true);paintMus();}flash(tapeLine(r));}});
-  dkey('next','next','NEXT',()=>{const r=G.music.next();if(r){if(!G.music.on()){G.music.set(true);paintMus();}flash(tapeLine(r));}});
-  mus=dkey('music','note','MUSIC',()=>{const on=!G.music.on();G.music.set(on);paintMus();flash(on?'♪ MUSIC ON':'♪ MUSIC OFF');});}
+let mus=null,keysK=null;
+if(deck){  dkey('next','next','NEXT',()=>{const r=G.music.next();if(r){if(!G.music.on()){G.music.set(true);paintMus();}flash(tapeLine(r));}});
+  mus=dkey('music','note','MUSIC',()=>{const on=!G.music.on();G.music.set(on);paintMus();flash(on?'♪ MUSIC ON':'♪ MUSIC OFF');});
+  keysK=dkey('keys','up','KEYS',()=>{const on=!pad.hidden;G.padSet(on?'off':'on');flash(on?'ON-SCREEN KEYS · OFF':'ON-SCREEN KEYS · ON');});}
 function paintMus(){if(!mus)return;const on=G.music.on();mus.mark=on?'on':'off';mus.paint();mus.b.querySelector('span').textContent=on?'MUSIC':'OFF';mus.b.setAttribute('aria-pressed',String(on));}
 paintMus();
 /* ---------- the MENU soft key on the bezel ---------- */
@@ -119,6 +131,7 @@ setInterval(()=>{const st=G.state,m=mode(),want=m==='on'||(m==='auto'&&touchSeen
       if(ex1>cx0&&ex0<cx1&&ey1>cy0&&ey0<cy1)lift=Math.max(0,cy1-ey0+10);}
     pad.style.setProperty('--lift',Math.round(lift)+'px');}catch(e){}}scr.classList.toggle('touchpad',on);
   if(sk)sk.hidden=!(st==='play');
-  if(deck){const t=G.music.tape();for(const b of deck.querySelectorAll('[data-id=prev],[data-id=next]'))b.hidden=t.watch;}
+  deck.hidden=!((st==='play'||st==='watch')&&!document.body.classList.contains('photo'));if(keysK){keysK.b.hidden=st!=='play';if(keysK.mark!==(on?'on':'off')){keysK.mark=on?'on':'off';keysK.paint();}}
+  {const t=G.music.tape();for(const b of deck.querySelectorAll('[data-id=next]'))b.hidden=t.watch;}
   if(mus&&mus.mark!==(G.music.on()?'on':'off'))paintMus();},250);
 })();
