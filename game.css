@@ -197,7 +197,7 @@ body.ui #wTag2{opacity:0}
 .pnote{margin:0 0 8px;font-family:Silk;font-size:9px;letter-spacing:3px;color:#7ee3e5;max-width:min(520px,84vw);text-align:center;line-height:1.6}
 .pnote[hidden]{display:none}
 .touchpad .tpanel{width:min(720px,62%)}
-.touchpad .tbot{left:calc(3% + clamp(44px,5.4vw,66px)*3.5 + 20px)}
+.touchpad .tbot{right:calc(3% + clamp(44px,5.4vw,66px)*3.5 + 20px);left:0}
 
 /* title (Nov 2026): a light veil so the ship reads; the wordmark carries its own contrast with a hard pixel outline and drop,
    and the menu sits on its own dark panel. A text-local treatment beats darkening the whole picture. */

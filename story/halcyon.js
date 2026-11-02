@@ -16,7 +16,7 @@ window.DS_GAME={
   '00:00 door quarters-door open','00:00 door bridge-hatch open','00:00 door engineering-door open',
   '00:00 screen bridge.left text-terminal for 7s','00:00 screen bridge.left2 signal-bars for 7s','00:00 screen bridge.nav idle-grid for 7s','00:00 screen bridge.side waveform for 7s','00:00 screen sensor.main waveform for 7s','00:00 screen bridge.security idle-grid for 7s',
   '00:00.8 camera cutaway scan',
-  '00:01.7 camera room bridge quick',
+  '00:02.2 camera room bridge quick',
   '00:00 pilot typing for 7s','00:00 systems typing for 7s','00:00 commander sit for 7s',
   '00:02.8 set signal_strength 0.8 over 1.4s','00:02.8 screen bridge.nav signal for 3s','00:02.8 screen sensor.main signal for 3s','00:03 screen bridge.left noise for 2s',
   '00:03.6 pilot alarm for 1.6s','00:03.6 systems alarm for 1.6s','00:03.8 commander recoil for 1.4s',

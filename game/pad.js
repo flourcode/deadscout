@@ -49,11 +49,11 @@ const css=document.createElement('style');css.textContent=`
 .pad[hidden],.pad [hidden]{display:none!important}
 .pad .grp{position:absolute;opacity:.72}
 .pad .grp.act{opacity:1}
-.pad .dp{left:3%;bottom:6%;width:calc(var(--k)*2.5);height:calc(var(--k)*2.5)}
+.pad .dp{right:3%;bottom:calc(6% + var(--lift,0px));transition:bottom .3s steps(4);width:calc(var(--k)*2.5);height:calc(var(--k)*2.5)}
 .pad .dp img{width:100%;height:100%;image-rendering:pixelated;display:block;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .pad .dp button{position:absolute;width:33.3%;height:33.3%;pointer-events:auto;background:none;border:0;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
 .pad .dp .hub{left:33.3%;top:33.3%}.pad .dp .up{left:33.3%;top:0}.pad .dp .down{left:33.3%;top:66.6%}.pad .dp .left{left:0;top:33.3%}.pad .dp .right{left:66.6%;top:33.3%}
-.pad .ac{left:calc(3% + var(--k)*2.5 + 12px);bottom:6%;display:flex;flex-direction:column;gap:calc(var(--k)*.12);width:calc(var(--k)*.82)}
+.pad .ac{right:calc(3% + var(--k)*2.5 + 12px);bottom:calc(6% + var(--lift,0px));transition:bottom .3s steps(4);display:flex;flex-direction:column;gap:calc(var(--k)*.12);width:calc(var(--k)*.82)}
 .pad .k{position:relative;width:100%;pointer-events:auto;background:none;border:0;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center}
 .pad .k img{width:100%;height:auto;image-rendering:pixelated;display:block;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .pad .k span{font-family:Silk,monospace;letter-spacing:2px;color:#c6ab92;text-shadow:0 1px 0 #0b0e11,1px 0 0 #0b0e11;margin-top:2px;white-space:nowrap}
@@ -109,7 +109,15 @@ const mode=()=>{try{const p=JSON.parse(localStorage.getItem('deadScoutGamePrefs'
 let wasOn=false;
 setInterval(()=>{const st=G.state,m=mode(),want=m==='on'||(m==='auto'&&touchSeen&&!gamepad());const on=want&&st==='play'&&!document.body.classList.contains('photo');
   if(wasOn&&!on){if(dPressed){dPressed=null;paintCross();}for(const K of KEYS)if(K.down){K.down=false;K.img.src=cap(K.w,K.h,K.legend,false,K.seed);send('keyup',K.code);}}
-  pad.hidden=!on;wasOn=on;scr.classList.toggle('touchpad',on);
+  pad.hidden=!on;wasOn=on;
+  /* the rear deck stays visible: if the EVA platform is on screen under the keys, the keys step up above it */
+  if(on){try{const ev=CUT.MAP.rooms.eva,V=G.view(),r=scr.getBoundingClientRect();let lift=0;
+    if(ev&&V){const xs=ev.poly.map(q=>q[0]),ys=ev.poly.map(q=>q[1]),sx=v=>(v-V[0])/V[2]*r.width,sy=v=>(v-V[1])/V[3]*r.height;
+      const ex0=sx(Math.min(...xs)),ex1=sx(Math.max(...xs)),ey0=sy(Math.min(...ys)-40),ey1=sy(Math.max(...ys)+30); /* the antenna above, the rail and tether below */
+      const prev=pad.style.getPropertyValue('--lift');pad.style.setProperty('--lift','0px');const a=dp.getBoundingClientRect(),b=ac.getBoundingClientRect();pad.style.setProperty('--lift',prev);
+      const cx0=Math.min(a.left,b.left)-r.left,cx1=Math.max(a.right,b.right)-r.left,cy0=Math.min(a.top,b.top)-r.top,cy1=Math.max(a.bottom,b.bottom)-r.top;
+      if(ex1>cx0&&ex0<cx1&&ey1>cy0&&ey0<cy1)lift=Math.max(0,cy1-ey0+10);}
+    pad.style.setProperty('--lift',Math.round(lift)+'px');}catch(e){}}scr.classList.toggle('touchpad',on);
   if(sk)sk.hidden=!(st==='play');
   if(deck){const t=G.music.tape();for(const b of deck.querySelectorAll('[data-id=prev],[data-id=next]'))b.hidden=t.watch;}
   if(mus&&mus.mark!==(G.music.on()?'on':'off'))paintMus();},250);
