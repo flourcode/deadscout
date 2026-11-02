@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeadScout Director</title>
+<meta name="description" content="The authoring desk behind DeadScout: script the ship in Director JSON, watch it play on the HALCYON cutaway, generate a Night Watch, record a transmission.">
+<meta name="theme-color" content="#06060a">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="director.css?v=3">
+</head>
+<body>
+<header class="top">
+  <h1>DEAD<span>SCOUT</span> <small>DIRECTOR</small></h1>
+  <nav><a href="index.html">PLAY THE GAME ↗</a><a href="privacy.html">PRIVACY</a></nav>
+</header>
+<main class="desk">
+  <section class="screen">
+    <div class="vscreen" id="vscreen"><canvas id="stage" width="960" height="540"></canvas><div class="vfd" id="vfd"><span id="vfdName">DEADSCOUT</span><span id="vfdLoud"></span><span id="vfdTime">0:00 / 0:00</span></div></div>
+    <div class="transport">
+      <button type="button" id="tPlay">▶ PLAY</button><button type="button" id="tStop">■ STOP</button>
+      <span class="chapters" id="tChapters"></span>
+      <button type="button" id="tMake" class="rec" hidden>● MAKE VIDEO</button>
+      <select id="tPreset" hidden><option value="master">YOUTUBE MASTER · 1920×1080</option><option value="quick">QUICK TEST · 1280×720 · 1 MIN</option></select>
+      <a id="takeLink" class="take" hidden></a><span class="parts" id="parts"></span>
+    </div>
+    <p class="live" id="live"></p>
+  </section>
+  <section class="panes">
+    <div class="pane bcast">
+      <h2>BROADCAST LINK <small class="sub">the live game in a clean window, for OBS</small></h2>
+      <div class="row"><label>MODE<select id="lMode"><option value="watch">NIGHT WATCH · AMBIENT</option><option value="play">GAMEPLAY</option></select></label></div>
+      <div class="row lw"><label>VIEW<select id="lView"><option value="full-ship">FULL SHIP</option><option value="bridge">BRIDGE</option><option value="engineering">ENGINEERING</option><option value="outer-hull">OUTER HULL</option><option value="auto">AUTO</option></select></label><label>MOOD<select id="lMood"><option value="quiet">QUIET</option><option value="routine">ROUTINE</option><option value="strange">STRANGE</option></select></label><label>MUSIC<select id="lMusic"></select></label></div>
+      <div class="row lw"><label>LENGTH<select id="lMins"><option>30</option><option selected>60</option><option>120</option><option>180</option><option>240</option><option>480</option><option value="600">ENDLESS</option></select> MIN</label><label>SEED<input id="lSeed" size="9" placeholder="random"></label><label><input type="checkbox" id="lSleep"> SLEEP FADE</label><label><input type="checkbox" id="lLabel"> LABEL</label></div>
+      <div class="row lp" hidden><label>CAMERA<select id="lCam"><option value="follow">FOLLOW HER · 9:16 SAFE</option><option value="ship">WHOLE SHIP</option></select></label></div>
+      <input id="lUrl" readonly class="lurl">
+      <div class="row btns"><button type="button" id="lOpen">OPEN IN A NEW WINDOW</button><button type="button" id="lCopy">COPY LINK</button></div>
+      <p class="hint" id="lHint"></p>
+    </div>
+    <div class="pane">
+      <h2>PROJECT</h2>
+      <div class="row"><label>TITLE<input id="pName" maxlength="60"></label><label>YEAR<input id="pYear" maxlength="6" size="6"></label><label>LENGTH<select id="pLen"><option>30</option><option>45</option><option>60</option><option>75</option><option>90</option><option>120</option><option>180</option><option>240</option></select> MIN</label><label>SEED<input id="pSeed" size="8"><button type="button" id="pReseed">↻</button></label></div>
+      <div class="row"><label>STYLE<select id="pStyle"></select></label><label>TAPE<select id="pTape"></select></label><label>VIBE<select id="pVibe"><option value="calm">CALM</option><option value="cruising">CRUISING</option><option value="driving">DRIVING</option><option value="dark">DARK</option></select></label><label>DRUMS<select id="pDrums"><option>low</option><option>mid</option><option>high</option></select></label><label>SYNTH<select id="pSynth"><option>low</option><option>mid</option><option>high</option></select></label><label>AMBIENCE<select id="pAmb"><option>low</option><option>mid</option><option>high</option></select></label></div>
+      <div class="row"><label>INTRO<select id="pIntro"><option value="halcyon">HALCYON OPEN · 13 S</option><option value="1">CARD · 2.6 S</option><option value="0">OFF</option></select></label><label>OUTRO<select id="pOutro"><option value="card">END CARD</option><option value="fade">FADE TO BLACK</option><option value="0">HARD CUT</option></select></label></div>
+      <div class="row btns"><button type="button" id="bGame">LOAD THE GAME'S OPENING</button><button type="button" id="bEpisode">LOAD THE SIGNAL (60 MIN)</button><label class="file">OPEN MANIFEST<input type="file" id="bOpen" accept=".json,application/json" hidden></label><button type="button" id="bExport">EXPORT MANIFEST</button></div>
+      <div class="row"><span class="l">NIGHT WATCH</span><select id="nwView"><option value="full-ship">FULL SHIP</option><option value="bridge">BRIDGE</option><option value="engineering">ENGINEERING</option><option value="outer-hull">OUTER HULL</option><option value="auto">AUTO WATCH</option></select><select id="nwAct"><option value="quiet">QUIET</option><option value="routine" selected>ROUTINE</option><option value="strange">STRANGE</option></select><select id="nwLen"><option>30</option><option>60</option><option>120</option><option>180</option><option>240</option></select><button type="button" id="nwMake">GENERATE</button></div>
+      <div class="row" hidden><span class="l">BROADCAST</span><label>PROFILE<select id="bProfile"><option value="focus">FOCUS</option><option value="sleep">SLEEP · CALM</option></select></label><label>LOUDNESS<select id="bLoud"><option value="-14">−14 LUFS · YOUTUBE</option><option value="-16">−16 LUFS</option><option value="-18">−18 LUFS</option><option value="off">AS MIXED</option></select></label><label>FILES<select id="bParts"><option value="0">ONE FILE</option><option value="60">1-HOUR PARTS</option><option value="120">2-HOUR PARTS</option></select></label><label>CARDS<select id="bCards"><option value="all">TITLE + CHAPTERS</option><option value="title">TITLE</option><option value="none">NONE</option></select></label></div>
+      <p class="hint" id="bHint" hidden></p>
+      <div class="row btns"><span class="l">SAVED</span><select id="pSaved"></select><button type="button" id="pSave">SAVE</button><button type="button" id="pLoad">OPEN</button><button type="button" id="pDel">DELETE</button></div>
+    </div>
+    <div class="pane">
+      <h2>STORY <small id="sErr"></small></h2>
+      <div class="chlist" id="chList"></div>
+      <div class="row"><label>TITLE<input id="cTitle" maxlength="40"></label><label>ROLE<select id="cRole"></select></label><label>ENERGY<input id="cEnergy" type="range" min="0" max="1" step=".05"></label><label>MINUTES<input id="cMin" size="5"></label><button type="button" id="cAdd">+ CHAPTER</button><button type="button" id="cDel">− CHAPTER</button></div>
+      <textarea id="cBeats" spellcheck="false" placeholder="00:00 camera room bridge&#10;00:30 move commander to bridge.nav"></textarea>
+      <h3>SCRIPT <small>absolute times, from the start of the transmission</small></h3>
+      <textarea id="sScript" spellcheck="false" placeholder="00:00 camera exterior"></textarea>
+      <details class="help"><summary>THE BEAT LANGUAGE</summary><div id="help"></div></details>
+    </div>
+    <div class="pane">
+      <h2>PUBLISH</h2>
+      <label>TITLE<input id="yTitle" readonly></label>
+      <textarea id="yDesc" readonly></textarea>
+      <div class="row btns"><button type="button" id="cTitleBtn">COPY TITLE</button><button type="button" id="cDescBtn">COPY DESCRIPTION</button></div>
+      <p class="hint">Royalty-free, no Content ID: every track is synthesized live from the seed. Nothing leaves this browser.</p>
+    </div>
+  </section>
+</main>
+<script src="mix.js?v=16"></script>
+<script src="space.js?v=5"></script>
+<script src="music.js?v=10"></script>
+<script src="deep.js?v=4"></script>
+<script src="assets-core.js?v=19"></script>
+<script src="assets-world.js?v=6"></script>
+<script src="assets-cast.js?v=7"></script>
+<script src="pix.js?v=11"></script>
+<script src="cut.js?v=35"></script>
+<script src="episode.js?v=3"></script>
+<script src="episodes/default.js?v=6"></script>
+<script src="story/halcyon.js?v=9"></script>
+<script src="watch.js?v=6"></script>
+<script src="lc.js?v=11"></script>
+<script src="loud.js?v=1"></script>
+<script src="rec.js?v=8"></script>
+<script src="director.js?v=4"></script>
+</body>
+</html>

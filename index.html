@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DeadScout</title>
+<meta name="description" content="A living retro-industrial spaceship to wander. Explore the abandoned deep survey vessel HALCYON with a service robot at your heel, listen to her, play the crew's tapes, tune a handheld scanner into what she remembers, and notice what the cameras don't.">
+<meta name="theme-color" content="#06060a">
+<meta property="og:title" content="DeadScout">
+<meta property="og:description" content="DSV HALCYON · 2291 · presumed lost with all hands. Walk the ship. Read the terminals. Notice what the cameras don't.">
+<meta property="og:image" content="og.png">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="game.css?v=20">
+</head>
+<body>
+<div class="g" id="g">
+ <div class="unit" id="unit">
+  <header class="u-top">
+    <span class="u-id"><i class="bolt"></i>DSV-2291<em>·</em>RECOVERED FEED</span>
+    <span class="hud-hint" id="hHint" hidden></span>
+    <span class="u-link"><i class="led" id="ledLink"></i>HALCYON LINK<i class="bolt"></i></span>
+  </header>
+  <div class="screen" id="screen">
+  <canvas id="stage" width="1920" height="1080" aria-label="The ship"></canvas>
+  <div class="glass" aria-hidden="true"></div>
+  <div class="talk" id="talk" aria-live="polite"><span class="trec" id="tRec" hidden>● REC</span><div class="strip" id="tStrip" hidden></div><div class="bub" id="tBub" hidden><b></b><span></span></div><div class="tbot"><div class="iprompt" id="hPrompt" hidden></div><div class="tpanel" id="tPanel" hidden><b></b><span></span></div></div></div>
+  <div class="veil" id="veil"></div>
+  <button type="button" class="bcgo" id="bcGo" hidden>CLICK TO BEGIN THE BROADCAST</button>
+  <div class="cards" id="cards" hidden></div>
+  <section class="title" id="title">
+    <h1 class="t-name">DEAD<span>SCOUT</span></h1>
+    <nav class="menu" id="tMenu" aria-label="Main menu">
+      <button type="button" data-m="new">ENTER HALCYON</button>
+      <button type="button" data-m="continue" id="mContinue" hidden>CONTINUE</button>
+      <button type="button" data-m="second" id="mSecond" hidden>SECOND TRANSMISSION</button>
+      <button type="button" data-m="watch">NIGHT WATCH</button>
+      <div class="util"><button type="button" data-m="registry">REGISTRY</button><button type="button" data-m="controls">CONTROLS</button><button type="button" data-m="options">OPTIONS</button></div>
+    </nav>
+    <p class="t-foot">↑ ↓ CHOOSE · ENTER SELECT</p>
+  </section>
+  <section class="pause" id="pause" hidden>
+    <p class="t-kicker">TRANSMISSION HELD</p>
+    <p class="pnote" id="pNote" hidden></p>
+    <canvas class="schem" id="schem" width="480" height="200" aria-label="Ship schematic"></canvas>
+    <nav class="menu" id="pMenu" aria-label="Pause menu">
+      <button type="button" data-m="resume">RESUME</button>
+      <button type="button" data-m="tape" id="mTape">TAPE · ORBITAL CRUISE</button>
+      <button type="button" data-m="camera" id="mCamera">CAMERA · FOLLOW</button>
+      <button type="button" data-m="controls">CONTROLS</button>
+      <button type="button" data-m="options">OPTIONS</button>
+      <button type="button" data-m="quit">QUIT TO TITLE</button>
+    </nav>
+    <a class="take" id="takeLink" hidden></a>
+  </section>
+  <section class="pause opts" id="opts" hidden>
+    <p class="t-kicker">OPTIONS</p>
+    <nav class="menu" id="oMenu" aria-label="Options">
+      <button type="button" data-o="sound" id="mSound">SOUND · ON</button>
+      <button type="button" data-o="music" id="mMusic">MUSIC · ON</button>
+      <button type="button" data-o="text" id="mText">TEXT SIZE · NORMAL</button>
+      <button type="button" data-o="pad" id="mPad">ON-SCREEN KEYS · AUTO</button>
+      <button type="button" data-o="full">FULLSCREEN</button>
+      <button type="button" data-o="photo" id="mPhoto">PHOTO MODE</button>
+      <button type="button" data-o="record" id="mRecord">RECORD A TAKE</button>
+      <button type="button" data-o="back">BACK</button>
+    </nav>
+  </section>
+  <section class="setup" id="setup" hidden>
+    <p class="t-kicker">NIGHT WATCH</p>
+    <div class="rows" id="nwRows">
+      <div class="row" data-k="view"><span>VIEW</span><b></b></div>
+      <div class="row" data-k="activity"><span>MOOD</span><b></b></div>
+      <div class="row" data-k="music"><span>MUSIC</span><b></b></div>
+      <div class="row" data-k="duration"><span>TIME</span><b></b></div>
+      <div class="row" data-k="focus"><span>FOCUS</span><b></b></div>
+      <div class="row" data-k="objective"><span>OBJECTIVE</span><input type="text" id="nwObj" maxlength="40" placeholder="optional · one line" autocomplete="off" spellcheck="false" aria-label="Objective"></div>
+    </div>
+    <nav class="menu" id="nwMenu"><button type="button" data-m="begin">BEGIN</button><button type="button" data-m="back">BACK</button></nav>
+    <p class="t-foot hours" id="nwHours"></p>
+    <p class="t-foot">↑ ↓ ROW · ← → CHANGE · ENTER BEGIN</p>
+  </section>
+  <section class="wui" id="wui" hidden>
+    <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time" id="wTime"></span></div>
+    <div class="wui-bar">
+      <div class="mixer" id="mixer"></div>
+      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="dim" id="wDim">SLEEP DIM · OFF</button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="photo">PHOTO</button><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float">FLOAT</button><button type="button" data-w="full">FULLSCREEN</button><button type="button" data-w="tag" id="wTag">LABEL · ON</button><button type="button" data-w="end">END WATCH</button></div>
+    </div>
+  </section>
+  <div class="dim" id="dim" hidden></div>
+  <span class="tag" id="wTag2" hidden>NIGHT WATCH // DSV HALCYON</span>
+  <span class="focusline" id="wFocus" hidden></span>
+  <section class="photo" id="photo" hidden><div class="ph-flash" id="phFlash"></div>
+    <div class="ph-bar"><span class="ph-k">PHOTO</span><button type="button" data-p="less">◂</button><b id="phScale">4×</b><button type="button" data-p="more">▸</button><button type="button" data-p="save" class="ph-save">SAVE PNG</button><button type="button" data-p="back">BACK</button></div>
+    <p class="ph-foot">← → SIZE · ENTER SAVE · ESC BACK</p></section>
+  <section class="controls route" id="route" hidden>
+    <p class="t-kicker">HALCYON // POWER ROUTING</p>
+    <p class="r-note" id="routeHint">NOT ENOUGH POWER FOR EVERYTHING · ↑ ↓ CHOOSE · E SWITCH · ESC CLOSE</p>
+    <nav class="menu" id="rMenu"></nav>
+    <p class="t-foot" id="routeBudget"></p>
+  </section>
+  <section class="controls route deck" id="deck" hidden>
+    <p class="t-kicker">HALCYON // AUDIO DECK</p>
+    <p class="r-note">CREW TAPES · SIX · ↑ ↓ CHOOSE · E PLAY · ESC CLOSE</p>
+    <nav class="menu" id="kMenu"></nav>
+    <p class="t-foot">PROPERTY OF DSV-2291 · DO NOT REMOVE FROM QUARTERS</p>
+  </section>
+  <section class="controls route" id="chart" hidden>
+    <p class="t-kicker">HALCYON // NAV CHART</p>
+    <canvas id="chartC" width="768" height="432" class="chartc" aria-label="Star chart"></canvas>
+    <p class="t-foot">OUTER SYSTEMS RESEARCH DIRECTORATE · CHART 2291.04</p>
+  </section>
+  <section class="controls registry" id="registry" hidden>
+    <p class="t-kicker">SHIP REGISTRY</p>
+    <h2 class="r-name">DSV HALCYON</h2>
+    <dl class="keys reg">
+      <dt>REGISTRY</dt><dd>DSV-2291</dd>
+      <dt>CLASS</dt><dd>Deep Survey Vessel</dd>
+      <dt>MISSION</dt><dd>Long-range survey · signal reconnaissance</dd>
+      <dt>AUTHORITY</dt><dd>Outer Systems Research Directorate</dd>
+      <dt>COMMISSIONED</dt><dd>2286 · mission year 2291</dd>
+      <dt>AREA</dt><dd>Outer heliosphere, beyond the Kuiper Belt</dd>
+      <dt>LAST POSITION</dt><dd>approx. 167 AU from Sol</dd>
+      <dt>CREW</dt><dd>3</dd>
+      <dt>SYSTEMS</dt><dd>long-range sensor array · deep-space comms · autonomous maintenance · EVA survey · extended life support · independent fusion power</dd>
+      <dt>STATUS</dt><dd class="r-lost">LOST · presumed lost with all hands · last transmission 2291 · recovery: none</dd>
+    </dl>
+    <p class="r-note">Decades after loss of contact, automated listening stations detected a repeating low-power transmission near HALCYON's last recorded position. No authenticated crew identification accompanied the signal.</p>
+    <div class="logbook" id="logbook"></div>
+    <p class="t-foot">ESC or ENTER to go back</p>
+  </section>
+  <section class="con" id="con" hidden><div class="con-crt"><div class="con-out" id="conOut"></div><label class="con-in"><span>&gt;</span><input type="text" id="conIn" autocomplete="off" spellcheck="false" aria-label="Ship computer command"></label></div><p class="con-foot">TYPE HELP · ESC TO LEAVE</p></section>
+  <section class="controls" id="controls" hidden>
+    <p class="t-kicker">CONTROLS</p>
+    <dl class="keys">
+      <dt>← →</dt><dd>walk</dd>
+      <dt>↑ ↓</dt><dd>climb</dd>
+      <dt>E</dt><dd>interact · open · operate · look</dd>
+      <dt>Q</dt><dd>scanner sweep · on a strong signal, opens the dial: ← → until the trace aligns, hold, it locks</dd>
+      <dt>F</dt><dd>flashlight</dd>
+      <dt>ESC</dt><dd>ship schematic · pause · tapes (or play them at the deck in the crew quarters)</dd>
+      <dt>🎮</dt><dd>a controller works: stick/d-pad move · A interact · B scanner · X flashlight · Y camera · START pause</dd>
+      <dt>TAB</dt><dd>the whole ship (the default: HALCYON as an ant farm) / follow her up close</dd>
+      <dt>SHIFT</dt><dd>move carefully</dd>
+      <dt>M</dt><dd>sound</dd>
+      <dt>C</dt><dd>in Night Watch: take or release control of the commander</dd>
+    </dl>
+    <p class="t-foot">W A S D work too · ESC or ENTER to go back</p>
+  </section>
+  </div>
+  <footer class="u-deck">
+   <div class="hud" id="hud" hidden>
+    <div class="d-col d-left"><span class="d-lab">LOCATION</span><span class="hud-room" id="hRoom"></span><span class="hud-rec" id="hRec" hidden>● REC</span></div>
+    <div class="d-col d-mid"><span class="d-lab">COMMS · CH 01</span><div class="comms"><div class="say" id="hSay" hidden><b id="sayWho"></b><span id="sayText"></span></div><span class="c-idle">CARRIER ONLY</span></div></div>
+    <div class="d-col d-right"><span class="d-lab">AUDIO DECK</span><span class="hud-track" id="hTrack">♪ —</span><span class="deckkeys" id="deckKeys"></span><span class="hud-note" id="hNote" hidden></span></div>
+   </div>
+   <div class="u-idle"><span class="d-lab">STATUS</span><span>STANDBY · AWAITING OPERATOR</span></div>
+   <button type="button" class="softkey" id="skMenu" hidden>MENU</button>
+   <span class="u-plate">OSRD · HOS 4.1 · MONITOR UNIT MU-7</span>
+  </footer>
+ </div>
+</div>
+<script src="mix.js?v=16"></script>
+<script src="space.js?v=5"></script>
+<script src="music.js?v=10"></script>
+<script src="deep.js?v=4"></script>
+<script src="assets-core.js?v=19"></script>
+<script src="pix.js?v=11"></script>
+<script src="cut.js?v=35"></script>
+<script src="episode.js?v=3"></script>
+<script src="story/halcyon.js?v=9"></script>
+<script src="watch.js?v=6"></script>
+<script src="amb.js?v=1"></script>
+<script src="audio/sfx.js?v=4"></script>
+<script src="lc.js?v=11"></script>
+<script src="rec.js?v=8"></script>
+<script src="game/scanner.js?v=5"></script>
+<script src="game/power.js?v=4"></script>
+<script src="game/drift.js?v=2"></script>
+<script src="game/k9.js?v=3"></script>
+<script src="game/events.js?v=2"></script>
+<script src="game/story.js?v=12"></script>
+<script src="game/console.js?v=1"></script>
+<script src="game.js?v=30"></script>
+<script src="game/pad.js?v=8"></script>
+<script>/* the rest of the ship arrives while the title is up (§50): the cutaway master and its overlays, then the crew */
+(function(){let n=0;for(const f of ['assets-world.js?v=6','assets-cast.js?v=7']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
+</body>
+</html>

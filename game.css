@@ -1,0 +1,241 @@
+/* DeadScout · the game. One dark room, one picture, a few words in the margins. Nothing moves that isn't the ship. */
+@font-face{font-family:Silk;src:url(fonts/silkscreen-400.woff2) format("woff2");font-display:swap}
+@font-face{font-family:PlexMono;src:url(fonts/plexmono-400.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:PlexMono;src:url(fonts/plexmono-500.woff2) format("woff2");font-weight:500;font-display:swap}
+/* the UI lock: HALCYON hardware. Pixel font, flat instrument-panel blacks, 2 px borders (one UI pixel at 1080p), CRT green, amber, dull cyan. No gradients, no glows, no soft shadows. */
+:root{--ink:#e9d7c2;--dim:#907763;--cyan:#7ee3e5;--green:#7ee3e5;--amber:#ffb04a;--orange:#e47a1e;--red:#d0442e;--bg:#0b0e11;--panel:#14181c;--line:#3c3a40;--line2:#2895a8} /* the visual lock: reference palette */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 PlexMono,ui-monospace,monospace;overflow:hidden;-webkit-font-smoothing:antialiased}
+.g{position:fixed;inset:0;display:grid;place-items:center;background-color:#050508;background-image:linear-gradient(#0a0a10 1px,transparent 1px),linear-gradient(90deg,#0a0a10 1px,transparent 1px);background-size:24px 24px}
+/* THE UNIT (presentation pass): the game is a recovered HALCYON monitoring terminal. One housing, one display in its
+   bezel, one control deck under it. Hard pixel edges, flat tones, two accent colours, small legends. Nothing glows. */
+.unit{--cut:10px;display:grid;grid-template-rows:auto auto auto;background:#191c21;padding:0 14px 12px;box-shadow:inset 0 2px 0 #3c3a40,inset 0 -2px 0 #0b0e11,inset 2px 0 0 #2e3134,inset -2px 0 0 #0b0e11;
+  clip-path:polygon(var(--cut) 0,calc(100% - var(--cut)) 0,100% var(--cut),100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,var(--cut) 100%,0 calc(100% - var(--cut)),0 var(--cut))}
+.u-top{height:30px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:Silk;font-size:9px;letter-spacing:3px;color:#c6ab92;text-transform:uppercase;margin-bottom:8px;box-shadow:0 2px 0 #0b0e11,0 4px 0 #2e3134;white-space:nowrap}
+.u-top em{font-style:normal;color:var(--amber);margin:0 8px}
+.u-id::after{content:'';display:inline-block;width:22px;height:6px;margin-left:14px;background:repeating-linear-gradient(90deg,#e47a1e 0 4px,transparent 4px 7px);vertical-align:1px} /* the service stripe */
+.u-plate{position:absolute;right:16px;bottom:-1px;transform:translateY(100%);padding-top:3px;font-family:Silk;font-size:7px;letter-spacing:3px;color:#5c584d}
+.u-link{display:flex;align-items:center}
+.led{display:inline-block;width:6px;height:6px;background:var(--cyan);margin-right:8px;animation:blink 2.4s steps(1) infinite}
+.led.amber{background:var(--amber)}.led.red{background:var(--red)}
+.bolt{display:inline-block;width:4px;height:4px;background:#3c3a40;box-shadow:1px 1px 0 #0b0e11;margin:0 12px;vertical-align:1px}
+.screen{position:relative;border:8px solid #0b0e11;box-shadow:0 0 0 2px #3c3a40,0 0 0 4px #0b0e11,0 0 0 6px #2e3134}
+#stage{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#000}
+.glass{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(0,0,0,.85);background:repeating-linear-gradient(0deg,rgba(0,0,0,.07) 0 1px,transparent 1px 3px)}
+/* the control deck: where the HUD lives now. Location, comms, the deck. The picture stays clear */
+.u-deck{position:relative;margin-top:14px;margin-bottom:12px;min-height:78px;background:#14181c;padding:8px 4px;box-shadow:0 0 0 2px #2e3134,inset 0 0 0 2px #0b0e11;font-family:Silk;font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.hud{display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,2.3fr) minmax(170px,1.2fr);pointer-events:none}
+.hud[hidden]{display:none}
+.d-col{display:flex;flex-direction:column;gap:5px;padding:0 12px;min-width:0;box-shadow:-2px 0 0 #292a31}
+.d-left{box-shadow:none}
+.d-lab{font-size:8px;letter-spacing:3px;color:#907763}
+.hud-room{color:var(--ink)}
+.hud-track{color:var(--cyan);opacity:.55;transition:opacity 1.4s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud-track.on{opacity:1;transition:opacity .4s}
+.comms{min-height:36px;background:#0b0e11;box-shadow:inset 0 0 0 2px #224a5b;padding:5px 9px 6px}
+.c-idle{color:#446d75;font-size:9px;letter-spacing:3px}
+.comms:has(.say:not([hidden])) .c-idle{display:none}
+.hud-prompt{color:var(--ink);font-size:10px}
+.hud-prompt b{font-weight:400;color:var(--cyan);margin-right:10px}.hud-prompt i{font-style:normal;color:var(--orange)}
+.hud-prompt[hidden],.hud-hint[hidden],.hud-rec[hidden]{display:none}
+.hud-hint{color:var(--dim);letter-spacing:3px;animation:fade 1s 14s forwards}
+.hud-rec{color:var(--red);animation:blink 1.2s steps(1) infinite}
+.u-idle{display:none;flex-direction:column;gap:5px;padding:0 12px;color:#9a917e}
+.u-deck:has(#hud[hidden]) .u-idle{display:flex}
+.u-idle span:last-child{animation:blink 2.4s steps(1) infinite}
+@media (max-width:760px){.hud{grid-template-columns:1fr 1fr}.d-mid{grid-column:1/-1;order:-1;box-shadow:none;margin-bottom:6px}.d-right{box-shadow:-2px 0 0 #1f1c17}.u-top .u-id em,.u-top .bolt{display:none}.unit{padding:0 8px 8px}}
+@keyframes fade{to{opacity:0}}
+@keyframes blink{50%{opacity:.25}}
+/* the veil: black between scenes, and the title cards */
+.veil{position:absolute;inset:0;background:var(--bg);pointer-events:none;opacity:1;transition:opacity 1.6s steps(6)}
+.veil.clear{opacity:0}
+.cards{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;text-align:center;font-family:Silk;font-size:15px;letter-spacing:5px;color:var(--ink);background:var(--bg)}
+.cards[hidden]{display:none}
+.cards p{margin:0;opacity:0;animation:card 4.2s ease-in-out forwards}
+.cards p.alt{color:var(--cyan)}
+.cards p.chapter{font-size:16px;letter-spacing:8px;color:var(--ink)}.cards p.chapter span{display:block;font-size:40px;letter-spacing:10px;color:var(--cyan);margin-bottom:14px}
+.cards p.year{font-size:34px;letter-spacing:12px}
+.opening .d-left>:not(.d-lab),.opening .d-right>:not(.d-lab),.opening .hud-prompt{visibility:hidden} /* in the opening only comms speaks */
+.cards p.disc{animation-duration:2.2s}.cards p.disc span{font-size:11px;letter-spacing:8px;color:var(--dim);margin-bottom:12px}
+.deck .menu button{min-width:min(520px,84vw)}
+.chartc{width:min(960px,90vw);image-rendering:pixelated;border:2px solid var(--line,#574a3d);background:#06060a}
+.cards p.crawl{font-family:PlexMono,monospace;font-size:21px;letter-spacing:1px;line-height:1.75;max-width:min(860px,80vw);text-transform:none}
+.cards .skip{position:absolute;bottom:26px;left:0;right:0;font-size:9px;letter-spacing:4px;color:var(--dim);opacity:.6}
+.say{color:var(--ink);font-size:10px;letter-spacing:2px;line-height:1.5}
+.say[hidden]{display:none}.say b{display:inline;font-weight:400;color:var(--cyan);font-size:9px;letter-spacing:3px;margin-right:10px}.say b.hos{color:var(--amber)}.say span::before{content:'> ';color:var(--dim)}
+.hud-note{color:var(--green);font-size:8px;letter-spacing:2px;line-height:1.5;animation:note .4s steps(3) 1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hud-note[hidden]{display:none}
+@keyframes note{0%{opacity:0}100%{opacity:1}}
+.schem{width:min(480px,86vw);height:auto;image-rendering:pixelated;border:2px solid var(--line2)}
+.schem[hidden]{display:none}
+.route .menu button{min-width:min(420px,80vw);display:flex;justify-content:space-between}
+.route .menu button b{font-weight:400;color:var(--dim)}.route .menu button b.on{color:var(--cyan)}
+.r-name{margin:-6px 0 0;font-family:Silk;font-size:26px;letter-spacing:8px;color:var(--ink)}
+.keys.reg{max-width:min(760px,86vw);font-size:12px;gap:6px 22px}.keys.reg dt{white-space:nowrap}.r-lost{color:var(--amber)}
+.r-note{margin:0;max-width:min(680px,84vw);font-size:12px;line-height:1.6;color:var(--dim)}
+@keyframes card{12%{opacity:1}80%{opacity:1}100%{opacity:0}}
+/* title and menus: centred, quiet, keyboard first */
+.title,.pause,.controls{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+.title[hidden],.pause[hidden],.controls[hidden]{display:none}
+.title{background:linear-gradient(rgba(6,6,10,.3) 0 22%,rgba(6,6,10,.8) 22% 80%,rgba(6,6,10,.3) 80%)} /* a hard band, not a fade: the title sits on a strip of dark glass */
+.pause,.controls{background:rgba(6,6,10,.86)}
+.t-kicker{margin:0;font-family:Silk;font-size:11px;letter-spacing:5px;color:var(--cyan)}
+.t-name{margin:0 0 14px;font-family:Silk;font-weight:400;font-size:clamp(44px,8vw,86px);line-height:1;letter-spacing:.12em;color:var(--ink)}
+.t-name span{color:var(--dim)}
+.menu{display:flex;flex-direction:column;gap:4px;min-width:300px;border:2px solid var(--line);background:var(--panel);padding:8px}
+.menu button{all:unset;cursor:pointer;font-family:Silk;font-size:12px;letter-spacing:4px;color:var(--dim);padding:8px 18px;text-align:center;position:relative;border:2px solid transparent}
+.menu button[hidden]{display:none}
+.menu button:hover,.menu button.sel{color:var(--ink);border-color:var(--line2)}
+.menu button.sel::before{content:'>';position:absolute;left:6px;color:var(--orange)}
+.menu button:focus-visible{outline:none;color:var(--ink)}
+.t-foot{margin:16px 0 0;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--dim)}
+.t-foot a{color:var(--dim);text-decoration:none}.t-foot a:hover{color:var(--ink)}
+.t-sep{margin:0 12px}
+.keys{display:grid;grid-template-columns:auto auto;gap:8px 26px;margin:0;font-size:13px;text-align:left}
+.keys dt{font-family:Silk;letter-spacing:2px;color:var(--amber);font-size:11px;padding-top:2px}
+.keys dd{margin:0;color:var(--ink)}
+.take{font-family:Silk;font-size:11px;letter-spacing:3px;color:#1d1410;background:var(--amber);padding:12px 18px;text-decoration:none}
+.take[hidden]{display:none}
+@media (max-width:640px){.hud{font-size:9px}.menu button{font-size:12px}.keys{font-size:12px}.cards p.crawl{font-size:15px}.cards p.chapter{font-size:16px;letter-spacing:8px;color:var(--ink)}.cards p.chapter span{display:block;font-size:40px;letter-spacing:10px;color:var(--cyan);margin-bottom:14px}
+.cards p.year{font-size:24px}.keys.reg{font-size:10px}.r-note{font-size:10px}}
+
+/* night watch: a setup screen, then nothing until the mouse moves */
+.setup,.wui{position:absolute;inset:0}
+.setup{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;background:rgba(6,6,10,.86)}
+.setup[hidden],.wui[hidden],.dim[hidden]{display:none}
+.rows{display:grid;gap:10px;min-width:320px}
+.row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;font-family:Silk;font-size:12px;letter-spacing:3px;padding:8px 14px;cursor:pointer}
+.row span{color:var(--dim);text-align:left}.row b{font-weight:400;color:var(--ink);text-align:left}
+.row.sel{box-shadow:inset 0 0 0 1px rgba(231,219,192,.22)}.row.sel b::before{content:'◂ ';color:var(--amber)}.row.sel b::after{content:' ▸';color:var(--amber)}
+.wui{pointer-events:none;opacity:0;transition:opacity .6s}
+.wui.on{opacity:1}
+.wui-top{position:absolute;left:28px;right:28px;top:22px;display:flex;justify-content:space-between;font-family:Silk;font-size:10px;letter-spacing:3px;color:var(--dim)}
+.wui-bar{position:absolute;left:0;right:0;bottom:0;padding:16px 28px 18px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;background:linear-gradient(transparent,rgba(6,6,10,.85));pointer-events:auto}
+.mixer{display:flex;gap:14px;flex-wrap:wrap}
+.mixer label{display:flex;flex-direction:column;gap:6px;font-family:Silk;font-size:8px;letter-spacing:2px;color:var(--dim);width:72px}
+.mixer input{-webkit-appearance:none;appearance:none;width:72px;height:2px;background:rgba(231,219,192,.25);outline:none}
+.mixer input::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:var(--ink);border-radius:50%;cursor:pointer}
+.mixer input::-moz-range-thumb{width:10px;height:10px;background:var(--ink);border:0;border-radius:50%;cursor:pointer}
+.wui-btns{display:flex;gap:6px;flex-wrap:wrap}
+.wui-btns button{all:unset;cursor:pointer;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--dim);padding:9px 12px;box-shadow:inset 0 0 0 1px rgba(231,219,192,.2)}
+.wui-btns button:hover,.wui-btns button.on{color:var(--ink)}
+.wui-btns #wControl{color:var(--amber)}
+.tag{position:absolute;left:28px;top:22px;font-family:Silk;font-size:9px;letter-spacing:3px;color:rgba(143,136,120,.55);pointer-events:none}
+.dim{position:absolute;inset:0;background:#000;opacity:.42;pointer-events:none}
+body.watching{cursor:none}body.watching.ui{cursor:default}
+
+/* focus: one faint line, always there while a session runs (under the sleep dim it stays readable, just) */
+.focusline{position:absolute;right:28px;top:22px;font-family:Silk;font-size:9px;letter-spacing:3px;color:rgba(126,227,229,.5);pointer-events:none;z-index:3}
+.focusline.brk{color:rgba(255,176,74,.55)}
+body.ui .focusline{opacity:0}
+.row input{all:unset;font-family:Silk;font-size:12px;letter-spacing:3px;color:var(--ink);text-align:left;border-bottom:1px solid rgba(231,219,192,.18);padding:2px 0;min-width:0}
+.row input::placeholder{color:rgba(143,136,120,.5)}
+.wui-btns input{all:unset;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--ink);padding:9px 12px;width:180px;box-shadow:inset 0 0 0 1px rgba(231,219,192,.2)}
+.wui-btns input::placeholder{color:var(--dim)}
+/* photo mode: nothing over the ship but a small bar at the bottom (the saved picture never has it) */
+.photo{position:absolute;inset:0;pointer-events:none}
+.photo[hidden]{display:none}
+.ph-bar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;background:rgba(6,6,10,.78);pointer-events:auto;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--dim)}
+.ph-bar button{all:unset;cursor:pointer;padding:7px 10px;color:var(--dim);box-shadow:inset 0 0 0 1px rgba(231,219,192,.2)}
+.ph-bar button:hover{color:var(--ink)}.ph-bar .ph-save{color:var(--amber)}.ph-bar b{font-weight:400;color:var(--ink);min-width:170px;text-align:center}.ph-k{padding:0 8px;color:var(--amber)}
+.ph-foot{position:absolute;left:0;right:0;bottom:-2px;margin:0;text-align:center;font-family:Silk;font-size:8px;letter-spacing:3px;color:rgba(143,136,120,.5)}
+.ph-flash{position:absolute;inset:0;background:#f6efe4;opacity:0}
+.ph-flash.on{animation:phf .5s ease-out}
+@keyframes phf{from{opacity:.5}to{opacity:0}}
+body.photo #hud,body.photo #wui,body.photo #wFocus,body.photo #wTag2,body.photo #dim,body.photo #hHint{display:none!important}
+.setup .rows{min-width:460px}.row input{width:100%;box-sizing:border-box}
+.wui-btns input{width:260px}
+body.ui #wTag2{opacity:0}
+
+/* ---------- the UI pass (Nov 2026): dialogue lives in the picture; the shell frames, it doesn't compete ---------- */
+.talk{position:absolute;inset:0;pointer-events:none;z-index:3;font-family:Silk,monospace;text-transform:uppercase}
+.talk [hidden]{display:none!important}
+/* crew: a small SNES-style balloon over the speaker, hard 2-px border, stepped pixel tail */
+.bub{position:absolute;max-width:min(300px,38%);background:#14181c;color:#e9d7c2;box-shadow:0 0 0 2px #c6ab92,0 0 0 4px #0b0e11,4px 4px 0 4px rgba(11,14,17,.6);padding:6px 9px 7px;font-size:clamp(8px,.78vw,11px);letter-spacing:1.5px;line-height:1.55}
+.bub b{display:block;font-weight:400;font-size:.78em;letter-spacing:3px;color:#1fb4ce;margin-bottom:2px}
+.bub::after,.bub::before{content:'';position:absolute;left:var(--tx,50%);width:10px;height:8px;transform:translateX(-50%)}
+.bub::before{top:100%;margin-top:2px;background:#0b0e11;clip-path:polygon(0 0,100% 0,100% 25%,75% 25%,75% 50%,62% 50%,62% 75%,50% 75%,50% 100%,38% 100%,38% 0)}
+.bub::after{top:100%;background:#c6ab92;clip-path:polygon(0 0,100% 0,100% 25%,75% 25%,75% 50%,62% 50%,62% 75%,50% 75%,50% 100%,38% 100%,38% 0)}
+.bub.below::before,.bub.below::after{top:auto;bottom:100%;transform:translateX(-50%) scaleY(-1)}
+/* the panel: long, important, offscreen, or the whole-ship camera */
+.tbot{position:absolute;left:0;right:0;bottom:3.5%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tpanel{width:min(720px,62%);max-height:20%;background:#0b0e11;box-shadow:0 0 0 2px #446d75,0 0 0 4px #0b0e11;padding:7px 12px 9px;color:#e9d7c2;font-size:clamp(9px,.86vw,12px);letter-spacing:2px;line-height:1.6;opacity:.96}
+.tpanel b{display:block;font-weight:400;font-size:.8em;letter-spacing:4px;color:#1fb4ce;margin-bottom:3px}
+.tpanel b::after{content:' ────────';color:#2e3134}
+.tpanel b.hos,.bub b.hos{color:#eeb072}.tpanel b.k9,.bub b.k9{color:#649da1}
+/* the ship: a thin strip at the top of the picture, never from a place */
+.strip{position:absolute;left:50%;top:3.5%;transform:translateX(-50%);background:#0b0e11;padding:4px 12px 5px;font-size:clamp(8px,.72vw,10px);letter-spacing:3px;white-space:nowrap;box-shadow:0 0 0 2px #2e3134}
+.strip.cyan{color:#7ee3e5}.strip.amber{color:#eeb072;box-shadow:0 0 0 2px #7b3f1c}.strip.red{color:#d0442e;box-shadow:0 0 0 2px #4d2613}
+/* the interaction prompt: compact, in the picture, near the bottom */
+.iprompt{display:flex;align-items:center;gap:8px;background:rgba(11,14,17,.82);padding:4px 10px 5px;font-size:clamp(8px,.72vw,10px);letter-spacing:2px;color:#c6ab92;box-shadow:0 0 0 2px #2e3134}
+.iprompt kbd{font-family:inherit;color:#0b0e11;background:#c6ab92;box-shadow:inset 0 -2px 0 #907763,0 0 0 1px #0b0e11;padding:1px 5px 2px;font-size:.95em}
+.iprompt i{font-style:normal;color:#e9d7c2}.iprompt b{font-weight:400;color:#907763}
+/* the COMMS deck: a passive echo of the last line */
+.say span::before{content:'> '}
+/* title: the primary choices, then a small utility line */
+.menu .util{display:flex;justify-content:center;gap:2px;margin-top:6px;padding-top:6px;box-shadow:0 -2px 0 #1f1c17}
+.menu .util button{font-size:9px;letter-spacing:3px;padding:6px 10px;color:#6b6a6e}
+.menu .util button.sel::before{left:-2px}
+.title .menu button:not(.util button){font-size:13px}
+/* a quieter shell: legends dim, the picture is the brightest thing */
+.u-top{color:#907763}.u-plate{color:#4e423c}.d-lab{color:#6b6a6e}
+.opts .menu button{min-width:min(360px,80vw)}
+/* the screen hugs the picture, so everything laid over it (dialogue, touch keys, menus) lines up with the game */
+.screen{width:max-content;max-width:100%;margin-left:auto;margin-right:auto}
+/* short landscape screens (phones): the picture first; the deck keeps only the tape keys, the header steps aside */
+@media (max-height:520px){.u-top{display:none}.u-deck{min-height:0;margin-top:6px;margin-bottom:4px;padding:3px 4px}.d-left,.d-mid,.u-plate{display:none}.hud{grid-template-columns:1fr}.d-right{flex-direction:row;align-items:center;gap:12px;box-shadow:none}.d-right .d-lab{display:none}.softkey{left:auto;right:8px;top:4px;bottom:auto;transform:none}}
+/* with the touch keys up, the dialogue panel and prompt sit between them */
+.touchpad .tpanel{width:calc(100% - clamp(44px,5.4vw,66px)*5.9 - 6%)}
+@media (max-height:520px){.softkey{position:absolute;left:auto;right:10px;top:50%;bottom:auto;transform:translateY(-50%);z-index:2;font-size:9px;padding:6px 12px 8px}.hud-note{display:none!important}}
+/* the second cut (Nov 2026): nothing below the screen. The ship speaks in the picture; the music lives in the pause menu
+   (TAPE) and Options (MUSIC); MENU is Esc, or the key beside the touch pad. The bezel is bare hardware. */
+.u-deck{display:none!important}
+.u-top .u-id,.u-top .u-link,.u-top .hud-hint{visibility:hidden}
+.u-top{height:14px;margin-bottom:6px}
+.softkey{display:none!important}
+.trec{position:absolute;left:2%;top:3%;font-size:9px;letter-spacing:3px;color:#d0442e;animation:blink 1.2s steps(1) infinite}
+.pnote{margin:0 0 8px;font-family:Silk;font-size:9px;letter-spacing:3px;color:#7ee3e5;max-width:min(520px,84vw);text-align:center;line-height:1.6}
+.pnote[hidden]{display:none}
+.touchpad .tpanel{width:min(720px,62%)}
+.touchpad .tbot{left:calc(3% + clamp(44px,5.4vw,66px)*3.5 + 20px)}
+
+/* title (Nov 2026): a light veil so the ship reads; the wordmark carries its own contrast with a hard pixel outline and drop,
+   and the menu sits on its own dark panel. A text-local treatment beats darkening the whole picture. */
+.title{background:linear-gradient(rgba(6,6,10,.12) 0 28%,rgba(6,6,10,.38) 28% 74%,rgba(6,6,10,.12) 74%)}
+.t-name{text-shadow:-3px 0 0 #0b0e11,3px 0 0 #0b0e11,0 -3px 0 #0b0e11,0 3px 0 #0b0e11,-3px -3px 0 #0b0e11,3px -3px 0 #0b0e11,-3px 3px 0 #0b0e11,3px 3px 0 #0b0e11,7px 7px 0 rgba(11,14,17,.75)}
+.t-name span{color:#c6ab92}
+.title .menu{background:rgba(20,24,28,.94)}
+@media (max-height:520px){.title .t-foot{display:none}}
+
+/* broadcast (?broadcast=1): the picture and nothing else */
+body.bc .g{background:#000}
+body.bc .unit{padding:0;background:none;box-shadow:none}
+body.bc .u-top,body.bc .u-deck,body.bc .pad,body.bc #wui,body.bc #wFocus,body.bc .softkey,body.bc #tRec,body.bc .glass{display:none!important}
+body.bc .screen{border:0;box-shadow:none}
+.bcgo{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;z-index:9;font-family:Silk;font-size:14px;letter-spacing:5px;color:#e9d7c2;background:#14181c;border:0;box-shadow:0 0 0 2px #446d75,0 0 0 4px #0b0e11;padding:16px 26px;cursor:pointer}
+.bcgo[hidden]{display:none}
+
+/* text size (Options): dialogue, the ship's strip and the prompt, for people watching from a sofa */
+body{--tz:1}body[data-text=large]{--tz:1.4}body[data-text=xl]{--tz:1.85}
+.bub{font-size:calc(clamp(8px,.78vw,11px)*var(--tz));max-width:min(calc(300px*var(--tz)),48%)}
+.tpanel{font-size:calc(clamp(9px,.86vw,12px)*var(--tz));width:min(calc(720px*var(--tz)),78%);max-height:none}
+.strip{font-size:calc(clamp(8px,.72vw,10px)*var(--tz))}
+.iprompt{font-size:calc(clamp(8px,.72vw,10px)*var(--tz))}
+
+/* the ship's computer: a CRT inside the picture */
+.con{position:absolute;inset:0;display:grid;place-items:center;background:rgba(6,6,10,.45);z-index:5}
+.con[hidden]{display:none}
+.con-crt{width:min(720px,80%);height:min(420px,72%);background:#0c2226;box-shadow:0 0 0 3px #0b0e11,0 0 0 6px #4e423c,0 0 0 8px #0b0e11,inset 0 0 40px rgba(0,0,0,.6);padding:14px 16px;display:flex;flex-direction:column;font-family:Silk,monospace;font-size:calc(clamp(9px,.85vw,12px)*var(--tz));letter-spacing:1.5px;color:#7ee3e5;text-transform:uppercase;position:relative}
+.con-crt::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
+.con-out{flex:1;overflow:hidden;line-height:1.7;white-space:pre}
+.con-out div:first-child{color:#d8fff0}
+.con-in{display:flex;gap:8px;align-items:center;color:#d8fff0}
+.con-in input{all:unset;flex:1;caret-color:#d8fff0;color:#d8fff0;text-transform:uppercase}
+.con-foot{margin:10px 0 0;font-family:Silk;font-size:8px;letter-spacing:3px;color:#907763}
+.logbook{margin-top:14px;max-width:min(620px,86vw);font-family:Silk;font-size:9px;letter-spacing:2px;text-align:left;max-height:34vh;overflow:auto}
+.logbook .lb-h{color:#1fb4ce;letter-spacing:4px;margin:0 0 6px}.logbook .lb-x{color:#4e423c;margin:3px 0}
+.logbook summary{cursor:pointer;color:#c6ab92;margin:3px 0}.logbook details p{font-family:PlexMono,monospace;font-size:12px;letter-spacing:0;line-height:1.6;color:#e9d7c2;margin:4px 0 10px 18px;text-transform:none}
+
+.k9mark{position:absolute;transform:translateX(-50%);font-family:Silk,monospace;font-size:calc(14px*var(--tz));color:#7ee3e5;text-shadow:0 2px 0 #0b0e11;animation:k9m 1.4s steps(7) forwards;pointer-events:none}
+@keyframes k9m{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-18px)}}
+.con{display:flex;flex-direction:column;align-items:center;justify-content:center}

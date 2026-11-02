@@ -1,0 +1,45 @@
+/* DeadScout Director · a desk, not a page: the screen, the script, the switches. Same ink as the game. */
+@font-face{font-family:Silk;src:url(fonts/silkscreen-400.woff2) format("woff2");font-display:swap}
+@font-face{font-family:PlexMono;src:url(fonts/plexmono-400.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:PlexMono;src:url(fonts/plexmono-500.woff2) format("woff2");font-weight:500;font-display:swap}
+:root{--ink:#e7dbc0;--dim:#8f8878;--cyan:#8fd8c0;--amber:#e8a33a;--red:#d0442e;--bg:#06060a;--panel:#0d0d13;--line:rgba(231,219,192,.14)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.5 PlexMono,ui-monospace,monospace;-webkit-font-smoothing:antialiased}
+.top{display:flex;align-items:baseline;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line)}
+.top h1{margin:0;font:400 20px Silk;letter-spacing:6px}.top h1 span{color:var(--cyan)}.top h1 small{font-size:10px;letter-spacing:4px;color:var(--dim);margin-left:14px}
+.top nav a{font-family:Silk;font-size:10px;letter-spacing:3px;color:var(--amber);text-decoration:none;margin-left:22px}
+.desk{display:grid;grid-template-columns:minmax(520px,1fr) minmax(420px,1fr);gap:18px;padding:18px 22px;max-width:1440px;margin:0 auto}
+@media (max-width:1000px){.desk{grid-template-columns:1fr}}
+.screen{position:sticky;top:12px;align-self:start}
+.vscreen{position:relative;background:#000;border:1px solid var(--line);aspect-ratio:16/9}
+#stage{width:100%;height:100%;display:block;image-rendering:pixelated}
+.vfd{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;padding:8px 12px;font-family:Silk;font-size:10px;letter-spacing:3px;color:var(--cyan);background:linear-gradient(rgba(6,6,10,.7),transparent);pointer-events:none}
+.transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0}
+button,select,input,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);padding:6px 10px}
+button{font-family:Silk;font-size:10px;letter-spacing:2px;cursor:pointer}button:hover{border-color:var(--amber)}button.on{color:var(--amber);border-color:var(--amber)}
+button.rec{color:var(--red)}button.rec.on{background:var(--red);color:#000}
+.chapters button{padding:6px 8px}.chapters button.cur{color:var(--cyan);border-color:var(--cyan)}
+.take{font-family:Silk;font-size:10px;letter-spacing:2px;color:var(--cyan)}
+.live{margin:0;font-family:Silk;font-size:9px;letter-spacing:2px;color:var(--dim);min-height:16px}
+.panes{display:grid;gap:18px}
+.pane{border:1px solid var(--line);padding:14px 16px;background:rgba(13,13,19,.6)}
+.pane h2{margin:0 0 10px;font:400 12px Silk;letter-spacing:4px;color:var(--cyan)}.pane h2 small{font-family:PlexMono;letter-spacing:0;color:var(--red);margin-left:10px}
+.pane h3{margin:14px 0 6px;font:400 10px Silk;letter-spacing:3px;color:var(--amber)}.pane h3 small{font-family:PlexMono;letter-spacing:0;color:var(--dim);margin-left:8px;text-transform:none}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px}
+.row label,.row .l{font-family:Silk;font-size:9px;letter-spacing:2px;color:var(--dim);display:inline-flex;align-items:center;gap:6px}
+.row input,.row select{font-family:PlexMono;font-size:12px;padding:4px 6px}
+.row input[type=range]{width:90px;padding:0}
+label.file{cursor:pointer;border:1px solid var(--line);padding:6px 10px;background:var(--panel);color:var(--ink)}
+textarea{width:100%;min-height:150px;resize:vertical;font-size:12px;line-height:1.5;tab-size:4}
+#sScript{min-height:90px}#yDesc{min-height:140px;color:var(--dim)}
+.chlist{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chlist button{font-size:9px;padding:5px 8px}.chlist button.cur{color:var(--cyan);border-color:var(--cyan)}
+.help summary{font-family:Silk;font-size:9px;letter-spacing:2px;color:var(--dim);cursor:pointer;margin-top:8px}
+.help div{font-size:11px;color:var(--dim);line-height:1.6}.help b{color:var(--ink);font-weight:500}
+.hint{font-size:11px;color:var(--dim);margin:8px 0 0}
+#yTitle{width:100%;margin-bottom:8px}
+
+.parts{display:inline-flex;gap:10px;flex-wrap:wrap}.parts a{font-family:Silk;font-size:10px;letter-spacing:2px;color:var(--cyan)}
+#vfdLoud{opacity:.8}
+
+.lurl{width:100%;margin:2px 0 8px;font-size:11px;color:var(--cyan)}.pane h2 small.sub{color:var(--dim);font-family:PlexMono;letter-spacing:0}.row[hidden]{display:none}
