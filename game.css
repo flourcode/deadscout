@@ -239,3 +239,5 @@ body{--tz:1}body[data-text=large]{--tz:1.4}body[data-text=xl]{--tz:1.85}
 .k9mark{position:absolute;transform:translateX(-50%);font-family:Silk,monospace;font-size:calc(14px*var(--tz));color:#7ee3e5;text-shadow:0 2px 0 #0b0e11;animation:k9m 1.4s steps(7) forwards;pointer-events:none}
 @keyframes k9m{0%{opacity:0;transform:translate(-50%,6px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-18px)}}
 .con{display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+.wui-btns button[hidden],.wui-btns input[hidden]{display:none}

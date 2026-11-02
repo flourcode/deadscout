@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=21">
+<link rel="stylesheet" href="game.css?v=22">
 </head>
 <body>
 <div class="g" id="g">
@@ -88,7 +88,7 @@
     <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time" id="wTime"></span></div>
     <div class="wui-bar">
       <div class="mixer" id="mixer"></div>
-      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="dim" id="wDim">SLEEP DIM · OFF</button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="photo">PHOTO</button><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float">FLOAT</button><button type="button" data-w="full">FULLSCREEN</button><button type="button" data-w="tag" id="wTag">LABEL · ON</button><button type="button" data-w="end">END WATCH</button></div>
+      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="mood" id="wMood">MOOD · NIGHT WATCH</button><button type="button" data-w="dim" id="wDim" hidden>SLEEP DIM · OFF</button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="photo">PHOTO</button><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float">FLOAT</button><button type="button" data-w="full">FULLSCREEN</button><button type="button" data-w="clock" id="wClock">CLOCK · AMBER</button><button type="button" data-w="tag" id="wTag" hidden>LABEL · ON</button><button type="button" data-w="end">END WATCH</button></div>
     </div>
   </section>
   <div class="dim" id="dim" hidden></div>
@@ -170,14 +170,14 @@
 <script src="space.js?v=5"></script>
 <script src="music.js?v=10"></script>
 <script src="deep.js?v=4"></script>
-<script src="assets-core.js?v=23"></script>
+<script src="assets-core.js?v=24"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=43"></script>
+<script src="cut.js?v=47"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=11"></script>
 <script src="watch.js?v=7"></script>
 <script src="amb.js?v=1"></script>
-<script src="audio/sfx.js?v=4"></script>
+<script src="audio/sfx.js?v=6"></script>
 <script src="lc.js?v=11"></script>
 <script src="rec.js?v=8"></script>
 <script src="game/scanner.js?v=5"></script>
@@ -187,10 +187,11 @@
 <script src="game/events.js?v=2"></script>
 <script src="game/story.js?v=13"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=33"></script>
+<script src="game.js?v=35"></script>
 <script src="game/pad.js?v=11"></script>
-<script src="game/toys.js?v=3"></script>
+<script src="game/toys.js?v=7"></script>
+<script src="game/clock.js?v=4"></script>
 <script>/* the rest of the ship arrives while the title is up (§50): the cutaway master and its overlays, then the crew */
-(function(){let n=0;for(const f of ['assets-world.js?v=10','assets-cast.js?v=7']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
+(function(){let n=0;for(const f of ['assets-world.js?v=10','assets-cast.js?v=8']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
 </body>
 </html>
