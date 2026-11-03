@@ -11,7 +11,7 @@ const N=k=>M.nodes[k],up=(k,dy)=>()=>[N(k)[0],N(k)[1]-dy];
 const ROOMS=Object.keys(M.rooms).filter(r=>r!=='eva').sort((a,b)=>M.rooms[a].poly[0][0]-M.rooms[b].poly[0][0]);
 const S={drive:1,lit:Object.fromEntries(ROOMS.map(r=>[r,1])),beacon:false,busy:{}};
 const SFX=window.SFX,BED={},bed=(n,g,r)=>{BED[n]=g;try{SFX&&SFX.bed&&SFX.bed(n,A.soundOn()?g:0,r);}catch(e){}};
-const later=(ms,f)=>setTimeout(f,ms);
+const later=(ms,f)=>setTimeout(()=>{if(G.state==='title'||G.state==='end'||G.state==='setup'){S.busy={};return;}f();},ms); /* a toy's follow-through dies with the session it started in */
 /* ---------- moods ---------- */
 function hum(n){bed('hum',Math.min(.07,.03+.006*n),.12);clearTimeout(S.ht);S.ht=later(1600,()=>bed('hum',0,5));}
 function setRoom(r,on,quiet){if(S.lit[r]===on)return;S.lit[r]=on;CUT.toy({room:{[r]:on}});if(quiet)return;

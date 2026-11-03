@@ -1,5 +1,5 @@
 /* DEADSCOUT · the game's own manifest. Same Director JSON the studio reads (cut.js beats), used here as the authored
-   opening and the music arc. Everything after she wakes is the player's, with story/slice.js putting the ship's changes
+   opening and the music arc. Everything after she wakes is the player's, with game/story.js putting the ship's changes
    on the same timeline. Times in `events` are absolute from the start of the transmission. */
 window.DS_GAME={
  deadscout_plan:4,game:true,title:'DEADSCOUT',year:'2291',length_minutes:110,location:'research',

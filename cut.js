@@ -19,9 +19,9 @@ const IMG=PX.IMG,ready=PX.isReady,hash=PX.hash,vn=PX.vn,clamp=(v,a,b)=>Math.max(
 const W=SC.w,H=SC.h,NODES=SC.nodes,SPOTS=SC.spots,OBJ=SC.objects||{};
 const ACTORS=['pilot','systems','commander','scout','k9','k9m','deadscout'],CREW=['pilot','systems','commander','scout','k9m','k9']; /* k9: HALCYON's service quadruped (present); k9m: the clean 2291 one, only in a memory */ /* scout: her living self in a memory. Canon (visual lock): DeadScout IS the pilot of 2291, so she wears the pilot's sheet, and a memory never shows two of her */
 const NAMES={pilot:'PILOT',systems:'SYSTEMS TECH',commander:'COMMANDER',scout:'PILOT',k9:'K9-4',k9m:'K9-4',deadscout:'DEADSCOUT'};
-const SHEET={pilot:'pilot',systems:'systems',commander:'commander',scout:'pilot',k9:'k9',k9m:'k9',deadscout:'deadscout'},FALLBACK={};
+const SHEET={pilot:'pilot',systems:'systems',commander:'commander',scout:'pilot',k9:'k9',k9m:'k9',deadscout:'commander'},FALLBACK={}; /* r23: she wears the commander's sheet, the one the night watch uses; the chibi production sheet is gone */
 /* she is never drawn in the commander's body: an action her sheet lacks borrows her nearest own frame */
-const ALIAS={observe:'idle','look-around':'turn',sit:'idle',kneel:'operate',flashlight:'idle',scanner:'operate',recoil:'turn',crouch:'idle',inspect:'operate','eva-float':'idle',reach:'operate',breathe:'idle','connect-tether':'operate',comms:'terminal-idle',stand:'idle',typing:'interact',wake:'idle'}; /* her production sheet carries the walk and the terminal; everything else is still the commander's */
+const ALIAS={run:'walk',turn:'look-around','climb-mount':'climb',operate:'interact',typing:'interact','terminal-idle':'interact',point:'reach',wave:'reach',hurt:'recoil',down:'crouch',jump:'idle','lie-down':'crouch',rest:'crouch','get-up':'crouch',wake:'idle',puzzled:'look-around',observe:'idle',kneel:'crouch',stand:'idle',breathe:'idle',comms:'interact'}; /* what a sheet lacks is played by its nearest pose (applied only when the sheet has no animation of that name) */
 const WALK=22*SPD,SNEAK=13*SPD,CLIMB=11*SPD,HOIST=24*SPD,BOARD=2.2;
 /* gait personality (§locomotion): she is deliberate, the pilot a touch quick, the commander heavy, K9 short-stepped with a trot to catch up */
 const SPEEDF={deadscout:1,scout:1,pilot:1.08,systems:1,commander:.9,k9:.88,k9m:.88};const vWalk=(a,sneak,fast)=>(sneak?SNEAK:WALK)*(SPEEDF[a]||1)*(fast?1.4:1);
@@ -95,7 +95,7 @@ function place(ref){ref=String(ref||'');if(ref[0]==='@'){const [a,b,f]=ref.slice
 const stateId=s=>{s=String(s||'').toLowerCase();return STATE_ALIAS[s]||s;};
 const worldId=k=>WORLD_ALIAS[k]||k;
 /* ---------- beats: lines in, objects out ---------- */
-const AN=id=>{const sid=SHEET[id]||id,S=A.sheets[sid],F=A.sheets[FALLBACK[sid]||''];return [...new Set(Object.keys((S&&S.animations)||{}).concat(Object.keys((F&&F.animations)||{})).filter(k=>!/^bust/.test(k)&&!(id==='systems'&&k==='radio')).concat(Object.keys(EXTRA[sid]||{}),Object.keys(EXTRA[FALLBACK[sid]]||{})))];};
+const AN=id=>{const sid=SHEET[id]||id,S=A.sheets[sid],F=A.sheets[FALLBACK[sid]||''];return [...new Set(Object.keys((S&&S.animations)||{}).concat(Object.keys((F&&F.animations)||{})).filter(k=>!/^bust/.test(k)&&!(id==='systems'&&k==='radio')).concat(Object.keys(EXTRA[sid]||{}),Object.keys(EXTRA[FALLBACK[sid]]||{}),Object.keys(ALIAS)))];}; /* an aliased pose is a legal action too */
 const ACTIONS=['wake','climb-up','climb-down','interact','open-hatch','cautious','normal-walk'];
 function parseLine(line){const raw=line.trim();if(!raw||raw.startsWith('#'))return null;const m=raw.match(/^(\d+:\d{1,2}(?:\.\d)?)\s+(.*)$/);if(!m)return {err:'START WITH A TIME, LIKE 03:00'};
   const at=m[1],w=m[2].trim().split(/\s+/),lw=w.map(x=>x.toLowerCase()),dur=()=>{const i=lw.findIndex(x=>x==='for'||x==='over');return i>=0?secs(String(lw[i+1]||'').replace(/s$/,'')):null;};
@@ -192,10 +192,10 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
   for(const r in C.rooms){const L=C.rooms[r],out=[];let cur=L[0].state;for(const e of L){if(e.soft&&cur!=='normal'&&e.at>0)continue;out.push(e);cur=e.state;}C.rooms[r]=out;}
   const total=times.length?times[times.length-1].end:3600,chapAt=t=>C.chapters.find(c=>t>=c.start&&t<c.end)||C.chapters[C.chapters.length-1];
   const travel=(a,p,q,sn)=>legsBetween(a,p,q,sn).reduce((s,L)=>s+legTime(L.k,L.k==='walk'?dist(L.a,L.b)*Math.abs(L.f1-L.f0):Math.abs(NY(L.a)-NY(L.b))*Math.abs(L.f1-L.f0),sn,a),0);
-  const doorAt=(d,t)=>{let st='open';for(const e of C.doors[d])if(e.at<=t)st=e.state;return st;};
+  const doorAt=(d,t)=>{let st='open',ta=-1e9;for(const e of C.doors[d])if(e.at<=t&&e.at>=ta){ta=e.at;st=e.state;}return st;}; /* latest in time, not last in the list: auto-opens are pushed after the sorted script */
   const busy=[];
   /* the crew first (their doors open for them); DeadScout last: doors don't sense her, she opens them by hand */
-  for(const a of ACTORS){const p0=place(start[a]||HOME[a][0]||'quarters.bunk'),L=cmds[a].sort(byAt),all=[];let here=p0,free=0,ci=0,n=0;
+  for(const a of ACTORS){const p0=place(start[a])||place(HOME[a][0])||place('quarters.bunk'),L=cmds[a].sort(byAt),all=[];let here=p0,free=0,ci=0,n=0;
     const hidden=t=>{let h=false;for(const e of C.vis[a])if(e.at<=t)h=!e.on;return h;};
     for(;;){const next=ci<L.length?L[ci]:null,limit=next?next.at:total-30,ch=chapAt(free),tr=ch?ch.traffic:'normal',gap=tr==='normal'?150:tr==='low'?280:1e9;
       if(HOME[a].includes(here.ref)&&!hidden(free)&&tr!=='off'){const go=free+gap*(.55+.7*hash(n,a.length*17+3)),dest=place(ERRANDS[a][Math.floor(hash(n,a.length*31+5)*ERRANDS[a].length)]),stay=20+40*hash(n,a.length*7+11);
@@ -214,12 +214,16 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
       for(let j=oev.length-1;j>=0;j--)if(oev[j].at>=t){const e=oev[j];const L=e.list,idx=L.indexOf(e.ev);if(idx>=0)L.splice(idx,1);oev.splice(j,1);}
       ref=null;return t;};
     const hold=(t,d,extra)=>{S.push(Object.assign({k:'hold',t0:t,t1:t+d,pos,face:'right',ref:null},extra||{}));return t+d;};
+    let goShort=false; /* set when a walk ends early at a locked door: the caller leaves her there, not at the target */
     const go=(t,target,sneak,viaPos,fast,coast)=>{const legs=viaPos?legsBetween(a,pos,viaPos,sneak).concat(legsBetween(a,viaPos,target.pos,sneak)):legsBetween(a,pos,target.pos,sneak);const V=vWalk(a,sneak,fast);
       for(const L of legs){const [x0,y0]=xyOf({a:L.a,b:L.b,f:L.f0}),[x1,y1]=xyOf({a:L.a,b:L.b,f:L.f1}),len=L.k==='walk'?Math.hypot(x1-x0,y1-y0):Math.abs(y1-y0);if(len<.01)continue;
-        if(L.k==='walk'){/* doors on the way: DeadScout has to open closed ones herself */
-          let f0=L.f0;if(a==='deadscout')for(const [id,D] of Object.entries(SC.doors)){if(D.floor||D.wall||Math.abs(D.y-(y0+y1)/2)>8*SS)continue;const lo=Math.min(x0,x1),hi=Math.max(x0,x1);if(D.x<=lo+1||D.x>=hi-1)continue;if(doorAt(id,t)==='open')continue;
-              const dir=x1>x0?1:-1,fd=L.f0+(L.f1-L.f0)*((D.x-12*SS*dir)-x0)/(x1-x0),[xa,ya]=xyOf({a:L.a,b:L.b,f:f0}),[xb,yb]=xyOf({a:L.a,b:L.b,f:fd}),d=Math.hypot(xb-xa,yb-ya)/V;
-              if(d>0){S.push({k:'walk',t0:t,t1:t+d,ea:L.a,eb:L.b,f0,f1:fd,sneak,fast});t+=d;}pos={a:L.a,b:L.b,f:fd};t=hold(t,1.6,{act:'open-hatch',face:dir>0?'right':'left'});const ev={at:t-.8,state:'open'};C.doors[id].push(ev);oev.push({at:ev.at,ev,list:C.doors[id]});f0=fd;}
+        if(L.k==='walk'){/* doors on the way, in walking order: DeadScout opens closed ones herself; a locked one stops her with a hand on it (r22: a click-to-move walked straight through) */
+          let f0=L.f0;if(a==='deadscout'){const dir=x1>x0?1:-1,lo=Math.min(x0,x1),hi=Math.max(x0,x1);
+            const onWay=Object.entries(SC.doors).filter(([id,D])=>!D.floor&&!D.wall&&Math.abs(D.y-(y0+y1)/2)<=8*SS&&D.x>lo+1&&D.x<hi-1).sort((p,q)=>(p[1].x-q[1].x)*dir);
+            for(const [id,D] of onWay){const fd=L.f0+(L.f1-L.f0)*((D.x-12*SS*dir)-x0)/(x1-x0),[xa,ya]=xyOf({a:L.a,b:L.b,f:f0}),[xb,yb]=xyOf({a:L.a,b:L.b,f:fd}),d=Math.hypot(xb-xa,yb-ya)/V,st=doorAt(id,t+d);if(st==='open')continue;
+              if(d>0){S.push({k:'walk',t0:t,t1:t+d,ea:L.a,eb:L.b,f0,f1:fd,sneak,fast});t+=d;}pos={a:L.a,b:L.b,f:fd};
+              if(st==='locked'){t=hold(t,1.2,{act:'reach',face:dir>0?'right':'left'});C.uses.push({id,at:t,locked:true});goShort=true;return t;}
+              t=hold(t,1.6,{act:'open-hatch',face:dir>0?'right':'left'});const ev={at:t-.8,state:'open'};C.doors[id].push(ev);oev.push({at:ev.at,ev,list:C.doors[id]});f0=fd;}}
           const [xa,ya]=xyOf({a:L.a,b:L.b,f:f0}),d=Math.hypot(x1-xa,y1-ya)/V*(coast?2:1);if(d>0)S.push({k:'walk',t0:t,t1:t+d,ea:L.a,eb:L.b,f0,f1:L.f1,sneak,fast,coast});t+=d;}
         else if(L.k==='ladder'){t=hold(t,.5,{pause:1});const d=len/CLIMB;S.push({k:'ladder',t0:t,t1:t+d,ea:L.a,eb:L.b,f0:L.f0,f1:L.f1});t+=d;pos={a:L.a,b:L.b,f:L.f1};t=hold(t,.5,{pause:1});}
         else{t=hold(t,BOARD,{lift:1,call:1});const d=len/HOIST;S.push({k:'hoist',t0:t,t1:t+d,ea:L.a,eb:L.b,f0:L.f0,f1:L.f1});t+=d;}
@@ -231,18 +235,20 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
       if(c.kind==='cautious'){cautious=true;continue;}if(c.kind==='normal-walk'){cautious=false;continue;}
       if(c.kind==='move'&&c.teleport){const to=place(c.to);if(to){pos=to.pos;face=to.face||face;ref=to.ref;}}
       else if(c.kind==='move'){const to=place(c.to);if(!to)continue;if(a!=='deadscout'&&!c.via&&to.spot&&!to.pos.b){const nb=(ADJ[to.pos.a]||[]).filter(e=>e.k==='walk');if(nb.length){const e=nb[Math.floor(hash(Math.round(c.at*7),a.length*5)*nb.length)],len=dist(to.pos.a,e.to);if(len>30*SS)to.pos={a:to.pos.a,b:e.to,f:(3+7*hash(Math.round(c.at*3),a.length*9))*SS/len};}} /* arrival radius: a few px along a floor edge, seeded by the beat */
-        t=go(t,to,c.sneak||cautious,c.via&&place(c.via)?place(c.via).pos:null,c.fast,c.coast);pos=to.pos;face=to.face||(S.length&&S[S.length-1].k==='walk'?(S[S.length-1].f1>S[S.length-1].f0?'right':'left'):face);ref=to.ref;
-        if(!to.face&&S.length&&S[S.length-1].k==='walk'){const s=S[S.length-1],[xa]=xyOf({a:s.ea,b:s.eb,f:s.f0}),[xb]=xyOf({a:s.ea,b:s.eb,f:s.f1});face=xb<xa?'left':'right';}}
+        t=go(t,to,c.sneak||cautious,c.via&&place(c.via)?place(c.via).pos:null,c.fast,c.coast);
+        if(goShort){goShort=false;face=S[S.length-1].face||face;ref=null;} /* stopped at a locked door: pos is already there */
+        else{pos=to.pos;face=to.face||(S.length&&S[S.length-1].k==='walk'?(S[S.length-1].f1>S[S.length-1].f0?'right':'left'):face);ref=to.ref;
+        if(!to.face&&S.length&&S[S.length-1].k==='walk'){const s=S[S.length-1],[xa]=xyOf({a:s.ea,b:s.eb,f:s.f0}),[xb]=xyOf({a:s.ea,b:s.eb,f:s.f1});face=xb<xa?'left':'right';}}}
       else if(c.kind==='climb-up'||c.kind==='climb-down'){const [px0,py0]=xyOf(pos);let best=null;for(const e of SC.ladders.concat(SC.hoist)){for(const [top,bot] of [[e[0],e[1]],[e[1],e[0]]]){if(!(NY(top)<NY(bot)))continue;const from=c.kind==='climb-down'?top:bot,to=c.kind==='climb-down'?bot:top;const d=Math.hypot(NX(from)-px0,(NY(from)-py0)*3);if(!best||d<best.d)best={d,from,to};}}
-        if(best){t=go(t,{pos:{a:best.from,b:null,f:0}},cautious);pos={a:best.from,b:null,f:0};t=go(t,{pos:{a:best.to,b:null,f:0}},cautious);pos={a:best.to,b:null,f:0};face='right';ref=null;}}
+        if(best){t=go(t,{pos:{a:best.from,b:null,f:0}},cautious);if(goShort){goShort=false;ref=null;}else{pos={a:best.from,b:null,f:0};t=go(t,{pos:{a:best.to,b:null,f:0}},cautious);pos={a:best.to,b:null,f:0};face='right';ref=null;}}}
       else if(c.kind==='interact'||c.kind==='open-hatch'){const id=c.obj||(nearObj(c.kind==='open-hatch'?60:90)||{}).id;
-        if(id&&OBJ[id]&&!OBJ[id].screen){const O=OBJ[id],sp=place(O.spot);if(sp){t=go(t,sp,cautious);pos=sp.pos;face=sp.face;ref=sp.ref;}t=hold(t,.18,{act:'idle',face,ref});t=hold(t,O.hold||1.8,{act:O.act||'operate',face,ref});t=hold(t,.22,{act:'idle',face,ref}); /* settle, operate, recover */C.obj[id]=(C.obj[id]||0)+1;C.uses.push({id,at:t});} /* a switch, a locker, a lever: the game reads the count */
-        else if(id&&OBJ[id]){const sp=place(OBJ[id].spot);if(sp){t=go(t,sp,cautious);pos=sp.pos;face=sp.face;ref=sp.ref;}t=hold(t,.18,{act:'idle',face,ref});t=hold(t,2.6,{act:'interact',face,ref});C.uses.push({id,at:t});
+        if(id&&OBJ[id]&&!OBJ[id].screen){const O=OBJ[id],sp=place(O.spot);if(sp){t=go(t,sp,cautious);if(goShort){goShort=false;ref=null;S.push({k:'hold',t0:t,t1:1e9,pos,face,ref});tc=t;continue;}pos=sp.pos;face=sp.face;ref=sp.ref;}t=hold(t,.18,{act:'idle',face,ref});t=hold(t,O.hold||1.8,{act:O.act||'operate',face,ref});t=hold(t,.22,{act:'idle',face,ref}); /* settle, operate, recover */C.obj[id]=(C.obj[id]||0)+1;C.uses.push({id,at:t});} /* a switch, a locker, a lever: the game reads the count */
+        else if(id&&OBJ[id]){const sp=place(OBJ[id].spot);if(sp){t=go(t,sp,cautious);if(goShort){goShort=false;ref=null;S.push({k:'hold',t0:t,t1:1e9,pos,face,ref});tc=t;continue;}pos=sp.pos;face=sp.face;ref=sp.ref;}t=hold(t,.18,{act:'idle',face,ref});t=hold(t,2.6,{act:'interact',face,ref});C.uses.push({id,at:t});
           const O=OBJ[id];C.obj[id]=C.obj[id]||0;let i=C.obj[id];const md=O.seq[i%O.seq.length];const list=(C.screens[O.screen]=C.screens[O.screen]||[]);
           const push=(at,mode)=>{const ev={at,mode,cam:O.camera};list.push(ev);oev.push({at,ev,list});};
           if(md==='boot'){push(t-1.8,'boot');push(t+2.6,O.seq[(i+1)%O.seq.length]);i+=2;}else{push(t-1.2,md);i+=1;}C.obj[id]=i;}
         else if(id&&SC.doors[id]){const D=SC.doors[id],[px0]=xyOf(pos),dir=D.x>px0?1:-1;const near=Object.entries(SPOTS).flatMap(([r,o])=>Object.keys(o).map(k=>place(r+'.'+k))).filter(p=>Math.abs(p.y-D.y)<8*SS).sort((p,q)=>Math.abs(p.x-(D.x-14*SS*dir))-Math.abs(q.x-(D.x-14*SS*dir)))[0];
-          if(near&&Math.abs(near.x-px0)>16*SS){t=go(t,near,cautious);pos=near.pos;}const was=doorAt(id,t);if(was==='locked'){t=hold(t,1.2,{act:'reach',face:dir>0?'right':'left'});C.uses.push({id,at:t,locked:true});} /* a locked door only gets a hand on it */
+          if(near&&Math.abs(near.x-px0)>16*SS){t=go(t,near,cautious);if(goShort){goShort=false;ref=null;S.push({k:'hold',t0:t,t1:1e9,pos,face,ref});tc=t;continue;}pos=near.pos;}const was=doorAt(id,t);if(was==='locked'){t=hold(t,1.2,{act:'reach',face:dir>0?'right':'left'});C.uses.push({id,at:t,locked:true});} /* a locked door only gets a hand on it */
           else{t=hold(t,1.6,{act:'open-hatch',face:dir>0?'right':'left'});const ev={at:t-.8,state:was==='open'?'closed':'open'};C.doors[id].push(ev);oev.push({at:ev.at,ev,list:C.doors[id]});C.uses.push({id,at:t});}}
         else t=hold(t,1.6,{act:'look-around',face});}
       S.push({k:'hold',t0:t,t1:1e9,pos,face,ref});tc=t;}
@@ -343,12 +349,12 @@ function nearby(P,times,t,a,skip){const C=compile(P,times),s=actorAt(C,a||'deads
   for(const [id,D] of Object.entries(SC.doors)){if(D.floor||D.wall)continue;const d=Math.hypot(D.x-s.x,(D.y-s.y)*2);if(d<40*SS&&(!best||d<best.d)&&doorOpen(C,id,t)<.5)best={id,d,type:'door',name:lastOf(C.doors[id],t).state==='locked'?(D.big?'HATCH':'DOOR')+' · LOCKED':'OPEN '+(D.big?'HATCH':'DOOR')};}
   if(!best)for(const [a_,b_] of SC.ladders){const top=NY(a_)<NY(b_)?a_:b_,bot=top===a_?b_:a_;if(Math.abs(NX(a_)-s.x)>26*SS)continue;if(Math.abs(s.y-NY(bot))<6*SS)best={id:a_+'|'+b_,d:0,type:'ladder',key:'↑',name:'CLIMB'};else if(Math.abs(s.y-NY(top))<6*SS)best={id:a_+'|'+b_,d:0,type:'ladder',key:'↓',name:'CLIMB DOWN'};else if(s.y<NY(bot)&&s.y>NY(top))best={id:a_+'|'+b_,d:0,type:'ladder',key:'↑↓',name:'LADDER'};}
   return best;}
-function snapshot(P,times,t,a){const C=compile(P,times),o={t,ref:hereRef(P,times,t,a),doors:{},obj:Object.assign({},C.obj),era:eraAt(C,t),rooms:{},world:{}};for(const d of DOORS)o.doors[d]=lastOf(C.doors[d],t).state;for(const r of Object.keys(SC.rooms))o.rooms[r]=roomState(C,r,t);for(const k in WORLD)o.world[k]=worldAt(C,k,t);return o;}
+function snapshot(P,times,t,a){const C=compile(P,times),o={t,ref:hereRef(P,times,t,a),doors:{},obj:Object.assign({},C.obj),era:eraAt(C,t),rooms:{},world:{}};for(const d of DOORS)o.doors[d]=lastOf(C.doors[d],t).state;for(const r of Object.keys(SC.rooms))o.rooms[r]=lastOf(C.rooms[r]||[{state:'normal'}],t).state; /* the commanded state, not the derived one (r22: 'present-dark' came back as a hard state and silenced later soft ones) */for(const k in WORLD)o.world[k]=worldAt(C,k,t);return o;}
 const roomAt=(P,times,t,a)=>{const C=compile(P,times),s=actorAt(C,a||'deadscout',t);return roomOf(s.x,s.y-20);};
-function travelTime(a,fromRef,toRef,sneak){const f=place(fromRef),g=place(toRef);if(!f||!g)return 0;return legsBetween(a,f.pos,g.pos,sneak).reduce((s,L)=>s+legTime(L.k,(L.k==='walk'?dist(L.a,L.b):Math.abs(NY(L.a)-NY(L.b)))*Math.abs(L.f1-L.f0),sneak),0);}
+function travelTime(a,fromRef,toRef,sneak){const f=place(fromRef),g=place(toRef);if(!f||!g)return 0;return legsBetween(a,f.pos,g.pos,sneak).reduce((s,L)=>s+legTime(L.k,(L.k==='walk'?dist(L.a,L.b):Math.abs(NY(L.a)-NY(L.b)))*Math.abs(L.f1-L.f0),sneak,a),0);}
 function wakeAt(P,times){const C=compile(P,times);const e=C.vis.deadscout.find(v=>v.on&&v.at>=0);return e?e.at:(C.chapters[1]?C.chapters[1].start:0);}
 /* ---------- drawing ---------- */
-const cv=document.createElement('canvas');cv.width=W;cv.height=H;let x=cv.getContext('2d');x.imageSmoothingEnabled=false;const scv=document.createElement('canvas'),scx=scv.getContext('2d');
+const cv=document.createElement('canvas');cv.width=W;cv.height=H;let x=cv.getContext('2d');x.imageSmoothingEnabled=false;const scv=document.createElement('canvas'),scx=scv.getContext('2d'),CAMCV={};
 const gc=document.createElement('canvas'),gx=gc.getContext('2d');/* ghost sprite tinting */
 /* the layers arrive in bundles (assets-world.js after assets-core.js), so they are looked up when drawing */
 let L0,L2,LG,LX,LD,LFD;const LREV={}; /* LD/LFD: the artist's powered-down ship and its foreground (HALCYON v2); LREV: each room's light last frame */const LP=null,L1=null;function layers(){LD=IMG['world/frame-dark'];LFD=IMG['world/front-dark'];L0=IMG['world/frame'];L2=IMG['world/front'];LG=IMG['world/grime'];LX=IMG['world/exterior'];}layers();
@@ -358,7 +364,7 @@ const PATHS={};for(const [r,o] of Object.entries(SC.rooms)){const p=new Path2D()
 const BBOX=Object.fromEntries(Object.entries(SC.rooms).map(([r,o])=>{const xs=o.poly.map(p=>p[0]),ys=o.poly.map(p=>p[1]);return [r,[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]];}));
 const roomOf=(X,Y)=>{for(const [r,p] of Object.entries(PATHS))if(x.isPointInPath(p,X,Y))return r;let best=null,bd=1e9;for(const [r,[x0,y0,x1,y1]] of Object.entries(BBOX)){const d=Math.hypot(Math.max(x0-X,0,X-x1),Math.max(y0-Y,0,Y-y1)*2);if(d<bd){bd=d;best=r;}}return best;}; /* a doorway between rooms belongs to the nearer room */
 function glow(cx,cy,r,col,a){if(a<=0)return;const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,`rgba(${col},${a})`);g.addColorStop(.45,`rgba(${col},${a*.4})`);g.addColorStop(1,`rgba(${col},0)`);x.fillStyle=g;x.fillRect(cx-r,cy-r,r*2,r*2);}
-function frameOf(id,anim,t,sd,an0){let sid=SHEET[id]||id,S=A.sheets[sid];if(FALLBACK[sid]&&(!S||(!an0&&!S.animations[anim]&&!(EXTRA[sid]&&EXTRA[sid][anim])))){sid=FALLBACK[sid];S=A.sheets[sid];}if(!S)return null;if(sid==='deadscout'&&!S.animations[anim]&&!an0)anim=ALIAS[anim]||'idle';const an=an0||(EXTRA[sid]&&EXTRA[sid][anim])||S.animations[anim]||(anim==='operate'&&S.animations.interact)||S.animations.idle||Object.values(S.animations)[0];
+function frameOf(id,anim,t,sd,an0){let sid=SHEET[id]||id,S=A.sheets[sid];if(FALLBACK[sid]&&(!S||(!an0&&!S.animations[anim]&&!(EXTRA[sid]&&EXTRA[sid][anim])))){sid=FALLBACK[sid];S=A.sheets[sid];}if(!S)return null;if(!an0&&!S.animations[anim]&&!(EXTRA[sid]&&EXTRA[sid][anim])&&ALIAS[anim])anim=ALIAS[anim];const an=an0||(EXTRA[sid]&&EXTRA[sid][anim])||S.animations[anim]||(anim==='operate'&&S.animations.interact)||S.animations.idle||Object.values(S.animations)[0];
   const tot=an.reduce((p,f)=>p+f[1],0);let u=((t+sd*1.37)%tot+tot)%tot,fi=an[0][0];for(const [f,d] of an){if(u<d){fi=f;break;}u-=d;}return {S,fi,im:IMG[S.path]};}
 function drawSprite(id,anim,X,Y,flip,t,sd,alpha,an0,ctx){ctx=ctx||x;const F=frameOf(id,anim,t,sd,an0);if(!F||!ready(F.im))return null;const S=F.S,fw=S.frame_width,fh=S.frame_height,ax=S.anchor?S.anchor[0]:fw/2,ay=S.anchor?S.anchor[1]:fh-1;ctx.save();if(alpha!=null&&alpha<1)ctx.globalAlpha=alpha;ctx.imageSmoothingEnabled=false;
   if(flip){ctx.translate(Math.round(X)*2,0);ctx.scale(-1,1);}ctx.drawImage(F.im,F.fi*fw,0,fw,fh,Math.round(X-ax*SS),Math.round(Y-ay*SS),fw*SS,fh*SS);ctx.restore();return {w:fw*SS,h:fh*SS};}
@@ -381,7 +387,7 @@ function echoCast(room,preset,C,t){/* who appears in a memory echo, by room */
     upper:[at('commander','idle','upper.mid')]};
   const key=Object.keys(R).find(k=>roomId(k)===room)||room;return (R[key]||[]).filter(Boolean);}
 function screenDraw(id,r,mode,t,W_,camSnap){r=[r[0]+2,r[1]+2,r[2]-2,r[3]-2]; /* the mapped rectangle is the glass; content keeps a one-CRT-pixel margin inside it and is always clipped to it */
-  if(CS>1){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y1-y0+1,sw=Math.max(6,Math.round(w/CS)),sh=Math.max(4,Math.round(h/CS));if(scv.width!==sw||scv.height!==sh){scv.width=sw;scv.height=sh;}
+  if(CS>1){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y1-y0+1,sw=Math.max(6,Math.round(w/CS)),sh=Math.max(4,Math.round(h/CS));if(scv.width<sw||scv.height<sh){scv.width=Math.max(scv.width,sw);scv.height=Math.max(scv.height,sh);} /* grows to the largest screen once; a resize per screen per frame reallocated the backing store ~20× a frame */
     const keep=x;x=scx;x.imageSmoothingEnabled=false;x.clearRect(0,0,sw,sh);screenDraw1(id,[0,0,sw-1,sh-1],mode,t,W_,camSnap);x=keep;x.save();x.beginPath();x.rect(x0,y0,w,h);x.clip();x.imageSmoothingEnabled=false;x.drawImage(scv,0,0,sw,sh,x0,y0,w,h);x.restore();return;}x.save();x.beginPath();x.rect(r[0],r[1],r[2]-r[0]+1,r[3]-r[1]+1);x.clip();screenDraw1(id,r,mode,t,W_,camSnap);x.restore();}
 function screenDraw1(id,r,mode,t,W_,camSnap){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y1-y0+1,big=w>40,T=(s,X,Y,c)=>PX.text(x,s,X,Y,c);
   /* density follows the glass: a small monitor shows a trace, bars or a grid, never a page of text */
@@ -526,7 +532,7 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
     const dimK9=(a==='k9'||a==='k9m')&&/^(off|power-down|power-up)$/.test(anim);if(dimK9){const k=anim==='off'?.32:.55+.35*Math.abs(Math.sin(t*3));x.filter=`brightness(${k})`;} /* one pose until the production sheet: the engine dims it */
     const r=drawSprite(a,anim,st.x,st.y,flip,tt,i*5+1,mem?.92:1,an0);if(dimK9)x.filter='none';if(r)AB[a]={x:st.x,y:st.y,h:r.h,flip,anim,ref:st.ref||''};};
   CREW.forEach((a,i)=>drawActor(a,i));
-  const camSnap={};for(const [id,,room] of camScreens){const R=(SC.cameras&&SC.cameras[room])||[0,0,W,H],w=R[2]-R[0],h=R[3]-R[1],cc=document.createElement('canvas');cc.width=w;cc.height=h;cc.getContext('2d').drawImage(cv,R[0],R[1],w,h,0,0,w,h);camSnap[id]=cc;}
+  const camSnap={};for(const [id,,room] of camScreens){const R=(SC.cameras&&SC.cameras[room])||[0,0,W,H],w=R[2]-R[0],h=R[3]-R[1];let cc=CAMCV[id];if(!cc){cc=CAMCV[id]=document.createElement('canvas');}if(cc.width!==w||cc.height!==h){cc.width=w;cc.height=h;}else cc.getContext('2d').clearRect(0,0,w,h);cc.getContext('2d').drawImage(cv,R[0],R[1],w,h,0,0,w,h);camSnap[id]=cc;}
   drawActor('deadscout',3);
   if(DARKART&&ready(LFD)){x.drawImage(LFD,0,0,W,H);if(ready(L2))for(const r in LREV){const a=clamp((LREV[r]-.55)/.45,0,1);if(a>.003&&PATHS[r]){x.save();x.clip(PATHS[r]);x.globalAlpha=a;x.drawImage(L2,0,0,W,H);x.restore();}}}
   else if(ready(L2))x.drawImage(L2,0,0,W,H);
@@ -552,8 +558,8 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
      if(tg>=1&&since<1.1){v=hash(Math.floor(since*14),r.length*7+3)<(since<.5?.55:.25)?.12:(since<.5?.75:1);}else v+=(tg-v)*.35; /* a fluorescent tube finding itself */
      RLV[r]=v;L*=.1+.9*v;}
     if(F.flicker&&hash(Math.floor(t*7),r.length*11)<.12)L*=.45;if(evNow&&evNow.type!=='signal-flash')L*=1-.45*evE*(evNow.type==='power-drop'?1.6:1);
-    LREV[r]=L;x.save();x.clip(PATHS[r]);const dk=DARKART?clamp(.5-L,0,.6):clamp(1-L,0,.92);if(dk>.001){x.fillStyle=`rgba(4,3,8,${dk})`;x.fillRect(0,0,W,H);}
-    x.globalCompositeOperation='lighter';const tint=(col,a)=>{if(a>0){x.fillStyle=`rgba(${col},${a})`;x.fillRect(0,0,W,H);}};const ec=ech[r]?ech[r].e:0;
+    LREV[r]=L;x.save();x.clip(PATHS[r]);const [bx0,by0,bx1,by1]=BBOX[r],bw=bx1-bx0+1,bh=by1-by0+1; /* fills under the clip cover the room's box, not the whole hull */const dk=DARKART?clamp(.5-L,0,.6):clamp(1-L,0,.92);if(dk>.001){x.fillStyle=`rgba(4,3,8,${dk})`;x.fillRect(bx0,by0,bw,bh);}
+    x.globalCompositeOperation='lighter';const tint=(col,a)=>{if(a>0){x.fillStyle=`rgba(${col},${a})`;x.fillRect(bx0,by0,bw,bh);}};const ec=ech[r]?ech[r].e:0;
     tint('90,220,200',(F.cyan||0)*(F.pulse?.6+.4*Math.sin(t*.9+r.length):1)+(B.cyan||0)+.05*ec);tint('255,150,70',(B.orange||0)*(present?.3:1));tint('255,170,110',(B.warm||0)*(present?.3:1));
     tint('255,50,30',((F.red||0)+(al>0&&r!=='quarters'?.05*al:0))*(.5+.5*Math.sin(t*3.4)));tint('255,170,60',(F.amber||0)*(.5+.5*Math.sin(t*5)));if(TOY.alert&&!B.outside){const pu=.5+.5*Math.sin(performance.now()/1000*2.6);x.globalCompositeOperation='multiply';x.fillStyle=`rgba(255,${Math.round(70-30*pu)},${Math.round(60-30*pu)},${.6+.15*pu})`;x.fillRect(0,0,W,H);x.globalCompositeOperation='lighter';tint('255,30,20',.06+.1*pu);}x.restore();}
   x.save();x.globalCompositeOperation='lighter';for(const [i,Lp] of SC.lamps.entries()){const st=rs[Lp.room]||'normal',F=STATES[st]||{},col=PX.LCOL[Lp.type]||PX.LCOL.amber;let p=PX.irr(t,[4.7,7.3,11.1,5.9,9.4][i%5],i*31+7);

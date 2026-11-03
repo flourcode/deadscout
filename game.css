@@ -46,6 +46,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 14
 @media (max-width:760px){.hud{grid-template-columns:1fr 1fr}.d-mid{grid-column:1/-1;order:-1;box-shadow:none;margin-bottom:6px}.d-right{box-shadow:-2px 0 0 #1f1c17}.u-top .u-id em,.u-top .bolt{display:none}.unit{padding:0 8px 8px}}
 @keyframes fade{to{opacity:0}}
 @keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.led,.hud-rec,.u-idle span:last-child,.trec{animation:none}}
 /* the veil: black between scenes, and the title cards */
 .veil{position:absolute;inset:0;background:var(--bg);pointer-events:none;opacity:1;transition:opacity 1.6s steps(6)}
 .veil.clear{opacity:0}
@@ -87,7 +88,9 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 14
 .menu button[hidden]{display:none}
 .menu button:hover,.menu button.sel{color:var(--ink);border-color:var(--line2)}
 .menu button.sel::before{content:'>';position:absolute;left:6px;color:var(--orange)}
-.menu button:focus-visible{outline:none;color:var(--ink)}
+.menu button:focus-visible{outline:none;color:var(--ink);border-color:var(--line2)}
+/* keyboard focus is visible on every bar whose buttons are all:unset */
+.wui-btns button:focus-visible,.ph-bar button:focus-visible,.rows .row input:focus-visible{outline:none;color:var(--ink);box-shadow:inset 0 0 0 2px var(--line2)}
 .t-foot{margin:16px 0 0;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--dim)}
 .t-foot a{color:var(--dim);text-decoration:none}.t-foot a:hover{color:var(--ink)}
 .t-sep{margin:0 12px}
@@ -130,6 +133,7 @@ body.watching{cursor:none}body.watching.ui{cursor:default}
 body.ui .focusline{opacity:0}
 .row input{all:unset;font-family:Silk;font-size:12px;letter-spacing:3px;color:var(--ink);text-align:left;border-bottom:1px solid rgba(231,219,192,.18);padding:2px 0;min-width:0}
 .row input::placeholder{color:rgba(143,136,120,.5)}
+.row[hidden]{display:none} /* the author display:grid beat the UA [hidden] rule: the OBJECTIVE row never hid with FOCUS off */
 .wui-btns input{all:unset;font-family:Silk;font-size:9px;letter-spacing:3px;color:var(--ink);padding:9px 12px;width:180px;box-shadow:inset 0 0 0 1px rgba(231,219,192,.2)}
 .wui-btns input::placeholder{color:var(--dim)}
 /* photo mode: nothing over the ship but a small bar at the bottom (the saved picture never has it) */

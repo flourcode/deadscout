@@ -122,6 +122,13 @@ function pMotor(E,L,r){const c=E.ctx,out=c.createGain(),f0=L.f0d&&r()<.4?L.f0d:r
   /* cycling machines (a fridge compressor) switch on and off with a clunk */
   if(L.cycle){M.on=L.cycle.startOn||r()<.5;M.nextCycle=r.range(20,L.cycle.on[1]);out.gain.value=M.on?1:0;}
   M.tick=(up)=>{const st=E.lv.strange,dr=E.lv.drift;
+    {/* the past is not scheduled: after a skip, a long stall or a resume, every counter is moved past the clock without creating a node
+        (r22 fired every missed pulse at once). The same draws are made from the same RNGs, so the seed stays honest. */
+      const lo=ctx.currentTime-E.t0-.1;while(M.nextDrift<lo){r.pm(r.range(.0015,.006));if(st>.15)r.pm(.01*st);M.nextDrift+=r.range(120,420);}
+      while(M.nextBlip<lo){if(dr>0){r.pm(r.range(.004,.015));r.range(.5,3);}M.nextBlip+=r.range(60,240)/Math.max(.5,dr||1);}
+      if(P){const jit=r.v(P.jit||[.01,.04])*(1+st*8);while(M.next<lo){if(!L.cycle||M.on){M.step++;M.pulseR.pm(.25);}M.next+=(1/M.rate)*(1+M.pulseR.pm(jit));}
+        if(st>.15)while(M.gnext<lo)M.gnext+=(1/(M.rate*(1+.01+st*.03)))*(1+M.pulseR.pm(jit));else M.gnext=M.next;}
+      if(L.cycle)while(M.nextCycle<lo){M.on=!M.on;out.gain.setTargetAtTime(M.on?1:0,ctx.currentTime,.01);M.nextCycle+=M.on?r.v(L.cycle.on):r.v(L.cycle.off);}}
     while(M.nextDrift<up){const t=E.t0+M.nextDrift;M.pitch=1+r.pm(r.range(.0015,.006))*dr+(st>.15?r.pm(.01*st):0);for(const [o,f] of oscs)o.frequency.setTargetAtTime(f*M.pitch,t,30);M.nextDrift+=r.range(120,420);}
     while(M.nextBlip<up){const t=E.t0+M.nextBlip;if(dr>0){const k=1+r.pm(r.range(.004,.015)),d=r.range(.5,3);for(const [o,f] of oscs){o.frequency.setTargetAtTime(f*M.pitch*k,t,.15);o.frequency.setTargetAtTime(f*M.pitch,t+d,.4);}}
       M.nextBlip+=r.range(60,240)/Math.max(.5,dr||1);} /* occasional: a small mechanical shift every 1-4 minutes */

@@ -52,7 +52,7 @@ box.addEventListener('pointerdown',e=>e.stopPropagation());
 box.addEventListener('click',e=>{e.stopPropagation();cycle(false);});
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wClock');if(b){e.stopPropagation();cycle(true);}},true);
 /* sits just left of the quick bar, on its row */
-function place(){const q=document.querySelector('.qbar');const sr=scr.getBoundingClientRect();if(q&&q.offsetParent){const r=q.getBoundingClientRect();box.style.right=Math.round(sr.right-r.left+14)+'px';box.style.top=Math.round(r.top-sr.top)+'px';}else{box.style.right='2%';box.style.top='3%';}}
+function place(){const q=document.querySelector('.qbar');const sr=scr.getBoundingClientRect();if(q&&q.offsetParent){const r=q.getBoundingClientRect();box.style.right=Math.round(sr.right-r.left+30)+'px';box.style.top=Math.round(r.top-sr.top)+'px';}else{box.style.right='2%';box.style.top='3%';}}
 function tick(){const on=P.c!=='off'||(window.__toys&&window.__toys.S&&window.__toys.S.mood==='alert');document.body.classList.toggle('clk',on);if(!document.body.classList.contains('watching'))return;
   const dimEl=document.getElementById('dim');box.classList.toggle('dimmed',!!(dimEl&&!dimEl.hidden));place();if(on)draw();}
 setInterval(tick,250);label();tick();

@@ -10,7 +10,8 @@ let ctx=null,out=null,L={},timers=[],alive=false,mood='routine',noiseBuf=null;
 function noise(){if(noiseBuf)return noiseBuf;const n=ctx.sampleRate*4,b=ctx.createBuffer(2,n,ctx.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);let s=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;s=.98*s+.02*w;d[i]=(w*.6+s*4)*.35;}}noiseBuf=b;return b;}
 function src(){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;s.start();return s;}
 const g=v=>{const n=ctx.createGain();n.gain.value=v;return n;};
-const lfo=(hz,amt,target)=>{const o=ctx.createOscillator(),k=ctx.createGain();o.frequency.value=hz;k.gain.value=amt;o.connect(k);k.connect(target);o.start();return o;};
+let lfos=[]; /* every modulator, so stop() can stop them: r22 left five oscillators running per start */
+const lfo=(hz,amt,target)=>{const o=ctx.createOscillator(),k=ctx.createGain();o.frequency.value=hz;k.gain.value=amt;o.connect(k);k.connect(target);o.start();lfos.push(o);return o;};
 function layer(name,build){const fader=g(0);fader.connect(out);const nodes=build(fader);L[name]={fader,nodes,level:0};}
 function start(c,dest,mix,opts){stop();ctx=c;out=g(1);out.connect(dest);alive=true;mood=(opts&&opts.mood)||'routine';
   layer('engine',f=>{const s=src(),lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=90;lp.Q.value=.7;const o=ctx.createOscillator();o.type='sine';o.frequency.value=48;const o2=ctx.createOscillator();o2.type='triangle';o2.frequency.value=96.4;
@@ -38,6 +39,7 @@ function click(f,v){const s=src(),hp=ctx.createBiquadFilter();hp.type='highpass'
 /* faders: 0..1 each, eased, with a curve so the lower half is usable */
 function set(mix,secs){if(!ctx)return;for(const k in L){const v=Math.pow(Math.max(0,Math.min(1,mix[k]!=null?mix[k]:MIX0[k])),1.6)*({engine:.55,ventilation:.5,machinery:.7,radio:.5,signal:.6,hull:.7}[k]||.5);L[k].level=v;L[k].fader.gain.setTargetAtTime(v,ctx.currentTime,secs!=null?secs/3:.4);}}
 function duck(amount,secs){if(!out)return;out.gain.setTargetAtTime(Math.max(0,1-amount),ctx.currentTime,(secs||10)/3);}
-function stop(){alive=false;timers.forEach(clearTimeout);timers=[];for(const k in L){try{L[k].fader.gain.setTargetAtTime(0,ctx.currentTime,.3);const F=L[k];setTimeout(()=>{try{F.fader.disconnect();F.nodes.forEach(n=>{try{n.stop();}catch(e){}});}catch(e){}},1500);}catch(e){}}L={};}
+function stop(){alive=false;timers.forEach(clearTimeout);timers=[];for(const k in L){try{L[k].fader.gain.setTargetAtTime(0,ctx.currentTime,.3);const F=L[k];setTimeout(()=>{try{F.fader.disconnect();F.nodes.forEach(n=>{try{n.stop();}catch(e){}});}catch(e){}},1500);}catch(e){}}L={};
+  {const old=lfos;lfos=[];setTimeout(()=>{for(const o of old){try{o.stop();o.disconnect();}catch(e){}}},1500);}}
 window.AMB={start,set,stop,duck,setMood:m=>{mood=m;},MIX0};
 })();

@@ -157,6 +157,7 @@ for(const id of ['lMode','lView','lMood','lMusic','lMins','lSeed','lSleep','lLab
 $('lOpen').addEventListener('click',()=>{window.open(bcUrl(),'_blank','noopener,width=1920,height=1080');});
 $('lCopy').addEventListener('click',()=>copy(bcUrl(),'LINK COPIED'));
 paintLink();
+if(LR&&LR.cleanup)LR.cleanup(); /* last session's recording parts go, as the game already does */
 load(window.NW?NW.manifest({view:'full-ship',activity:'quiet',duration_minutes:60}):DS_DEFAULT_EPISODE);paintHelp();paintSaved();paintBroadcast();sizeStage();requestAnimationFrame(frame);
 window.__director={get BC(){return BC;},meter:()=>meterL&&meterL.read(),get trim(){return trimG&&trimG.gain.value;},get P(){return P;},get TIMES(){return TIMES;},get AL(){return AL;},load};
 })();

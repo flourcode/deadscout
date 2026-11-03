@@ -31,7 +31,7 @@ async function record(o){const {canvas,ctx,source}=o,fps=o.fps||30,vbr=o.vbr||4.
     let mr;try{mr=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:vbr,audioBitsPerSecond:192000}:{videoBitsPerSecond:vbr});}catch(e){mr=new MediaRecorder(stream);}
     const chunks=[];let bytes=0;mr.ondataavailable=e=>{if(e.data&&e.data.size){chunks.push(e.data);bytes+=e.data.size;}};const type=(mr.mimeType||mime||'video/webm').split(';')[0];
     return {kind:'mr',mime:type,ext:/mp4/.test(type)?'mp4':'webm',start(){mr.start(1000);},frame(){},bytes:()=>bytes,
-      stop(){return new Promise(ok=>{mr.onstop=()=>{try{trim.disconnect();}catch(e){}ok(new Blob(chunks,{type}));};try{mr.state!=='inactive'?mr.stop():mr.onstop();}catch(e){mr.onstop();}});}};};
+      stop(){return new Promise(ok=>{mr.onstop=()=>{try{trim.disconnect();}catch(e){}try{stream.getTracks().forEach(t=>t.stop());dest.disconnect();}catch(e){} /* the canvas stops pumping frames once the take is over */ok(new Blob(chunks,{type}));};try{mr.state!=='inactive'?mr.stop():mr.onstop();}catch(e){mr.onstop();}});}};};
   /* WebCodecs, H.264 + AAC only (several H.264 levels and profiles: the biggest frame needs level 4 or more) */
   const sr=ctx.sampleRate;let V=null,Au=null;
   if(window.VideoEncoder&&window.AudioEncoder&&window.VideoFrame&&window.AudioData&&window.AudioWorkletNode&&ctx.audioWorklet){
@@ -57,7 +57,7 @@ async function record(o){const {canvas,ctx,source}=o,fps=o.fps||30,vbr=o.vbr||4.
   const aenc=new AudioEncoder({output:(c,m)=>mux.addAudioChunk(c,m),error:e=>{failed=e;}});aenc.configure({codec:Au.codec,sampleRate:sr,numberOfChannels:2,bitrate:192000});
   const tapName='sb-tap-'+(++nTap),wl='class T extends AudioWorkletProcessor{process(i){const c=i[0];if(c&&c.length){this.port.postMessage([c[0].slice(),(c[1]||c[0]).slice()]);}return true;}}registerProcessor("'+tapName+'",T);'; /* a new name each time: two recorders overlap at a part boundary */
   let tap=null;const mute=ctx.createGain();mute.gain.value=0;
-  try{await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([wl],{type:'text/javascript'})));tap=new AudioWorkletNode(ctx,tapName,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});tap.port.onmessage=e=>push(e.data[0],e.data[1]);}
+  try{const wurl=URL.createObjectURL(new Blob([wl],{type:'text/javascript'}));try{await ctx.audioWorklet.addModule(wurl);}finally{URL.revokeObjectURL(wurl);}tap=new AudioWorkletNode(ctx,tapName,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});tap.port.onmessage=e=>push(e.data[0],e.data[1]);}
   catch(e){/* pages that refuse worklet code: the older audio tap does the same job */tap=ctx.createScriptProcessor(4096,2,2);tap.onaudioprocess=ev=>{const ib=ev.inputBuffer,L=ib.getChannelData(0);push(L.slice(),(ib.numberOfChannels>1?ib.getChannelData(1):L).slice());};}
   tap.connect(mute).connect(ctx.destination);
   let on=false,samples=0,bufL=[],bufR=[],bufN=0,frames=0,lastF=-1;
@@ -68,7 +68,7 @@ async function record(o){const {canvas,ctx,source}=o,fps=o.fps||30,vbr=o.vbr||4.
     start(){trim.connect(tap);on=true;},
     frame(t){const f=Math.round(t*fps);if(!on||failed||f<=lastF)return;if(venc.encodeQueueSize>6)return; /* a slow computer drops a frame rather than falling behind */
       lastF=f;let vf;try{vf=new VideoFrame(canvas,{timestamp:Math.round(f/fps*1e6)});}catch(e){failed=e;console.error('recorder: the picture stopped recording',e);return;}venc.encode(vf,{keyFrame:frames%(fps*2)===0});vf.close();frames++;},
-    async stop(){on=false;flushAudio();try{trim.disconnect();tap.disconnect();}catch(e){}try{await venc.flush();await aenc.flush();}catch(e){}if(!vChunks)throw new Error('NO PICTURE');mux.finalize();
+    async stop(){on=false;flushAudio();try{trim.disconnect();tap.disconnect();mute.disconnect();}catch(e){}try{await venc.flush();await aenc.flush();}catch(e){}try{venc.close();aenc.close();}catch(e){} /* the hardware encoders are handed back */if(!vChunks)throw new Error('NO PICTURE');mux.finalize();
       if(disk){await disk.chain;try{await disk.w.close();}catch(e){disk.err=disk.err||e;}if(disk.err)throw new Error('DISK');return await disk.fh.getFile();}
       if(tail){parts.push(new Blob([tail]));tail=null;}
       return new Blob(parts,{type:'video/mp4'});}};

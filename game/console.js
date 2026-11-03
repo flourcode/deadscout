@@ -43,7 +43,7 @@ function run(raw,X){const c=raw.trim().toUpperCase().replace(/\s+/g,' ');if(!c)r
   case 'CLEAR':case 'CLS':return [null];
   case 'EXIT':case 'QUIT':case 'BYE':return [false];
   }
-  return ['COMMAND NOT RECOGNISED: '+w,'TYPE HELP.'];}
+  return ['COMMAND NOT RECOGNIZED: '+w,'TYPE HELP.'];}
 function wrap(s,n){const out=[];let line='';for(const w of s.split(' ')){if((line+' '+w).trim().length>n){out.push(line);line=w;}else line=(line+' '+w).trim();}if(line)out.push(line);return out;}
 window.SHIPCON={LOGS,logFor,run,wrap};
 })();

@@ -1,7 +1,7 @@
 /* DeadScout · NIGHT WATCH. The ship runs itself: a routine scheduler picks small storylets for the crew (a maintenance
    check, a break in the quarters, an EVA inspection), a micro-event stream keeps the screens and lamps alive, and in
    STRANGE a rare event library adds things nobody explains. Everything comes out as ordinary Director events on the
-   shared timeline, from a seed, so a session is coherent and a recorded one is repeatable. Used by the game (play.html)
+   shared timeline, from a seed, so a session is coherent and a recorded one is repeatable. Used by the game (index.html)
    and by the studio (a night-watch JSON becomes an episode to render).
    window.NW = {manifest(cfg), schedule(cfg,opts), title(cfg), VIEWS, ACTIVITY, MUSIC, DEFAULTS} */
 (function(){
@@ -45,7 +45,7 @@ const STRANGE=[
  {id:'hatch-opens',weight:.7,steps:[{door:'maint-hatch',state:'open'},{wait:28},{door:'maint-hatch',state:'closed'}]},
  {id:'lower-deck-dark',weight:.6,steps:[{room:'engineering',state:'blackout'},{wait:22},{room:'engineering',state:'normal'}]},
  {id:'slight-growth',weight:.4,steps:[{set:{contamination_level:'+.35'},over:60}]}];
-const SCREENS_CALM=['bridge.left2','bridge.side','sensor.small','sensor.bank1','sensor.bank2','utility.diag','engineering.flow','engineering.load'];
+const SCREENS_CALM=['bridge.left2','bridge.side','sensor.small','sensor.bank1','sensor.bank2','quarters.monitor','engineering.panel','engineering.load']; /* every id is a screen the map has (r22 named two that were not, and those beats were dropped) */
 const MODES_CALM=['idle-grid','waveform','text-terminal','signal-bars'];
 function rng(seed){let a=seed>>>0;return ()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
 const pick=(r,list,w)=>{const tot=list.reduce((s,x,i)=>s+(w?w(x,i):1),0);let u=r()*tot;for(const [i,x] of list.entries()){u-=w?w(x,i):1;if(u<=0)return x;}return list[list.length-1];};

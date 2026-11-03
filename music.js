@@ -63,7 +63,7 @@ function pMix(E,L,r0){const c=E.ctx,St=STYLES[L.style]||STYLES.synthwave,mx=Obje
   /* tape wobble for spacewave and chillwave: every oscillator drifts together */
   let wow=null;if(St.wow){const o=c.createOscillator();o.frequency.value=.35;wow=c.createGain();wow.gain.value=St.wow;o.connect(wow);o.start(E.t0);E.srcs.push(o);}
   const N=E.N;
-  function osc(type,f,t,end){const o=c.createOscillator();o.type=type;o.frequency.setValueAtTime(f,t);if(wow)wow.connect(o.detune);o.start(t);o.stop(end);return o;}
+  function osc(type,f,t,end){const o=c.createOscillator();o.type=type;o.frequency.setValueAtTime(f,t);if(wow){wow.connect(o.detune);o.addEventListener('ended',()=>{try{wow.disconnect(o.detune);}catch(e){}});} /* every voice lets go of the wobble (r22 left 7 of 8 pad voices connected for ever) */o.start(t);o.stop(end);return o;}
   function done(src,nodes){src.onended=()=>{for(const n of nodes)try{n.disconnect();}catch(e){}if(wow)try{wow.disconnect(src.detune);}catch(e){}};}
   const mtof=m=>440*Math.pow(2,(m-69)/12);
   /* drums */

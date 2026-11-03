@@ -97,7 +97,7 @@ function make(ctx,dest,o){o=o||{};const SLEEP=!!o.sleep; /* the sleep profile: n
   const bus=(dry,rev,dly)=>{const b=G(1),d=G(dry),r=G(rev),e=G(dly);b.connect(d);d.connect(tapeIn);b.connect(r);r.connect(rvIn);b.connect(e);e.connect(dIn);return {b,d,r,e};};
   const B={pad:bus(.55,.55,.04),air:bus(.25,.9,.1),ghost:bus(.2,1,.25),sub:bus(.8,.08,0),keys:bus(.35,.75,.32),perc:bus(.5,.35,.05),tex:bus(.45,.7,.2),bed:bus(.6,.25,0)};
   /* the bed: ventilation hiss, HALCYON's rain, always there, breathing very slowly */
-  {const s=noise(ctx.currentTime,1e6),f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1300;f.Q.value=.45;const l=ctx.createBiquadFilter();l.type='lowpass';l.frequency.value=3200;const g=G(.05),m=ctx.createOscillator(),mg_=G(.016);m.frequency.value=.041;m.connect(mg_);mg_.connect(g.gain);m.start();s.connect(f);f.connect(l);l.connect(g);g.connect(B.bed.b);}
+  {const s=noise(ctx.currentTime,1e6),f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1300;f.Q.value=.45;const l=ctx.createBiquadFilter();l.type='lowpass';l.frequency.value=3200;const g=G(.05),m=ctx.createOscillator(),mg_=G(.016);m.frequency.value=.041;m.connect(mg_);mg_.connect(g.gain);m.start();live.push({s:m,end:1e12}); /* stopped with the band, or it kept the whole graph (and the reverb IR) alive after every pause and tape change */s.connect(f);f.connect(l);l.connect(g);g.connect(B.bed.b);}
   const root=ROOTS[T.root]||55;
   function env(g,t,att,hold,rel,lvl){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(lvl,t+att);g.gain.setValueAtTime(lvl,t+att+Math.max(0,hold));g.gain.setTargetAtTime(0,t+att+Math.max(0,hold),rel/4);}
   function osc(type,f,t,end,det){const s=ctx.createOscillator();s.type=type;s.frequency.value=f;if(det)s.detune.value=det;s.start(t);s.stop(end);live.push({s,end});return s;}
@@ -136,7 +136,7 @@ function make(ctx,dest,o){o=o||{};const SLEEP=!!o.sleep; /* the sleep profile: n
     if(e.type==='phase'){phase=e.ph;for(const k of ['pad','air','ghost','keys','tex']){B[k].r.gain.setTargetAtTime((k==='pad'?.55:k==='air'?.9:k==='keys'?.75:.8)*e.ph.wet,Math.max(t,ctx.currentTime),8);}lwg.gain.setTargetAtTime(.0011*T.wow*e.ph.wow,Math.max(t,ctx.currentTime),20);return;}
     if(SLEEP&&(e.type==='dropout'||(e.type==='tex'&&(e.kind==='impact'||e.kind==='radio'))||(e.type==='motif'&&R()<.5)||/^(kick|brush|thud|tick|clank)$/.test(e.type)))return;
     if(e.type==='dropout'){out.gain.setTargetAtTime(.55,t,.01);out.gain.setTargetAtTime(1,t+e.dur,.02);return;}
-    if(e.type==='chord'){const v=e.v,lv=T.pad*ph.pad*M.pad,att=late?Math.min(1.5,e.att):e.att,dur=e.dur-late;
+    if(e.type==='chord'){const v=e.v,lv=T.pad*ph.pad*M.pad,att=late?Math.min(1.5,e.att):e.att,dur=Math.max(2,e.dur-late); /* a chord rescued late still has a positive length */
       [[v.low,.30,-.35],[v.mid,.24,.25],[v.up,.17,-.1]].forEach(([s,l,p])=>pad(hz(root,s),t,dur,att,e.rel,l*lv*.30,e.cut,p+(R()-.5)*.2)); /* low fifth ~E3, mid ~C4, upper ~G4 for A */
       if(v.top!=null&&R()<.6)pad(hz(root,v.top),t+rr(R,1,4),Math.max(2,dur-4),att+2,e.rel,.08*lv*.30,e.cut*1.4,(R()-.5)*.8);return;}
     if(e.type==='sub'){sub(hz(root,e.semi),t,e.dur-late,ph.quiet?.6:1);return;}
