@@ -274,3 +274,55 @@ body{--tz:1}body[data-text=large]{--tz:1.4}body[data-text=xl]{--tz:1.85}
 .con{display:flex;flex-direction:column;align-items:center;justify-content:center}
 
 .wui-btns button[hidden],.wui-btns input[hidden]{display:none}
+/* ===================== r27 · the boot screen: an old cabinet's loading card ===================== */
+.boot{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:#000;padding:16px;transition:opacity .4s steps(4)}
+.boot.out{opacity:0;pointer-events:none}
+.bt-box{width:min(640px,100%);aspect-ratio:4/3;max-height:calc(100svh - 32px);display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,5vw,48px);box-sizing:border-box;background:#000;box-shadow:0 0 0 4px #14181c,0 0 0 8px #3c3a40}
+.bt-top{margin:0 0 auto;display:flex;justify-content:space-between;font:400 clamp(8px,1.6vw,11px)/1 Silk;letter-spacing:3px;color:#4e423c}
+.bt-load{margin:0 0 clamp(10px,2.4vw,18px);font:400 clamp(22px,5.2vw,40px)/1 Silk;letter-spacing:.08em;color:var(--ink);text-shadow:3px 3px 0 #14181c}
+.bt-dots::after{content:'';animation:btdots 1.2s steps(4) infinite}
+@keyframes btdots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.bt-bar{height:clamp(22px,5vw,40px);box-shadow:inset 0 0 0 4px var(--ink);padding:8px;box-sizing:border-box}
+.bt-bar{display:flex;gap:clamp(2px,.6vw,4px)}.bt-bar b{flex:1}.bt-bar b.on{background:var(--ink)}.bt-bar b.on:last-of-type{background:var(--amber)}
+.bt-start{margin:0 0 clamp(10px,2.4vw,18px);font:400 clamp(26px,6.4vw,48px)/1 Silk;letter-spacing:.1em;color:var(--amber);text-shadow:3px 3px 0 #14181c;animation:blink 1.1s steps(1) infinite}
+.bt-foot{margin:0;display:flex;justify-content:space-between;align-items:center;gap:14px;font:400 clamp(7px,1.4vw,10px)/1.6 Silk;letter-spacing:3px;color:var(--dim)}
+.bt-foot button{all:unset;cursor:pointer;padding:6px 10px;color:var(--ink);box-shadow:inset 0 0 0 2px #3c3a40}.bt-foot button:hover,.bt-foot button:focus-visible{box-shadow:inset 0 0 0 2px var(--ink)}
+.boot{cursor:pointer}.bt-bar[hidden],.bt-load[hidden],.bt-sub[hidden],.bt-start[hidden],.bt-foot[hidden]{display:none}
+/* in a watch with the controls away, nothing on the glass but the ship and the clock */
+body.watching:not(.ui):not(.portrait) .qbar{opacity:0!important;pointer-events:none}
+body.watching:not(.ui):not(.portrait) .toys{opacity:0;transition:opacity .6s}
+.bt-sub{margin:clamp(8px,2vw,14px) 0 0;font:400 clamp(8px,1.6vw,11px)/1 Silk;letter-spacing:4px;color:var(--amber)}
+@media (prefers-reduced-motion:reduce){.bt-dots::after{animation:none;content:'...'}}
+/* ===================== r27 · small screens ===================== */
+/* the watch's top line: time remaining, then the track (the track goes on a small screen) */
+.wui-time{display:inline-flex;gap:12px;white-space:nowrap}.wui-time b{font-weight:400;color:var(--ink)}.wt-track:not(:empty)::before{content:'· ';color:var(--dim)}
+.wui-top,.wui-name{white-space:nowrap}
+.compact .wt-track{display:none}
+.compact .wui-top{left:10px;right:10px;top:8px;font-size:8px;letter-spacing:2px}
+.compact .wui-bar{padding:8px 8px 9px;gap:4px;justify-content:center}
+.compact .wui-btns{gap:4px;justify-content:center}
+.compact .wui-btns button{font-size:8px;letter-spacing:2px;padding:7px 8px}
+.wui-btns em{font-style:normal}.compact .wui-btns em{display:none}.wui-btns button.on{color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.compact .wui-btns input{width:150px;font-size:8px;padding:7px 8px}
+.compact .menu{min-width:0}.compact .menu button{padding:6px 14px;font-size:10px;letter-spacing:3px}
+.compact .t-name{font-size:clamp(30px,7vw,60px);margin-bottom:8px}
+.compact .setup .rows{min-width:0;gap:2px}.compact .row{grid-template-columns:84px 1fr;padding:5px 10px;font-size:9px;letter-spacing:2px}.compact .row input{font-size:9px}
+.compact .setup,.compact .title,.compact .pause,.compact .controls{gap:8px;padding:10px;overflow:auto}
+.compact .t-foot{font-size:7px;margin-top:6px}
+@media (max-height:520px){.compact .setup .t-foot:not(.hours),.compact .t-kicker{display:none}}
+/* a phone held upright: the picture at the top; menus, the watch's controls, the dialogue and the keys in the room below.
+   The panels are children of the screen, so they hang from its bottom edge across the full width of the page. */
+body.portrait .g{place-items:start center;padding-top:8px;min-height:100svh}
+body.portrait #screen>.title,body.portrait #screen>.pause,body.portrait #screen>.setup,body.portrait #screen>.controls,body.portrait #screen>.con,
+body.portrait .wui-bar,body.portrait .pad,body.portrait .tbot{position:absolute;inset:auto;top:calc(100% + 8px);left:calc(-1 * var(--sl) - 8px);width:100vw;box-sizing:border-box}
+body.portrait #screen>.title,body.portrait #screen>.pause,body.portrait #screen>.setup,body.portrait #screen>.controls,body.portrait #screen>.con{height:calc(100svh - var(--sb) - 8px);justify-content:flex-start;padding:18px 16px 24px;overflow:auto;background:#050508;z-index:6}
+body.portrait .pad{height:calc(100svh - var(--sb) - 8px)}
+body.portrait .wui{opacity:1}body.portrait .wui-bar{background:none;padding:14px 16px;justify-content:center}
+body.portrait .wui-btns{justify-content:center}
+body.portrait .tbot{bottom:auto;padding:12px 16px 0}body.portrait .touchpad .tbot{right:auto}
+body.portrait .t-name{font-size:clamp(30px,10vw,52px)}
+body.portrait .title .menu,body.portrait .pause .menu{width:min(100%,360px)}
+body.portrait .ab{padding-top:24px}
+body.portrait .unit{clip-path:none} /* the housing's chamfer would clip the panels hanging below the picture */
+
+.menu .util{flex-wrap:wrap;justify-content:center}.bt-foot button{white-space:nowrap;flex:none} /* r28: four small items on a phone */

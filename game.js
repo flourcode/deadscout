@@ -30,22 +30,32 @@ function quickKey(k){const fl=window.__padFlash||(()=>{});ensureAudio();if(k==='
   else if(k==='KeyK'){const m=prefs.pad==='on'||prefs.pad===true?'off':'on';prefs.pad=m;savePrefs();fl(m==='on'?'ON-SCREEN KEYS · ON':'ON-SCREEN KEYS · OFF');}}
 function setMusicOn(on){prefs.musicOn=!!on;savePrefs();if(musicMute)musicMute.gain.setTargetAtTime(on?1:0,actx.currentTime,.25);}
 const BCQ=new URLSearchParams(location.search),BC=BCQ.get('broadcast')==='1';let watchSeed=0,sleepReq=false;
-window.__game={toyApi:()=>({sfx:(n,g)=>sfx(n,null,g),mix:(k,v)=>{if(v==null)return prefs.mix[k];ensureAudio();setMix(k,v);},hero:k=>{try{band&&band.hero(k);}catch(e){}},note:(t,s)=>note(t,s),say:(w,l,s,o)=>say(w,l,s,o),
+window.__game={audio:()=>{ensureAudio();return {ctx:actx,out:master};},amb:room=>{if(AMB&&actx)AMB.set(room?roomMix(room):Object.assign({},AMB.MIX0,prefs.mix),3);},
+  quickWatch:()=>{if(state==='title')beginWatch();}, /* the boot screen's PRESS START: straight into the watch, last settings */
+  beat:b=>{b.at=now()+(+b.at||0);if(watch){P.script.push(b);P.rev++;}else{SP.cmds.push(b);SP.rev=(SP.rev||0)+1;}}, /* joy.js: a command on the shared timeline */
+  toyApi:()=>({sfx:(n,g)=>sfx(n,null,g),mix:(k,v)=>{if(v==null)return prefs.mix[k];ensureAudio();setMix(k,v);},hero:k=>{try{band&&band.hero(k);}catch(e){}},note:(t,s)=>note(t,s),say:(w,l,s,o)=>say(w,l,s,o),
   watch:()=>!!watch,soundOn:()=>!!prefs.sound,dim:on=>setDim(!!on,true),k9rest:()=>{try{k9Rest(now(),true);}catch(e){}},me:()=>me,logs:()=>prefs.logs||[],chirp:()=>{sfx('chirp',null,1.6);},
   go:id=>{const O=CUT.MAP.objects[id];if(!O||state!=='play')return;cmd({move:me,to:O.spot,interrupt:true});const t0=now(),tt=CUT.travelTime(me,CUT.hereRef(P,TIMES,t0,me),O.spot)||0;setTimeout(()=>{if(state==='play'){cmd({actor:me,interact:id,interrupt:true});findLog(id);}},(tt+.4)*1000);},
   look:secs=>{const t=now();runLines(['+0 camera exterior','+'+secs+' camera '+(watch?'cutaway':(prefs.camera==='follow'?'follow deadscout':'cutaway'))]);}}),padSet:m=>{prefs.pad=m;savePrefs();paintMenus();},say:(w,l,secs,o)=>say(w,l,secs,o),music:{on:()=>prefs.musicOn!==false,set:v=>{ensureAudio();setMusicOn(v);},prev(){if(watch)return null;setTape((prefs.tape||0)-1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},next(){if(watch)return null;setTape((prefs.tape||0)+1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},tape:()=>({n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0],watch:!!watch})},get state(){return state;},now:()=>now(),SP,eventsApi:()=>eventsApi(),events:()=>events,hint:()=>hintRef,endNow:()=>end(),run:l=>runLines(l),view:()=>CUT.view(P,TIMES,now()),story:()=>story,map(v){showMap=v;},shot(t,V){const c=document.createElement('canvas');c.width=V[2];c.height=V[3];CUT.force(V);CUT.render(c.getContext('2d'),P,TIMES,t,{x:0,y:0,w:V[2],h:V[3]},1);CUT.force(null);drawMap(t,c.getContext('2d'),V);return c.toDataURL('image/png');}};
 /* the display takes what the housing leaves: whole multiples of the 640 × 360 frame when that wastes little, otherwise the closest fit */
+/* a phone held upright: the picture at the top, menus and controls in the room below it (r27) */
+const portrait=()=>!BC&&window.innerHeight>window.innerWidth*1.15;
 function fit1(){const u=document.getElementById('unit');const cw0=stage.offsetWidth,ch0=stage.offsetHeight,cx=u.offsetWidth-cw0,cy=u.offsetHeight-ch0;
-  const mg=BC?0:20;let k=Math.min((window.innerWidth-cx-mg)/640,(window.innerHeight-cy-mg)/360);const ki=Math.floor(k);if(ki>=1&&ki>=(BC?.97:.86)*k)k=ki;k=Math.max(k,.6);
+  const P_=portrait();document.body.classList.toggle('portrait',P_);
+  const mg=BC?0:P_?8:20;let k=Math.min((window.innerWidth-cx-mg)/640,(P_?window.innerHeight*.5:window.innerHeight-cy-mg)/360);const ki=Math.floor(k);if(ki>=1&&ki>=(BC?.97:.86)*k)k=ki;k=Math.max(k,P_?.4:.6); /* an upright phone: as small as the width needs */
   const cw=Math.round(640*k/2)*2,ch=Math.round(cw*9/16);if(cw!==stage.width||ch!==stage.height)LCV.setSize(cw,ch);stage.style.width=cw+'px';stage.style.height=ch+'px';}
-function fit(){if(recording)return;fit1();fit1();}
+function fit(){if(recording)return;fit1();fit1();
+  /* the scale for the instrument chrome (clock, quick keys, reticles), from the picture's width: not the text size */
+  const scr=$('screen'),r=scr.getBoundingClientRect(),coarse=window.matchMedia&&matchMedia('(pointer: coarse)').matches;
+  scr.style.setProperty('--ui',String(Math.max(coarse?.8:.6,Math.min(2,r.width/1280))));scr.classList.toggle('compact',r.width<820);
+  document.documentElement.style.setProperty('--sl',Math.round(r.left+window.scrollX)+'px');document.documentElement.style.setProperty('--sb',Math.round(r.bottom+window.scrollY)+'px');}
 window.addEventListener('resize',fit);fit();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 loadWorld(window.DS_DEFAULT_EPISODE);
 /* ---------- the sound: the band on its own fader, the ship's ambience on six more ---------- */
 let actx=null,master=null,musicBus=null,band=null,t0=0,sched=null,curCh=-1,lastHero=0;
-const prefs=(()=>{try{return Object.assign({sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4},JSON.parse(localStorage.getItem(PREF)||'{}'));}catch(e){return {sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4};} /* r26: large print is the default for every message */})();
+const prefs=(()=>{try{return Object.assign({sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:360,focus:0,objective:''},tag:true,dim:false,photo:4},JSON.parse(localStorage.getItem(PREF)||'{}'));}catch(e){return {sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:360,focus:0,objective:''},tag:true,dim:false,photo:4};} /* r26: large print is the default for every message */})();
 const savePrefs=()=>{try{localStorage.setItem(PREF,JSON.stringify(prefs));}catch(e){}};
-function ensureAudio(){if(actx)return actx;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.gain.value=prefs.sound?1:0;master.connect(actx.destination);musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;musicBus.connect(musicMute);musicMute.connect(master);if(SFX)SFX.start(actx,master);return actx;}
+function ensureAudio(){if(actx)return actx;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.gain.value=prefs.sound?1:0;master.connect(actx.destination);musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;{const soft=actx.createBiquadFilter();soft.type='lowpass';soft.frequency.value=6200;soft.Q.value=.5;musicBus.connect(soft);soft.connect(musicMute);} /* r28: the band without its sharpest edge */musicMute.connect(master);if(SFX)SFX.start(actx,master);return actx;}
 function startBand(off){ensureAudio();if(actx.state!=='running')actx.resume();if(band){band.stop(.5);band=null;}
   t0=actx.currentTime+.08-off;
   if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,musicBus,{seed:P.seed,tape:(P.music&&P.music.tape)||'orbital-cruise',startAt:t0,fadeIn:off+1.2});curCh=-1;} /* the default: HALCYON dreaming */
@@ -72,7 +82,7 @@ function enter(s){state=s;if(s==='title')document.body.classList.remove('opening
   if(s==='route'){show('route',true);paintRoute();focusMenu('rMenu');}if(s==='deck'){show('deck',true);paintDeck();sel=prefs.tape||0;paintSel('kMenu');}if(s==='chart'){show('chart',true);CH.px=0;CH.py=0;paintChart();} /* the ship keeps running under its own panel */
   if(s==='registry'){show('registry',true);paintLogbook();}
   if(s==='console'){show('con',true);stopHere&&stopHere();for(const d in keys)keys[d]=false;if(!$('conOut').childElementCount)conPrint(['HOS 4.1 · COMMS CONSOLE · DSV-0417','TYPE HELP.','']);setTimeout(()=>$('conIn').focus(),30);}
-  if(s==='title'){session++;show('title',true);extT0=0;CUT.exterior(1);SP.on=false;stopBand();if(AMB)AMB.stop();if(watch){watch=null;loadWorld(window.DS_DEFAULT_EPISODE);}document.body.classList.remove('watching','ui','photo');show('wui',false);show('photo',false);FOC.phase=null;CUT.focus(null);paintFocus();show('dim',false);show('wTag2',false);idle0=performance.now()/1000;setTimeout(()=>{if(state==='title')$('veil').classList.add('clear');},400);{const sv=load();$('mContinue').hidden=!sv;$('mContinue').textContent='CONTINUE'+(sv&&sv.checkpoint?' · '+sv.checkpoint:'');$('mSecond').hidden=!prefs.second;}paintMenus();focusMenu('tMenu');if(!$('mContinue').hidden){sel=1;paintSel('tMenu');} /* a returning player's first choice is to carry on */}
+  if(s==='title'){session++;show('title',true);extT0=0;CUT.exterior(1);SP.on=false;stopBand();if(AMB)AMB.stop();if(watch){watch=null;loadWorld(window.DS_DEFAULT_EPISODE);}document.body.classList.remove('watching','ui','photo');show('wui',false);show('photo',false);FOC.phase=null;CUT.focus(null);paintFocus();show('dim',false);show('wTag2',false);idle0=performance.now()/1000;setTimeout(()=>{if(state==='title')$('veil').classList.add('clear');},400);{const sv=load();$('mContinue').hidden=!sv;$('mContinue').textContent='CONTINUE'+(sv&&sv.checkpoint?' · '+sv.checkpoint:'');$('mSecond').hidden=!prefs.second;}paintMenus();focusMenu('tMenu');if(!$('mContinue').hidden){sel=[...$('tMenu').querySelectorAll('button')].filter(b=>!b.hidden).indexOf($('mContinue'));paintSel('tMenu');} /* a returning player's first choice is to carry on */}
   if(s==='pause'){show('pause',true);if($('pNote')){$('pNote').textContent=lastNote;$('pNote').hidden=!lastNote;}$('hPrompt').hidden=true;held=now();stopBand();paintMenus();focusMenu('pMenu');save();if(!watch){const c=$('schem').getContext('2d');PW.schematic(c,CUT.MAP,CUT.actorAt(P,TIMES,now(),me),CUT.roomStates(P,TIMES,now()),['SVC UNIT K9-4  '+(k9&&k9.power==='full'?'ACTIVE · FULL':'ACTIVE · RESERVE'),(story?['found_photo','found_nav','found_patch','found_trace','found_eva'].filter(k=>story.flags[k]).length:0)+' / 5 FOUND',CHK?'LAST · '+CHK:'']);$('schem').hidden=false;}else $('schem').hidden=true;}
   if(s==='controls')show('controls',true);
   if(s==='options'){show('opts',true);paintMenus();focusMenu('oMenu');}
@@ -83,7 +93,7 @@ function focusMenu(id){sel=0;paintSel(id);}
 function paintSel(id){const bs=[...$(id).querySelectorAll('button')].filter(b=>!b.hidden);bs.forEach((b,i)=>b.classList.toggle('sel',i===sel));}
 function menuMove(id,d){const bs=[...$(id).querySelectorAll('button')].filter(b=>!b.hidden);sel=(sel+d+bs.length)%bs.length;paintSel(id);}
 function menuPick(id){const bs=[...$(id).querySelectorAll('button')].filter(b=>!b.hidden);const b=bs[sel];if(b)b.click();}
-function paintMenus(){if($('mText'))$('mText').textContent='TEXT SIZE · '+({large:'LARGE',xl:'TV'}[prefs.text]||'NORMAL');if($('mMusic'))$('mMusic').textContent='MUSIC · '+(prefs.musicOn===false?'OFF':'ON');{const fromT=menuFrom==='title';if($('mPhoto'))$('mPhoto').hidden=fromT;if($('mRecord'))$('mRecord').hidden=fromT;}if($('mPad'))$('mPad').textContent='ON-SCREEN KEYS · '+padMode().toUpperCase();$('mSound').textContent='SOUND · '+(prefs.sound?'ON':'OFF');$('mCamera').textContent='CAMERA · '+(prefs.camera==='follow'?'FOLLOW':'SHIP');$('mRecord').textContent=recording?'STOP THE TAKE':'RECORD A TAKE';$('mTape').textContent='TAPE · '+TAPES[prefs.tape||0][0];}
+function paintMenus(){{const f=document.querySelector('#oMenu [data-o=full]');if(f)f.hidden=!document.fullscreenEnabled;}if($('mText'))$('mText').textContent='TEXT SIZE · '+({large:'LARGE',xl:'TV'}[prefs.text]||'NORMAL');if($('mMusic'))$('mMusic').textContent='MUSIC · '+(prefs.musicOn===false?'OFF':'ON');{const fromT=menuFrom==='title';if($('mPhoto'))$('mPhoto').hidden=fromT;if($('mRecord'))$('mRecord').hidden=fromT;}if($('mPad'))$('mPad').textContent='ON-SCREEN KEYS · '+padMode().toUpperCase();$('mSound').textContent='SOUND · '+(prefs.sound?'ON':'OFF');$('mCamera').textContent='CAMERA · '+(prefs.camera==='follow'?'FOLLOW':'SHIP');$('mRecord').textContent=recording?'STOP THE TAKE':'RECORD A TAKE';$('mTape').textContent='TAPE · '+TAPES[prefs.tape||0][0];}
 /* ---------- whoever you are: every key becomes a command on the shared timeline ---------- */
 function cmd(c){c.at=now();if(watch){P.script.push(c);P.rev++;}else{SP.cmds.push(c);SP.rev=(SP.rev||0)+1;trim();}}
 function trim(){if(SP.cmds.length<60)return;const t=now(),s=CUT.snapshot(P,TIMES,t,me);
@@ -107,7 +117,7 @@ function stopHere(){const t=now(),s=CUT.actorAt(P,TIMES,t,me),r=coastRef(s,t);if
 function dirOf(k){return k==='ArrowLeft'||k==='KeyA'?'left':k==='ArrowRight'||k==='KeyD'?'right':k==='ArrowUp'||k==='KeyW'?'up':k==='ArrowDown'||k==='KeyS'?'down':null;}
 function use(){const n=CUT.nearby(P,TIMES,now(),me,disabled);if(n&&n.type==='ladder')return;if(n){cmd({actor:me,interact:n.id,interrupt:true});findLog(n.id);}else cmd({actor:me,do:'look-around',for:2.5});}
 function setCam(mode){prefs.camera=mode;savePrefs();if(watch){P.script.push({at:now(),camera:mode==='follow'?'follow':'cutaway',actor:me});P.rev++;}else{SP.cams.push({at:now(),mode:mode==='follow'?'follow':'cutaway',actor:me});SP.rev=(SP.rev||0)+1;}paintMenus();}
-function setSound(on){prefs.sound=on;savePrefs();if(master)master.gain.setTargetAtTime(on?1:0,actx.currentTime,.05);paintMenus();}
+function setSound(on){prefs.sound=on;savePrefs();if(master)master.gain.setTargetAtTime(on?1:0,actx.currentTime,.05);if(typeof pipV!=='undefined'&&pipV&&pipV.muted===on)pipV.muted=!on;paintMenus();}
 const controlling=()=>state==='play';
 document.addEventListener('keydown',e=>{const k=e.code;if(e.metaKey||e.ctrlKey||e.altKey)return;
   const tx=e.target&&e.target.tagName==='INPUT'&&e.target.type==='text'?e.target:null; /* the objective line: typing is typing */
@@ -177,7 +187,7 @@ function placeBubble(){const el=$('tBub');if(el.hidden||!talkWho)return;const o=
 function sayClear(){sayQ.length=0;clearTimeout(sayT);sayT=null;talkHide();}
 /* ---------- the menus ---------- */
 $('tMenu').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
-  if(m==='new')begin(null);else if(m==='second')begin(null,{second:true});else if(m==='continue')begin(load());else if(m==='watch')enter('setup');else if(m==='options'){menuFrom='title';enter('options');}else if(m==='controls'){menuFrom='title';enter('controls');}else if(m==='registry'){menuFrom='title';enter('registry');}else if(m==='sound'){ensureAudio();setSound(!prefs.sound);}});
+  if(m==='new')begin(null);else if(m==='second')begin(null,{second:true});else if(m==='continue')begin(load());else if(m==='watch')beginWatch();else if(m==='setup')enter('setup');else if(m==='options'){menuFrom='title';enter('options');}else if(m==='controls'){menuFrom='title';enter('controls');}else if(m==='registry'){menuFrom='title';enter('registry');}else if(m==='sound'){ensureAudio();setSound(!prefs.sound);}});
 $('pMenu').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
   if(m==='resume')resume();else if(m==='camera')setCam(prefs.camera==='follow'?'ship':'follow');else if(m==='psound')setSound(!prefs.sound);else if(m==='tape'){setTape((prefs.tape||0)+1,false);held=now();}else if(m==='controls'){menuFrom='pause';enter('controls');}
   else if(m==='record')toggleRecord();else if(m==='options'){menuFrom='pause';enter('options');}else if(m==='quit'){save();if(recording)toggleRecord();enter('title');}});
@@ -209,10 +219,20 @@ function focusStart(min,brk){const t=now();if(!min){FOC.phase=null;FOC.len=0;CUT
 /* ---------- SLEEP (Night Watch): over 20 or 40 minutes the music goes, the picture dims to almost nothing, one last relay
    click; then only the ventilation. The hours spent on watch are counted here, in this browser, and nowhere else. ---------- */
 let SLP=null,wsT=0;
-function sleepStart(min){const t=now();if(!min){SLP=null;setDim(prefs.dim,true);$('dim').style.opacity='';if(musicBus)musicBus.gain.setTargetAtTime(Math.pow(prefs.mix.music!=null?prefs.mix.music:.65,1.4),actx.currentTime,2);paintWatch();return;}
-  SLP={min,t0:t,t1:t+min*60,done:false};$('dim').hidden=false;if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,min*60/4);paintWatch();}
-function sleepTick(t){if(!SLP)return;const u=Math.max(0,Math.min(1,(t-SLP.t0)/(SLP.t1-SLP.t0)));$('dim').style.opacity=String(.15+.73*u);
-  if(u>=1&&!SLP.done){SLP.done=true;relay();if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,1);if(AMB)AMB.duck(.55,30);}}
+/* SLEEP (r28): over 20 or 40 minutes the ship settles for the night. Nothing strange happens any more, the lights go down to
+   the quarters' lamp, a brown-noise bed comes up under the vents, the band drops to a drone and then away, the picture dims
+   to black. The ship keeps breathing in the dark. A tap lifts the dark for a few seconds; SLEEP again wakes it all. */
+function sleepStart(min){const t=now(),mv=Math.pow(prefs.mix.music!=null?prefs.mix.music:.5,1.4);
+  if(!min){SLP=null;setDim(prefs.dim,true);$('dim').style.opacity='';if(musicBus)musicBus.gain.setTargetAtTime(mv,actx.currentTime,2);try{band&&band.setState(NW.ACTIVITY[watch.cfg.activity].state,20);}catch(e){}
+    if(AMB){AMB.setMood(watch?watch.cfg.activity:'routine');AMB.duck(1,6);}if(window.__joy)__joy.sleep(false);if(window.__toys&&__toys.sleepLights)__toys.sleepLights(false);paintWatch();return;}
+  SLP={min,t0:t,t1:t+min*60,done:false};$('dim').hidden=false;
+  if(watch){P.script=P.script.filter(b=>{const at=CUT.secs(b.at);return !(at>t&&(b.event||b.mystery||b.anomaly||b.echo||b.door||(b.room&&!/^(normal|low-power|powered)$/.test(String(b.state)))));});P.rev++;} /* nothing strange tonight */
+  if(musicBus)musicBus.gain.setTargetAtTime(mv*.45,actx.currentTime,60);try{band&&band.setState('quiet',60);}catch(e){}if(AMB){AMB.setMood('quiet');AMB.duck(.8,20);}
+  if(window.__joy)__joy.sleep(true);if(window.__toys&&__toys.sleepLights)__toys.sleepLights(true);paintWatch();}
+let sleepPeek=0;document.addEventListener('pointerdown',()=>{if(SLP&&SLP.done)sleepPeek=performance.now();},true);
+function sleepTick(t){if(!SLP)return;const u=Math.max(0,Math.min(1,(t-SLP.t0)/(SLP.t1-SLP.t0))),peek=performance.now()-sleepPeek<8000;
+  $('dim').style.opacity=String(SLP.done?(peek?.55:.985):.1+.8*u*u); /* the end of sleep is black; a tap lifts it a little */
+  if(u>=1&&!SLP.done){SLP.done=true;relay();if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,60);if(AMB)AMB.duck(.55,30);}}
 function relay(){sfx('click',null,.55);setTimeout(()=>sfx('click',null,.35),180);try{if(band&&band.hero)band.hero('relay');}catch(e){}}
 function focusTick(t){if(FOC.phase==='focus'&&!FOC.k9&&t-FOC.start>480){FOC.k9=true;try{k9Rest(t,true);}catch(e){}}
   if(!FOC.phase||t<FOC.end)return;if(FOC.k9){FOC.k9=false;try{k9Rest(t,false);}catch(e){}}relay();
@@ -235,14 +255,14 @@ $('photo').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(
 /* ---------- NIGHT WATCH: the watch itself ---------- */
 let uiT=null,wStart=0,endingSoon=false,uiKeep=false;
 async function beginWatch(){ensureAudio();try{await actx.resume();}catch(e){}await untilLoaded();const nw=prefs.nw,cfg={view:nw.view,activity:nw.activity,music:nw.music==='auto'?null:nw.music,duration_minutes:nw.duration,seed:watchSeed||22910000+Math.floor(Math.random()*89999)};
-  const man=NW.manifest(cfg);watch={cfg,man,seed:cfg.seed};session++;show('setup',false);$('veil').classList.remove('clear');await wait(700);
+  const man=NW.manifest(cfg);watch={cfg,man,seed:cfg.seed};session++;show('setup',false);show('title',false);show('opts',false); /* r28: a watch can start straight from the title */$('veil').classList.remove('clear');await wait(700);
   loadWorld(man);SP.on=false;SP.cmds.length=0;SP.cams.length=0;me='commander';held=null;endingSoon=false;
   $('wName').textContent='NIGHT WATCH // DSV HALCYON · '+NW.ACTIVITY[cfg.activity].name+' · '+NW.VIEWS[cfg.view].name;document.body.classList.add('watching');state='watch';show('hud',false);
   startBand(0);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,master,prefs.mix,{mood:cfg.activity});}musicBus.gain.value=Math.pow(prefs.mix.music!=null?prefs.mix.music:.65,1.4);
   keepAwake(true);setDim(prefs.dim&&cfg.activity==='quiet',true);SLP=null;$('dim').style.opacity='';if(sleepReq)setTimeout(()=>sleepStart(30),50);FOC.n=0;focusStart(prefs.nw.focus||0);paintWatch();wStart=performance.now();$('veil').classList.add('clear');wake();}
-function paintWatch(){$('wControl').textContent=state==='play'?'RELEASE CONTROL':'TAKE CONTROL';$('wDim').textContent='SLEEP DIM · '+(prefs.dim?'ON':'OFF');$('wTag').textContent='LABEL · '+(prefs.tag?'ON':'OFF');$('wSleep').textContent='SLEEP · '+(SLP?SLP.min+' MIN':'OFF');$('wFocusBtn').textContent='FOCUS · '+(FOC.phase?FOC.len+' MIN':'OFF');if(document.activeElement!==$('wObj'))$('wObj').value=prefs.nw.objective||'';$('wObj').hidden=!FOC.phase;$('wName').style.opacity=prefs.tag?1:0;$('wTag2').hidden=!(prefs.tag&&watch);$('wTag2').textContent=$('wName').textContent;
-  if(!$('mixer').children.length){for(const k of ['music','engine','ventilation','machinery','radio','signal','hull']){const l=document.createElement('label');l.innerHTML=k.toUpperCase()+'<input type="range" min="0" max="100" value="'+Math.round((prefs.mix[k]!=null?prefs.mix[k]:.5)*100)+'" data-k="'+k+'" aria-label="'+k+'">';$('mixer').appendChild(l);}
-    $('mixer').addEventListener('input',e=>{const i=e.target;if(i.dataset.k)setMix(i.dataset.k,+i.value/100);});}}
+function paintWatch(){/* full labels on a big screen; on a small one the words in <em> drop and an active button just turns amber */
+  $('wControl').innerHTML=(state==='play'?'<em>RELEASE </em>':'<em>TAKE </em>')+'CONTROL';$('wControl').classList.toggle('on',state==='play');$('wSleep').innerHTML='SLEEP<em> · '+(SLP?SLP.min+' MIN':'OFF')+'</em>';$('wSleep').classList.toggle('on',!!SLP);$('wFocusBtn').innerHTML='FOCUS<em> · '+(FOC.phase?FOC.len+' MIN':'OFF')+'</em>';$('wFocusBtn').classList.toggle('on',!!FOC.phase);if(document.activeElement!==$('wObj'))$('wObj').value=prefs.nw.objective||'';$('wObj').hidden=!FOC.phase;$('wName').style.opacity=prefs.tag?1:0;$('wTag2').hidden=!(prefs.tag&&watch);$('wTag2').textContent=$('wName').textContent;
+  $('wFloat').innerHTML=document.pictureInPictureElement?'FLOAT<em> · ON</em>':'FLOAT';$('wFloat').classList.toggle('on',!!document.pictureInPictureElement);$('wFloat').hidden=!document.pictureInPictureEnabled;{const f=document.querySelector('[data-w=full]');if(f)f.hidden=!document.fullscreenEnabled;}} /* only what this browser can do */ /* r27: the seven per-sound sliders are gone; MUSIC on the quick bar turns the music off */
 function wake(keep){if(BC)return;/* the mouse moved: show the few controls, then hide them again */
   if(!watch)return;$('wui').hidden=false;$('wui').classList.add('on');document.body.classList.add('ui');clearTimeout(uiT);if(!keep&&!uiKeep)uiT=setTimeout(()=>{if(document.activeElement===$('wObj')){wake();return;}$('wui').classList.remove('on');document.body.classList.remove('ui');},4000);}
 document.addEventListener('pointermove',()=>{if(watch&&(state==='watch'||state==='play'))wake();});
@@ -255,7 +275,7 @@ function takeControl(){if(!watch||state!=='watch')return;const t=now();P.script=
 function releaseControl(){if(!watch||state!=='play')return;const t=now();for(const d in keys)keys[d]=false;stopHere();
   const back=NW.schedule(watch.cfg,{from:t+3,only:'commander',at:{commander:CUT.hereRef(P,TIMES,t,'commander')}});P.script.push(...DSE.beatsIn(back).beats.map(b=>Object.assign(b,{at:CUT.secs(b.at)})));P.rev++;
   state='watch';show('hud',false);$('hPrompt').hidden=true;paintWatch();wake();fadeExterior(4000);}
-async function endWatch(){if(!watch)return;keepAwake(false);SLP=null;$('dim').style.opacity='';savePrefs();state='end';$('veil').classList.remove('clear');if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,.6);if(AMB)AMB.duck(1,2);await wait(1800);if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
+async function endWatch(){if(!watch)return;keepAwake(false);if(document.pictureInPictureElement)document.exitPictureInPicture().catch(()=>{});SLP=null;$('dim').style.opacity='';savePrefs();state='end';$('veil').classList.remove('clear');if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,.6);if(AMB)AMB.duck(1,2);await wait(1800);if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
 /* ---------- the episode: beginning, resuming, ending ---------- */
 const loaded=()=>!!window.DS_ALL&&PX.ready();
 async function untilLoaded(){if(loaded())return;show('cards',true);$('cards').innerHTML='<p class="year" style="animation:none;opacity:.7;font-size:14px;letter-spacing:6px">RECOVERING HALCYON</p>';while(!loaded())await wait(120);show('cards',false);}
@@ -416,7 +436,7 @@ function frame(){requestAnimationFrame(frame);pollPad();tickExterior();if(state=
   if(story&&!watch&&(state==='play'||state==='opening'||state==='route'||state==='deck')){sfxTick(t);story.update();if(k9&&state==='play'){k9.update(t);if(events)events.update(t);idleGlance(t);const r=CUT.roomAt(P,TIMES,t,me);if(r!==lastRoom){lastRoom=r;lastProgress=t;}}if(!(hudN%6))paintNotes();if(SCAN.found&&state==='play'){const p=CUT.actorAt(P,TIMES,t,me),k=Math.max(2,Math.round(stage.width/384)),R=SCAN.read(p.x,p.y);if(SCAN.tick(t,R)==='lock'){tuneReq=true;ping();}scanSound(R);if(scanVisible(t,R)){const c2=stage.getContext('2d');c2.save();c2.globalAlpha=scanA;SCAN.draw(c2,t,R,k,1);c2.restore();}}else scanSound(null);}else{tuneReq=false;scanSound(null);}
   if(recording&&(state==='play'||state==='watch'))recording.frame(Math.max(0,t-recording.t0));
   if(watch&&(state==='watch'||state==='play'||state==='photo')){focusTick(t);sleepTick(t);{const pn=performance.now();if(wsT&&pn-wsT<2000)prefs.watchSecs=(prefs.watchSecs||0)+(pn-wsT)/1000;wsT=pn;if(!(hudN%1800))savePrefs();}}
-  if(watch&&(state==='watch'||state==='play')){if(!(hudN%30)){paintFocus(t);$('wTime').textContent=(watch.cfg.duration_minutes>=300?'':hhmm(Math.max(0,TOTAL-t))+'  ·  ')+(AL.tracks.find(x=>t>=x.start&&t<x.start+x.dur)||{name:''}).name.toUpperCase();}
+  if(watch&&(state==='watch'||state==='play')){if(!(hudN%30)){paintFocus(t);$('wTime').textContent=watch.cfg.duration_minutes>=300?'':hhmm(Math.max(0,TOTAL-t));$('wTrack').textContent=(AL.tracks.find(x=>t>=x.start&&t<x.start+x.dur)||{name:''}).name.toUpperCase();}
     if(!endingSoon&&watch.cfg.duration_minutes<300&&t>TOTAL-240){endingSoon=true;musicBus.gain.setTargetAtTime(0,actx.currentTime,70);if(AMB)AMB.duck(.6,200);}
     if(t>=TOTAL-3){endOfWatch();return;}}
   if(state==='play'){if(!watch&&t>=TOTAL-3){end();return;}if(!watch){const pn=performance.now();if(playPn&&pn-playPn<2000)playT+=(pn-playPn)/1000;playPn=pn;} /* seconds, not frames: r22 counted 2× fast on a 120 Hz display */
@@ -424,7 +444,7 @@ function frame(){requestAnimationFrame(frame);pollPad();tickExterior();if(state=
       if(T&&T.i!==lastTrack&&!watch){lastTrack=T.i;$('hTrack').textContent='♪ '+String(T.i+1).padStart(2,'0')+' · '+T.name.toUpperCase();$('hTrack').classList.add('on');clearTimeout($('hTrack')._t);$('hTrack')._t=setTimeout(()=>$('hTrack').classList.remove('on'),5000);}
       const n=CUT.nearby(P,TIMES,t,me,disabled);if(n){$('hPrompt').innerHTML=promptOf(n);$('hPrompt').hidden=false;}else $('hPrompt').hidden=true;}
     if(!(saveN++%1800))save();
-    if(!watch&&!prefs.hint1&&t>22){prefs.hint1=true;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;note(touch?'TAP THE KEYS TO MOVE · ♪ TOP RIGHT':'← → MOVE · E USE · N NEXT TAPE · M MUSIC · K ON-SCREEN KEYS',11);}}
+    if(!watch&&!prefs.hint1&&t>22){prefs.hint1=true;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;note(touch?'TAP THE KEYS TO MOVE · ♪ TOP RIGHT':'← → MOVE · E USE · N NEXT TAPE · M MUSIC',11);}}
   if(talkWho&&!(hudN%2))placeBubble();hudN++;}
 $('hHint').textContent='← →  MOVE   ·   E  USE   ·   ESC  MENU';
 /* ---------- BROADCAST (?broadcast=1): the real game in a clean window, for OBS. The Director builds these links.
@@ -447,8 +467,18 @@ function toggleFull(){try{if(document.fullscreenElement)document.exitFullscreen(
 let wakeLk=null;async function keepAwake(on){try{if(on&&!wakeLk&&navigator.wakeLock){wakeLk=await navigator.wakeLock.request('screen');wakeLk.addEventListener('release',()=>{wakeLk=null;});}else if(!on&&wakeLk){await wakeLk.release();wakeLk=null;}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&watch)keepAwake(true);if(document.visibilityState==='hidden'&&!watch&&(state==='play'||state==='pause'))try{save();}catch(e){}}); /* a lunch break ends without warning: save the moment the tab goes away */
 window.addEventListener('pagehide',()=>{if(!watch&&(state==='play'||state==='pause'))try{save();}catch(e){}});
-let pipV=null;async function floatWindow(){try{if(document.pictureInPictureElement){await document.exitPictureInPicture();return;}
-  if(!pipV){pipV=document.createElement('video');pipV.muted=true;pipV.playsInline=true;pipV.srcObject=stage.captureStream(30);}await pipV.play();await pipV.requestPictureInPicture();}catch(e){note('FLOATING WINDOW · NOT AVAILABLE IN THIS BROWSER',4);}}
+/* FLOAT (r27): the ship in a picture-in-picture window. Its sound goes through that window's video while it floats, so the
+   window's own mute and pause buttons work (r26's video had no audio track: mute did nothing). Muting there is SOUND OFF. */
+let pipV=null,pipDest=null;const inPip=()=>!!pipV&&document.pictureInPictureElement===pipV;
+function pipRoute(on){if(!actx||!master||!pipDest)return;try{master.disconnect(on?actx.destination:pipDest);}catch(e){}master.connect(on?pipDest:actx.destination);} /* only that one edge: a recording's tap on master is left alone */
+async function floatWindow(){try{if(document.pictureInPictureElement){await document.exitPictureInPicture();return;}ensureAudio();
+  if(!pipV){pipV=document.createElement('video');pipV.playsInline=true;const st=stage.captureStream(30);pipDest=actx.createMediaStreamDestination();for(const tr of pipDest.stream.getAudioTracks())st.addTrack(tr);pipV.srcObject=st;
+    pipV.addEventListener('enterpictureinpicture',()=>{pipRoute(true);pipV.muted=!prefs.sound;paintWatch();});
+    pipV.addEventListener('leavepictureinpicture',()=>{pipRoute(false);paintWatch();});
+    pipV.addEventListener('volumechange',()=>{if(!inPip())return;const on=!pipV.muted&&pipV.volume>0;if(on!==!!prefs.sound)setSound(on);});
+    pipV.addEventListener('pause',()=>{if(!inPip())return;setSound(!prefs.sound);pipV.muted=!prefs.sound;pipV.play().catch(()=>{});}); /* the window's play/pause toggles the sound; the picture keeps running */
+    if(navigator.mediaSession){try{navigator.mediaSession.metadata=new MediaMetadata({title:'NIGHT WATCH',artist:'DSV HALCYON'});}catch(e){}}}
+  pipV.muted=!prefs.sound;await pipV.play();await pipV.requestPictureInPicture();}catch(e){note('FLOATING WINDOW · NOT AVAILABLE IN THIS BROWSER',4);}}
 window.addEventListener('dblclick',e=>{if(state==='watch'&&e.target===stage)toggleFull();});
 if(BC)broadcast();else{enter('title');}idle0=performance.now()/1000;requestAnimationFrame(frame);
 if(LR&&LR.cleanup)LR.cleanup();

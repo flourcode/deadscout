@@ -51,12 +51,12 @@ const IMG={toy:ret('#7ee3e5'),off:ret('#8a6f58')};
 const css=document.createElement('style');css.textContent=`
 .toys{position:absolute;inset:0;pointer-events:none;z-index:3}
 .toys[hidden]{display:none}
-.toy{position:absolute;width:calc(30px*var(--tz,1));height:calc(30px*var(--tz,1));margin:calc(-15px*var(--tz,1)) 0 0 calc(-15px*var(--tz,1));padding:0;border:0;background:none;cursor:pointer;opacity:0;transition:opacity .25s steps(3);pointer-events:none;-webkit-tap-highlight-color:transparent}
+.toy{position:absolute;width:calc(30px*var(--ui,1));height:calc(30px*var(--ui,1));margin:calc(-15px*var(--ui,1)) 0 0 calc(-15px*var(--ui,1));padding:0;border:0;background:none;cursor:pointer;opacity:0;transition:opacity .25s steps(3);pointer-events:none;-webkit-tap-highlight-color:transparent}
 .toy img{width:100%;height:100%;image-rendering:pixelated;display:block;filter:drop-shadow(0 1px 0 #0b0e11)}
 .toy.on{opacity:.85;pointer-events:auto}.toy.on:hover,.toy:focus-visible{opacity:1}
 .toy.ping img{animation:tping .6s steps(4) 1}
 @keyframes tping{0%{transform:scale(1.6)}100%{transform:scale(1)}}
-.toy span{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-family:Silk,monospace;font-size:calc(8px*var(--tz,1));letter-spacing:2px;color:#e9d7c2;background:rgba(11,14,17,.85);padding:2px 6px;white-space:nowrap;opacity:0;transition:opacity .2s steps(2)}
+.toy span{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-family:Silk,monospace;font-size:calc(8px*var(--ui,1));letter-spacing:2px;color:#e9d7c2;background:rgba(11,14,17,.85);padding:2px 6px;white-space:nowrap;opacity:0;transition:opacity .2s steps(2)}
 .toy:hover span,.toy:focus-visible span,.toy.lbl span{opacity:1}
 body.photo .toys,body.bc .toys{display:none!important}`;
 document.head.appendChild(css);
@@ -89,7 +89,7 @@ function tick(){const st=G.state,on=(st==='play'||st==='watch')&&!document.body.
   for(const [id,e] of Object.entries(EL))if(!live.has(id))e.classList.remove('on');}
 setInterval(tick,90);
 /* ---------- moods (Night Watch): one button, five presets, all made of the same switches ---------- */
-const MOODS=[{id:'watch',name:'NIGHT WATCH'},{id:'drift',name:'QUIET DRIFT'},{id:'engine',name:'ENGINE ROOM'},{id:'alert',name:'RED ALERT'},{id:'sleep',name:'SLEEP DIM'}];
+const MOODS=[{id:'watch',name:'NIGHT WATCH'},{id:'drift',name:'QUIET DRIFT'},{id:'engine',name:'ENGINE ROOM'},{id:'alert',name:'RED ALERT'}]; /* r28: sleeping is the SLEEP button's job now, not a scene */
 S.mood='watch';
 function lightsTo(map,def){ROOMS.forEach((r,i)=>{const v=map[r]!==undefined?map[r]:def;later(80+i*110,()=>{CUT.toy({room:{[r]:v}});S.lit[r]=v===null||v>0?1:0;A.sfx('relay',v===0?.9:.6);});});}
 const MIXK=['machinery','ventilation','radio'];
@@ -103,8 +103,8 @@ function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({a
   if(id==='sleep'){lightsTo({'crew-quarters':.5},.13);driveTo(1);mixTo({machinery:.5,ventilation:.8,radio:.5});A.dim(true);if(!S.k9slept){S.k9slept=1;A.k9rest();}}
   if(A.watch())try{G.run(['+0 camera cutaway']);}catch(e){}
   paintMood();}
-function paintMood(){const b=document.getElementById('wMood');if(b)b.textContent='MOOD · '+MOODS.find(m=>m.id===S.mood).name;}
+function paintMood(){const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+MOODS.find(m=>m.id===S.mood).name+'</em>';b.classList.toggle('on',S.mood!=='watch');}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood');if(!b)return;e.stopPropagation();const i=MOODS.findIndex(m=>m.id===S.mood);mood(MOODS[(i+1)%MOODS.length].id);},true);
 let wasWatch=false;setInterval(()=>{const w=document.body.classList.contains('watching');if(w!==wasWatch){wasWatch=w;if(!w&&S.mood!=='watch'){mood('watch',true);}S.k9slept=0;paintMood();}},400);
-window.__toys={mood,MOODS,S,TOYS,show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
+window.__toys={mood,MOODS,S,TOYS,sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{lightsTo({},null);mixTo(null);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
 })();

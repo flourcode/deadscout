@@ -15,9 +15,10 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=24">
+<link rel="stylesheet" href="game.css?v=27">
 </head>
 <body>
+<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p><p class="bt-foot" id="bootFoot" hidden><span>TAP · CLICK · ANY KEY · THE WATCH BEGINS</span><button type="button" id="bootMenu">MENU ▸</button></p></div></div>
 <div class="g" id="g">
  <div class="unit" id="unit">
   <header class="u-top">
@@ -35,11 +36,11 @@
   <section class="title" id="title">
     <h1 class="t-name">DEAD<span>SCOUT</span></h1>
     <nav class="menu" id="tMenu" aria-label="Main menu">
+      <button type="button" data-m="watch">NIGHT WATCH</button>
       <button type="button" data-m="new">ENTER HALCYON</button>
       <button type="button" data-m="continue" id="mContinue" hidden>CONTINUE</button>
       <button type="button" data-m="second" id="mSecond" hidden>SECOND TRANSMISSION</button>
-      <button type="button" data-m="watch">NIGHT WATCH</button>
-      <div class="util"><button type="button" data-m="registry">REGISTRY</button><button type="button" data-m="controls">CONTROLS</button><button type="button" data-m="options">OPTIONS</button></div>
+      <div class="util"><button type="button" data-m="setup">SETUP</button><button type="button" data-m="registry">REGISTRY</button><button type="button" data-m="controls">CONTROLS</button><button type="button" data-m="options">OPTIONS</button></div>
     </nav>
     <p class="t-foot">↑ ↓ CHOOSE · ENTER SELECT</p>
   </section>
@@ -85,10 +86,9 @@
     <p class="t-foot">↑ ↓ ROW · ← → CHANGE · ENTER BEGIN</p>
   </section>
   <section class="wui" id="wui" hidden>
-    <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time" id="wTime"></span></div>
+    <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time"><b id="wTime"></b><span class="wt-track" id="wTrack"></span></span></div>
     <div class="wui-bar">
-      <div class="mixer" id="mixer"></div>
-      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="mood" id="wMood">MOOD · NIGHT WATCH</button><button type="button" data-w="dim" id="wDim" hidden>SLEEP DIM · OFF</button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="photo">PHOTO</button><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float">FLOAT</button><button type="button" data-w="full">FULLSCREEN</button><button type="button" data-w="clock" id="wClock">CLOCK · AMBER</button><button type="button" data-w="tag" id="wTag" hidden>LABEL · ON</button><button type="button" data-w="end">END WATCH</button></div>
+      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="mood" id="wMood">SCENE<em> · NIGHT WATCH</em></button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button><button type="button" data-w="end">END<em> WATCH</em></button></div>
     </div>
   </section>
   <div class="dim" id="dim" hidden></div>
@@ -167,7 +167,7 @@
   <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>THE SHIP</span></h2>
   <p>DSV HALCYON, deep survey vessel, registry DSV-0417. Presumed lost with all hands in 2291, 167 AU from Sol. Decades later a repeating low-power transmission was detected near her last position. DeadScout is what answers when you link to it: a living ship to walk, to listen to, and to leave running.</p>
   <p><b>ENTER HALCYON</b> and you wake aboard, in the crew quarters, with a service robot at your heel. Read the terminals. Find the scanner and tune it into what the ship remembers. Play the crew's tapes. Notice what the cameras don't. There is no clock and nothing hunts you; the ship simply changes the longer you stay.</p>
-  <p><b>NIGHT WATCH</b> lets HALCYON run herself: crew routines, screens, lamps, and once in a while something strange. Set a view, a mood, the music and a length, then leave it on for sleep, for a focus session with its own timer, or for an hour of music. TAKE CONTROL hands you the commander mid-watch.</p>
+  <p><b>NIGHT WATCH</b> is where the ship starts: press start and HALCYON runs herself, crew routines, screens, lamps, weather outside, her lights following your own clock. Leave it on. Click anything: the monitors, the plant, the mug on the comms shelf, the ladder (it plays), the stars, the crew. Hold the bridge glass. Double-tap a floor and K9 comes to sit. SLEEP settles the ship for the night and fades to black; FOCUS keeps a study timer on the bridge. SETUP chooses the view, mood, music and length; TAKE CONTROL hands you the commander.</p>
   <h2><i class="ic ic-keys" aria-hidden="true"></i><span>CONTROLS</span></h2>
   <dl class="ab-keys">
    <dt>← → ↑ ↓</dt><dd>walk and climb (W A S D too)</dd>
@@ -195,13 +195,13 @@
 <script src="space.js?v=5"></script>
 <script src="music.js?v=11"></script>
 <script src="deep.js?v=5"></script>
-<script src="assets-core.js?v=26"></script>
+<script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
 <script src="cut.js?v=51"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=11"></script>
 <script src="watch.js?v=8"></script>
-<script src="amb.js?v=2"></script>
+<script src="amb.js?v=3"></script>
 <script src="audio/sfx.js?v=6"></script>
 <script src="lc.js?v=12"></script>
 <script src="rec.js?v=9"></script>
@@ -212,11 +212,30 @@
 <script src="game/events.js?v=2"></script>
 <script src="game/story.js?v=15"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=38"></script>
-<script src="game/pad.js?v=12"></script>
-<script src="game/toys.js?v=9"></script>
-<script src="game/clock.js?v=5"></script>
-<script>/* the rest of the ship arrives while the title is up (§50): the cutaway master and its overlays, then the crew */
-(function(){let n=0;for(const f of ['assets-world.js?v=10','assets-cast.js?v=9']){const s=document.createElement('script');s.src=f;s.async=true;s.onload=()=>{if(++n===2)window.DS_ALL=true;};document.body.appendChild(s);}})();</script>
+<script src="game.js?v=40"></script>
+<script src="game/pad.js?v=13"></script>
+<script src="game/toys.js?v=11"></script>
+<script src="game/clock.js?v=6"></script>
+<script src="game/joy.js?v=1"></script>
+<script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
+   progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
+(function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=9',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');
+  const ready=()=>!!(window.DS_ALL&&window.PX&&PX.ready());let shown=0,closed=false;
+  const target=()=>{const T=FILES.reduce((s,[f,d])=>s+(tot[f]||d),0),G=FILES.reduce((s,[f])=>s+Math.min(got[f]||0,tot[f]||1e9),0);return .12+.8*Math.min(1,G/T)+(ready()?.08:0);};
+  function tick(){if(closed)return;const g=target();shown+=Math.max(0,g-shown)*.18+.002;shown=Math.min(shown,g);const n=Math.max(1,Math.floor(shown*16+1e-6));for(let i=0;i<16;i++)F.children[i].classList.toggle('on',i<n);
+    if(SUB)SUB.textContent=n>=16?'FEED RECOVERED':n>9?'CONSTRUCTING CREW':n>4?'MAPPING HULL':'RECOVERING FEED';
+    if(ready()&&n>=16&&performance.now()-t0>900){closed=true;setTimeout(press,260);return;}requestAnimationFrame(tick);}
+  /* PRESS START (r28): the first tap both opens the sound and starts the watch with the last settings; MENU goes to the title */
+  const shut=()=>{B.classList.add('out');setTimeout(()=>B.remove(),420);removeEventListener('keydown',go,true);};
+  const go=e=>{if(e&&e.target&&e.target.id==='bootMenu')return;if(e&&e.type==='keydown'&&(e.metaKey||e.ctrlKey||e.altKey))return;if(e)e.preventDefault();shut();try{window.__game.quickWatch();}catch(err){}};
+  function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}document.getElementById('bootLoad').hidden=true;document.querySelector('.bt-bar').hidden=true;SUB.hidden=true;
+    document.getElementById('bootStart').hidden=false;document.getElementById('bootFoot').hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
+    document.getElementById('bootMenu').addEventListener('click',e=>{e.stopPropagation();shut();});}
+  requestAnimationFrame(tick);
+  const tag=f=>new Promise(ok=>{const s=document.createElement('script');s.src=f;s.onload=s.onerror=()=>{got[f]=tot[f]=1;ok();};document.body.appendChild(s);});
+  async function load([f]){try{const r=await fetch(f);if(!r.ok||!r.body)throw 0;tot[f]=+r.headers.get('content-length')||0;const rd=r.body.getReader(),parts=[];
+      for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got[f]=(got[f]||0)+value.length;}
+      if(!tot[f])tot[f]=got[f];const s=document.createElement('script');s.textContent=await new Blob(parts).text();document.body.appendChild(s);}catch(e){await tag(f);}}
+  Promise.all(FILES.map(load)).then(()=>{window.DS_ALL=true;});})();</script>
 </body>
 </html>

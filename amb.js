@@ -5,7 +5,7 @@
    window.AMB = {start(ctx,dest,mix,opts), set(mix), mood(name), stop(), MIX0} */
 (function(){
 "use strict";
-const MIX0={music:.65,engine:.55,ventilation:.4,machinery:.25,radio:.1,signal:.08,hull:.2};
+const MIX0={music:.5,engine:.5,ventilation:.45,machinery:.18,radio:.06,signal:.05,hull:.18}; /* r28: softer, the room tone first; radio and signal are the busy ones */
 let ctx=null,out=null,L={},timers=[],alive=false,mood='routine',noiseBuf=null;
 function noise(){if(noiseBuf)return noiseBuf;const n=ctx.sampleRate*4,b=ctx.createBuffer(2,n,ctx.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);let s=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;s=.98*s+.02*w;d[i]=(w*.6+s*4)*.35;}}noiseBuf=b;return b;}
 function src(){const s=ctx.createBufferSource();s.buffer=noise();s.loop=true;s.start();return s;}

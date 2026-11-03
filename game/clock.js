@@ -21,11 +21,12 @@ const cv=box.querySelector('canvas'),x=cv.getContext('2d'),lab=box.querySelector
 const css=document.createElement('style');css.textContent=`
 .shiptime{position:absolute;top:3%;right:12%;z-index:6;display:none;flex-direction:column;align-items:flex-end;gap:4px;cursor:pointer;pointer-events:auto;font-family:Silk,monospace}
 body.watching.clk .shiptime{display:flex}
-.shiptime .st-row{display:flex;align-items:center;gap:calc(8px*var(--tz,1))}
-.shiptime .st-lab,.shiptime .st-pm{font-size:calc(8px*var(--tz,1));letter-spacing:3px;opacity:.75}
+.shiptime .st-row{display:flex;align-items:center;gap:calc(8px*var(--ui,1))}
+.shiptime .st-lab,.shiptime .st-pm{font-size:calc(8px*var(--ui,1));letter-spacing:3px;opacity:.75;white-space:nowrap}
+.compact .shiptime .st-lab,.compact .shiptime .st-sub{display:none} /* a small screen: the digits only */
 .shiptime .st-pm{min-width:2.2em;text-align:left}
 .shiptime canvas{display:block;image-rendering:pixelated}
-.shiptime .st-sub{font-size:calc(8px*var(--tz,1));letter-spacing:3px;color:var(--dim,#8d8676);opacity:.8;white-space:nowrap}
+.shiptime .st-sub{font-size:calc(8px*var(--ui,1));letter-spacing:3px;color:var(--dim,#8d8676);opacity:.8;white-space:nowrap}
 .shiptime.dimmed{opacity:.5}
 body.photo .shiptime,body.bc .shiptime{display:none!important}
 body.watching.clk:not(.bc) #wTag2{display:none!important}
@@ -35,7 +36,7 @@ body.watching.clk .wui-name{display:none}`;
 document.head.appendChild(css);scr.appendChild(box);
 let geo='';
 function draw(){const alert=window.__toys&&window.__toys.S&&window.__toys.S.mood==='alert',c=COLS[alert?'red':P.c];if(!c)return;
-  const sr=scr.getBoundingClientRect(),K=Math.max(2,Math.min(8,Math.round(sr.width/560))),dpr=Math.max(1,Math.round(window.devicePixelRatio||1)),D=K*dpr,gap=D>=4?Math.max(1,Math.round(D/4)):0,pad=3*D;
+  const sr=scr.getBoundingClientRect(),K=Math.max(1,Math.min(8,Math.round(sr.width/560))),dpr=Math.max(1,Math.round(window.devicePixelRatio||1)),D=K*dpr,gap=D>=4?Math.max(1,Math.round(D/4)):0,pad=3*D;
   const w=GW*D+pad*2,h=GH*D+pad*2,g=w+'x'+h;if(g!==geo){geo=g;cv.width=w;cv.height=h;cv.style.width=w/dpr+'px';cv.style.height=h/dpr+'px';cv.style.margin=(-pad/dpr)+'px';}
   const d=new Date();let H=d.getHours(),M=d.getMinutes();const pm=H>=12;if(h12)H=H%12||12;
   const digs=[H>=10||!h12?Math.floor(H/10):-1,H%10,Math.floor(M/10),M%10],colon=alert?(d.getMilliseconds()%500<250):d.getMilliseconds()<500;

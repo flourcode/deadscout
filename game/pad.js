@@ -64,9 +64,10 @@ const css=document.createElement('style');css.textContent=`
 .deckkeys button:focus-visible,.pad button:focus-visible,.softkey:focus-visible{outline:2px solid #1fb4ce;outline-offset:2px}
 .qbar{position:absolute;right:2%;top:3%;z-index:4;display:flex;align-items:flex-start;gap:6px;opacity:.38;transition:opacity .3s steps(3)}
 .qbar:hover,.qbar.show,.qbar:focus-within{opacity:1}
-.qbar[hidden]{display:none}
+.qbar[hidden],.qbar button[hidden]{display:none}
 .qbar button{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
-.qbar img{width:calc(30px*var(--tz,1));height:calc(26px*var(--tz,1));image-rendering:pixelated;display:block}
+.qbar img{width:calc(30px*var(--ui,1));height:calc(26px*var(--ui,1));image-rendering:pixelated;display:block}
+.compact .qbar button span{display:none}
 .qbar button span{font-family:Silk,monospace;font-size:clamp(6px,.5vw,8px);letter-spacing:2px;color:#c6ab92;text-shadow:0 1px 0 #0b0e11;margin-top:2px}
 .qbar .qlab{position:absolute;right:0;top:calc(100% + 18px);font-family:Silk,monospace;font-size:clamp(8px,.7vw,10px);letter-spacing:3px;color:#7ee3e5;text-shadow:0 1px 0 #0b0e11;white-space:nowrap;opacity:0;transition:opacity .3s steps(3);margin-right:6px}
 .qbar.show .qlab{opacity:1}
