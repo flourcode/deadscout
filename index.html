@@ -15,10 +15,10 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=29">
+<link rel="stylesheet" href="game.css?v=31">
 </head>
 <body>
-<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-name">DEAD<span>SCOUT</span></p></div><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p><p class="bt-foot" id="bootFoot" hidden><span>TAP · CLICK · ANY KEY · THE WATCH BEGINS</span><button type="button" id="bootMenu">MENU ▸</button></p></div></div>
+<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><canvas class="bt-sky" id="bootSky" width="320" height="200" aria-hidden="true"></canvas><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-name">DEADSCOUT</p><div class="bt-ship" role="img" aria-label="The survey vessel HALCYON, DSV-0417"></div></div><div class="bt-mid"><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p></div><nav class="bt-nav" id="bootNav" aria-label="Start" hidden><button type="button" data-b="watch" class="on">NIGHT WATCH</button><button type="button" data-b="scene">SCENE</button><button type="button" data-b="sleep">SLEEP</button><button type="button" data-b="halcyon">ENTER HALCYON</button><button type="button" data-b="menu" id="bootMenu">MENU</button></nav><p class="bt-foot" id="bootFoot" hidden>TAP · CLICK · ANY KEY · THE WATCH BEGINS</p></div></div>
 <div class="g" id="g">
  <div class="unit" id="unit">
   <header class="u-top">
@@ -88,7 +88,7 @@
   <section class="wui" id="wui" hidden>
     <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time"><b id="wTime"></b><span class="wt-track" id="wTrack"></span></span></div>
     <div class="wui-bar">
-      <div class="wui-more" id="wMore" hidden><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button></div>
+      <div class="wui-more" id="wMore" hidden><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="rec" id="wRec">REC<em> · LONG TAKE</em></button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button></div>
       <div class="wui-btns main"><button type="button" data-w="control" id="wControl">CONTROL</button><button type="button" data-w="mood" id="wMood">SCENE<em> · NIGHT WATCH</em></button><button type="button" data-w="sleep" id="wSleep">SLEEP</button><button type="button" data-w="end">END</button><button type="button" data-w="more" id="wMoreBtn" aria-expanded="false" aria-label="More">⋯</button></div>
     </div>
   </section>
@@ -198,10 +198,10 @@
 <script src="deep.js?v=5"></script>
 <script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=53"></script>
+<script src="cut.js?v=54"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=11"></script>
-<script src="watch.js?v=9"></script>
+<script src="watch.js?v=10"></script>
 <script src="amb.js?v=3"></script>
 <script src="audio/sfx.js?v=6"></script>
 <script src="lc.js?v=12"></script>
@@ -213,15 +213,16 @@
 <script src="game/events.js?v=2"></script>
 <script src="game/story.js?v=15"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=42"></script>
+<script src="game.js?v=44"></script>
 <script src="game/pad.js?v=13"></script>
 <script src="game/toys.js?v=13"></script>
 <script src="game/clock.js?v=6"></script>
 <script src="game/k9nav.js?v=1"></script>
-<script src="game/joy.js?v=3"></script>
+<script src="game/joy.js?v=4"></script>
+<script src="game/town.js?v=1"></script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
-(function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=9',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');
+(function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=10',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');
   const ready=()=>!!(window.DS_ALL&&window.PX&&PX.ready());let shown=0,closed=false;
   const target=()=>{const T=FILES.reduce((s,[f,d])=>s+(tot[f]||d),0),G=FILES.reduce((s,[f])=>s+Math.min(got[f]||0,tot[f]||1e9),0);return .12+.8*Math.min(1,G/T)+(ready()?.08:0);};
   function tick(){if(closed)return;const g=target();shown+=Math.max(0,g-shown)*.18+.002;shown=Math.min(shown,g);const n=Math.max(1,Math.floor(shown*16+1e-6));for(let i=0;i<16;i++)F.children[i].classList.toggle('on',i<n);
@@ -229,10 +230,29 @@
     if(ready()&&n>=16&&performance.now()-t0>900){closed=true;setTimeout(press,260);return;}requestAnimationFrame(tick);}
   /* PRESS START (r28): the first tap both opens the sound and starts the watch with the last settings; MENU goes to the title */
   const shut=()=>{B.classList.add('out');setTimeout(()=>B.remove(),420);removeEventListener('keydown',go,true);};
-  const go=e=>{if(e&&e.target&&e.target.id==='bootMenu')return;if(e&&e.type==='keydown'&&(e.metaKey||e.ctrlKey||e.altKey))return;if(e)e.preventDefault();shut();try{window.__game.quickWatch();}catch(err){}};
+  const NAV=document.getElementById('bootNav');
+  const go=e=>{if(e&&e.target&&e.target.closest&&e.target.closest('.bt-nav'))return;if(e&&e.type==='keydown'){if(e.metaKey||e.ctrlKey||e.altKey)return;
+      const f=document.activeElement,inNav=f&&f.closest&&f.closest('.bt-nav');
+      if(/^Arrow(Left|Right|Up|Down)$/.test(e.code)||e.code==='Tab'){if(e.code!=='Tab'){e.preventDefault();const L=[...NAV.querySelectorAll('button')],k=inNav?L.indexOf(f):-1,d=/Left|Up/.test(e.code)?-1:1;L[(k+d+L.length)%L.length].focus();}return;}
+      if(inNav&&(e.code==='Enter'||e.code==='Space'))return;}
+    if(e)e.preventDefault();shut();try{window.__game.quickWatch();}catch(err){}};
+  /* r34: the start row. NIGHT WATCH is what a tap anywhere does; SCENE opens the watch setup; SLEEP starts a watch with the
+     30-minute sleep timer; ENTER HALCYON is the story; MENU is the title */
+  const act=b=>{shut();const G=window.__game,T=m=>{const el=document.querySelector('#tMenu [data-m="'+m+'"]');if(el)el.click();};
+    try{if(b==='watch')G.quickWatch();else if(b==='sleep')G.quickSleep();else if(b==='scene')T('setup');else if(b==='halcyon')T('new');}catch(err){}};
   function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}document.getElementById('bootLoad').hidden=true;document.querySelector('.bt-bar').hidden=true;SUB.hidden=true;
-    document.getElementById('bootStart').hidden=false;document.getElementById('bootFoot').hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
-    document.getElementById('bootMenu').addEventListener('click',e=>{e.stopPropagation();shut();});}
+    document.getElementById('bootStart').hidden=false;document.getElementById('bootFoot').hidden=false;NAV.hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
+    NAV.addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(!b)return;e.stopPropagation();act(b.dataset.b);});}
+  /* the sky behind the card: chunky stars, a few twinkling */
+  (function(){const c=document.getElementById('bootSky');if(!c)return;const bx=c.getBoundingClientRect();c.width=240;c.height=Math.max(90,Math.round(240*(bx.height||200)/(bx.width||320)));const x=c.getContext('2d'),W=c.width,H=c.height;let seed=417;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
+    const S=[];for(let i=0;i<90;i++)S.push([Math.floor(r()*W),Math.floor(r()*H),r()]);
+    const sky=x.createImageData(W,H),d=sky.data,put=(X,Y,c)=>{const i=(Y*W+X)*4;d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255;};
+    for(let Y=0;Y<H;Y++)for(let X=0;X<W;X++)put(X,Y,[10,12,17]);
+    const PX=-999,PY=-999,PR=0,MX=-999,MY=-999,MR=0; /* r35: no invented planet or moon: just the stars the ship flies through */
+    const base=sky;function frame(){x.putImageData(base,0,0);const t=performance.now()/1000;
+      for(const [X,Y,b] of S){const dx=X-PX,dy=Y-PY;if(Math.hypot(dx,dy)<PR+1||Math.hypot(X-MX,Y-MY)<MR+2)continue;const tw=b>.92?(.5+.5*Math.sin(t*2.2+X)):1;
+        x.globalAlpha=(b>.75?.9:b>.4?.45:.22)*tw;x.fillStyle=b>.8?'#e9d7c2':'#9aa3ad';x.fillRect(X,Y,1,1);}x.globalAlpha=1;}
+    frame();const iv=setInterval(()=>{if(!document.getElementById('bootSky'))return clearInterval(iv);frame();},140);})();
   requestAnimationFrame(tick);
   const tag=f=>new Promise(ok=>{const s=document.createElement('script');s.src=f;s.onload=s.onerror=()=>{got[f]=tot[f]=1;ok();};document.body.appendChild(s);});
   async function load([f]){try{const r=await fetch(f);if(!r.ok||!r.body)throw 0;tot[f]=+r.headers.get('content-length')||0;const rd=r.body.getReader(),parts=[];
