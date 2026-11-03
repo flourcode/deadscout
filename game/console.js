@@ -1,4 +1,4 @@
-/* DeadScout · the ship's computer (Nov 2026). The comms console takes typed commands and HOS answers in capitals: terse,
+/* Driftnaut · the ship's computer (Nov 2026). The comms console takes typed commands and HOS answers in capitals: terse,
    literal, sometimes withholding. It never explains her; it only reports what its sensors do and don't see.
    And the crew's personal logs: short entries found at things they left behind, kept across playthroughs in this browser.
    window.SHIPCON = {LOGS, logFor(objectId), run(cmd, ctx) -> lines[]} */

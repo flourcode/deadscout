@@ -1,4 +1,4 @@
-/* DeadScout · TOWN (release 33). HALCYON remembers her crew, and she keeps herself: the little residents that make a
+/* Driftnaut · TOWN (release 33). HALCYON remembers her crew, and she keeps herself: the little residents that make a
    watch look like a busy town on a derelict research ship. Everything here is drawn in the ship's own art pixels (one
    pixel = SS world units) on a transparent layer, and every sound is made in the page, panned to where it happens and
    quieter when the camera is far away.
@@ -26,7 +26,7 @@ const now=()=>{try{return G.now();}catch(e){return 0;}};
 /* ============================== the layer ============================== */
 const cv=document.createElement('canvas');cv.className='town';cv.setAttribute('aria-hidden','true');stage.after(cv);const x=cv.getContext('2d');
 const css=document.createElement('style');css.textContent=`.town{position:absolute;pointer-events:none;image-rendering:pixelated;z-index:2}body.photo .town{display:none}
-body.layered .joy,body.layered .daytint,body.layered .town{opacity:0}`;document.head.appendChild(css);
+body.layered .joy,body.layered .daytint,body.layered .town{opacity:0!important}`;document.head.appendChild(css);
 (window.__layers=window.__layers||[]).unshift(cv);   /* recordings composite the layers (game.js): residents are in the take */
 function size(){const D=Math.max(1,Math.min(2,window.devicePixelRatio||1)),w=stage.clientWidth,h=stage.clientHeight;cv.style.left=stage.offsetLeft+'px';cv.style.top=stage.offsetTop+'px';cv.style.width=w+'px';cv.style.height=h+'px';
   if(cv.width!==Math.round(w*D)||cv.height!==Math.round(h*D)){cv.width=Math.round(w*D);cv.height=Math.round(h*D);}}
@@ -140,14 +140,15 @@ function tick(dt){const t=now();if(!live()||!watching()){return;}
 
 /* footsteps on the decking, rungs on the ladder */
 const STEP={};
-function crewSounds(t,dt){if(asleep())return;for(const a of ['pilot','systems','commander','deadscout']){let s=null;try{s=CUT.actorAt(G.P,G.TIMES,t,a);}catch(e){}if(!s){continue;}
+function crewSounds(t,dt){if(asleep())return;for(const a of ['pilot','systems','commander']){let s=null;try{s=CUT.actorAt(G.P,G.TIMES,t,a);}catch(e){}if(!s){continue;}
   const st=STEP[a]||(STEP[a]={x:s.x,y:s.y,d:0});const dx=Math.abs(s.x-st.x),dy=Math.abs(s.y-st.y);st.x=s.x;st.y=s.y;if(dx+dy>80){st.d=0;continue;}
   if(s.walk){st.d+=dx;if(st.d>(s.sneak?26:34)){st.d=0;play('step',s.x,s.y,!!s.sneak);}}
   else if(s.climb){st.d+=dy;if(st.d>18){st.d=0;play('rung',s.x,s.y);}}else st.d=0;}}
 
 /* ============================== crew props from the schedule ============================== */
-const BUNK={pilot:{hx:575,y:705,col:'#4d2613'},systems:{hx:575,y:788,col:'#14181c'}};
-function propsNow(t){const w=W(),L=(w&&w.man&&w.man.props)||[];const carry={},bunk={};for(const p of L){if(p.at>t)break;if(p.carry)carry[p.carry]=p.prop;if(p.bunk){if(t<p.until)bunk[p.bunk]=p;else delete bunk[p.bunk];}}return {carry,bunk};}
+const SLOT={top:{hx:575,y:705},low:{hx:575,y:788}},PREF={commander:['low','top'],systems:['low','top'],pilot:['top','low']},HEAD={pilot:['#7b3f1c','#e39754'],systems:['#292a31','#99623b'],commander:['#e9d7c2','#14181c']}; /* r41: the commander sleeps in the bottom bunk, helmet and all */
+const SLEEPERS={};
+function propsNow(t){const w=W(),L=(w&&w.man&&w.man.props)||[];const carry={},bunk={};for(const p of L){if(p.at>t)break;if(p.carry)carry[p.carry]=p.prop;if(p.bunk){if(t<p.until)bunk[p.bunk]=p;else delete bunk[p.bunk];}}for(const a in SLEEPERS)bunk[a]=SLEEPERS[a];return {carry,bunk};}
 let lastBunkSnd=0;
 function drawProps(t){if(!watching())return;const {carry,bunk}=propsNow(t);let rep={};try{rep=CUT.report(G.P,G.TIMES,t);}catch(e){}
   for(const a in carry){const pr=carry[a];if(!pr||rep[a]==='GONE')continue;let s=null;try{s=CUT.actorAt(G.P,G.TIMES,t,a);}catch(e){}if(!s)continue;
@@ -157,24 +158,26 @@ function drawProps(t){if(!watching())return;const {carry,bunk}=propsNow(t);let r
     else if(pr==='mug'){blit(MUG,P,s.x+f*14,s.y-50,f<0,1,SS*1.5);if(Math.random()<.04)fx({k:'steam',x:s.x+f*13,y:s.y-60,vx:rnd(-2,2),vy:rnd(-10,-6),life:rnd(1,1.8)});if(!s.walk&&Math.random()<.002)play('sip',s.x,s.y);}
     else if(pr==='tablet'){blit(TAB,P,s.x+f*14,s.y-54,f<0,1,SS*1.5);px(snap(s.x+f*12),snap(s.y-60),'#c8ffff',.6+.3*Math.sin(t*3));}}
   /* the bunks: who's asleep or reading, under a blanket that breathes */
-  for(const a in bunk){const B=BUNK[a],p=bunk[a];if(!B)continue;const br=Math.sin(t*1.5+(a==='pilot'?0:2))>.55?1:0;
+  const used={},order=Object.keys(bunk).sort((a,b)=>(a==='commander'?-1:0)-(b==='commander'?-1:0));
+  for(const a of order){const sl=(PREF[a]||['low','top']).find(k=>!used[k]);if(!sl)continue;used[sl]=1;const B=SLOT[sl],p=bunk[a];const br=Math.sin(t*1.5+(a==='pilot'?0:2))>.55?1:0;
     const Y=B.y,hx=B.hx,u=SS*2;
     /* the blanket: a long low shape with a shoulder and a knee, outlined so it reads on the full ship; it rises as they breathe */
     for(let X=hx+8;X<hx+112;X+=u){const rel=(X-hx-8)/104,top=rel<.06?3:rel<.4?5+br:rel<.6?4:rel<.84?4:3;
       px(X,Y+u-u*(top+1),'#0b0e11',1,u);for(let k=top;k>=1;k--)px(X,Y+u-u*k,k===top?'#6f93b5':(X/u+k)%4===0?'#2e4a66':'#3b5a78',1,u);}
     px(hx+8-u,Y-u*2,'#0b0e11',1,u);px(hx+8-u,Y-u*3,'#0b0e11',1,u);px(hx+112,Y-u*2,'#0b0e11',1,u);px(hx+112,Y-u,'#0b0e11',1,u);
     /* the head on the pillow */
-    blit([".###.","#HHH#","#HHs#","#Hss#",".###."],Object.assign({},P,{H:a==='pilot'?'#7b3f1c':'#292a31',s:a==='pilot'?'#e39754':'#99623b'}),hx,Y-(p.kind==='read'?u*2:0),false,1,u);
+    blit([".###.","#HHH#","#HHs#","#Hss#",".###."],Object.assign({},P,{H:(HEAD[a]||HEAD.systems)[0],s:(HEAD[a]||HEAD.systems)[1]}),hx,Y-(p.kind==='read'?u*2:0),false,1,u);
     if(p.kind==='read'){blit(['####','#cc#','#cC#','####'],P,hx+22,Y-u*3,false,1,SS*1.5);
       x.globalCompositeOperation='lighter';const X=(hx+22-V[0])*K,YY=(Y-u*4-V[1])*K,g=x.createRadialGradient(X,YY,0,X,YY,22*K);g.addColorStop(0,'rgba(126,227,229,.22)');g.addColorStop(1,'rgba(126,227,229,0)');x.globalAlpha=1;x.fillStyle=g;x.fillRect(X-22*K,YY-22*K,44*K,44*K);x.globalCompositeOperation='source-over';
       if(t-lastBunkSnd>rnd(14,30)){lastBunkSnd=t;play('page',hx,Y);}}
-    else{if(Math.random()<.006)fx({k:'z',x:hx+6,y:Y-26,vx:rnd(2,5),vy:rnd(-7,-4),life:3});if(t-lastBunkSnd>rnd(9,16)){lastBunkSnd=t;play('snore',hx,Y);}}}}
+    else{}}}
 
 /* ============================== drawing ============================== */
 let lastT=0;
 function draw(){requestAnimationFrame(draw);const t=now(),dt=Math.max(0,Math.min(.1,t-lastT||0));lastT=t;
   V=view();K=cv.width/V[2];x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.imageSmoothingEnabled=false;
   if(!live()||!watching())return;
+  let ext=0;try{ext=CUT.extAt(G.P,G.TIMES,t);}catch(e){}cv.style.opacity=String(1-ext);if(ext>.98){try{tick(dt);}catch(e){}return;} /* r41: outside the hull, the residents are behind the plating */
   try{tick(dt);}catch(e){}
   /* the pipes, first: they are behind everything */
   x.globalCompositeOperation='lighter';
@@ -207,5 +210,5 @@ function draw(){requestAnimationFrame(draw);const t=now(),dt=Math.max(0,Math.min
     else if(p.k==='z'){const A=Math.min(1,u*4)*(1-u);for(const [a,b] of [[0,0],[1,0],[2,0],[1,1],[0,2],[1,2],[2,2]])px(snap(X,U)+a*U,snap(Y,U)+b*U,'#e9d7c2',A,U);}}
   x.globalAlpha=1;}
 requestAnimationFrame(draw);
-window.__town={R,ARM,TUBE,PIPES,props:propsNow,fire:{arm(){ARM.next=0;},tube(){TUBE.next=0;},recycler(){nextRecy=0;}}};
+window.__town={R,ARM,TUBE,PIPES,props:propsNow,sleep(a,on){if(on)SLEEPERS[a]={kind:'sleep'};else delete SLEEPERS[a];},fire:{arm(){ARM.next=0;},tube(){TUBE.next=0;},recycler(){nextRecy=0;}}};
 })();

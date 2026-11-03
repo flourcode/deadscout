@@ -3,22 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DeadScout</title>
-<meta name="description" content="A living retro-industrial spaceship to wander. Explore the abandoned deep survey vessel HALCYON with a service robot at your heel, listen to her, play the crew's tapes, tune a handheld scanner into what she remembers, and notice what the cameras don't.">
+<title>Driftnaut · Drift through space. Tune out the world.</title>
+<meta name="description" content="Driftnaut: a cozy sci-fi drifting experience. Float through HALCYON, a deep survey vessel lost long ago. Play chillhop tapes, operate old machinery, keep company with K9, and settle into Night Watch. Drift through space. Tune out the world.">
 <meta name="theme-color" content="#06060a">
-<meta property="og:title" content="DeadScout">
-<meta property="og:description" content="DSV HALCYON · 2291 · presumed lost with all hands. Walk the ship. Read the terminals. Notice what the cameras don't.">
+<meta property="og:title" content="Driftnaut">
+<meta property="og:description" content="A little lost astronaut. An old spaceship. Endless chillhop. DSV HALCYON · 0417 · Drift through space. Tune out the world.">
 <meta property="og:image" content="og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=31">
+<link rel="stylesheet" href="game.css?v=43">
 </head>
 <body>
-<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><canvas class="bt-sky" id="bootSky" width="320" height="200" aria-hidden="true"></canvas><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-name">DEADSCOUT</p><div class="bt-ship" role="img" aria-label="The survey vessel HALCYON, DSV-0417"></div></div><div class="bt-mid"><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p></div><nav class="bt-nav" id="bootNav" aria-label="Start" hidden><button type="button" data-b="watch" class="on">NIGHT WATCH</button><button type="button" data-b="scene">SCENE</button><button type="button" data-b="sleep">SLEEP</button><button type="button" data-b="halcyon">ENTER HALCYON</button><button type="button" data-b="menu" id="bootMenu">MENU</button></nav><p class="bt-foot" id="bootFoot" hidden>TAP · CLICK · ANY KEY · THE WATCH BEGINS</p></div></div>
+<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><canvas class="bt-sky" id="bootSky" width="320" height="200" aria-hidden="true"></canvas><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-kick">DSV-0417 // HALCYON</p><svg class="bt-orb" viewBox="0 0 40 20" aria-hidden="true"><ellipse cx="20" cy="11" rx="19" ry="4.5" fill="none" stroke="currentColor" stroke-width="1.6" transform="rotate(-12 20 11)"/><circle cx="20" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><p class="bt-name">DRIFTNAUT</p><p class="bt-tag">YOUR LITTLE PLACE IN SPACE</p><p class="bt-rule" aria-hidden="true">· · · · · · · ◆ · · · · · · ·</p><div class="bt-ship" role="img" aria-label="The survey vessel HALCYON, DSV-0417"></div></div><canvas class="bt-live" id="bootLive" aria-hidden="true"></canvas><div class="bt-mid"><p class="bt-load" id="bootLoad" hidden>LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill" hidden><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub" hidden>RECOVERING FEED</p><div class="bt-pick" id="bootStart"><button type="button" class="bt-card listen" data-b="listen"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9V7a5 5 0 0 1 10 0v2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="2" y="9" width="3" height="5" fill="currentColor"/><rect x="11" y="9" width="3" height="5" fill="currentColor"/></svg><b>LISTEN</b><span>RELAX · STUDY · DRIFT</span></button><button type="button" class="bt-card play" data-b="play"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="5" width="14" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="4" y="7" width="1" height="3" fill="currentColor"/><rect x="3" y="8" width="3" height="1" fill="currentColor"/><rect x="10" y="7" width="2" height="2" fill="currentColor"/><rect x="12" y="9" width="1" height="1" fill="currentColor"/></svg><b>PLAY</b><span>EXPLORE · TOUCH · DISCOVER</span></button></div></div><p class="bt-foot" id="bootFoot"><span>NO SETUP · NO STORY REQUIRED · NO PRESSURE</span><button type="button" id="bootMenu" data-b="menu">MENU</button></p></div></div>
+<script>/* r50: a tap before the ship has finished loading is remembered, then carried out */(function(){const B=document.getElementById('boot');if(!B)return;const f=e=>{const b=e.target.closest&&e.target.closest('[data-b]');if(window.__bootLive)return;window.__bootQ=b?b.dataset.b:'listen';const p=document.getElementById('bootStart');if(p)p.classList.add('wait');};B.addEventListener('click',f);addEventListener('keydown',e=>{if(!window.__bootLive&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&e.code!=='Tab'){window.__bootQ=e.code==='KeyP'?'play':'listen';}});})();</script>
 <div class="g" id="g">
  <div class="unit" id="unit">
   <header class="u-top">
@@ -28,19 +30,22 @@
   </header>
   <div class="screen" id="screen">
   <canvas id="stage" width="1920" height="1080" aria-label="The ship"></canvas>
+   <div class="restchip" id="restChip" hidden><button type="button" id="restBack">▸ RETURN</button><span>RESTING · ANY KEY RETURNS</span></div>
+   <button type="button" class="restbtn" id="restBtn" aria-label="Rest">REST</button>
   <div class="glass" aria-hidden="true"></div>
   <div class="talk" id="talk" aria-live="polite"><span class="trec" id="tRec" hidden>● REC</span><div class="strip" id="tStrip" hidden></div><div class="bub" id="tBub" hidden><b></b><span></span></div><div class="tbot"><div class="iprompt" id="hPrompt" hidden></div><div class="tpanel" id="tPanel" hidden><b></b><span></span></div></div></div>
   <div class="veil" id="veil"></div>
   <button type="button" class="bcgo" id="bcGo" hidden>CLICK TO BEGIN THE BROADCAST</button>
   <div class="cards" id="cards" hidden></div>
   <section class="title" id="title">
-    <h1 class="t-name">DEAD<span>SCOUT</span></h1>
+    <h1 class="t-name">DRIFT<span>NAUT</span></h1>
     <nav class="menu" id="tMenu" aria-label="Main menu">
-      <button type="button" data-m="watch">NIGHT WATCH</button>
-      <button type="button" data-m="new">ENTER HALCYON</button>
-      <button type="button" data-m="continue" id="mContinue" hidden>CONTINUE</button>
+      <button type="button" data-m="watch">LISTEN</button>
+      <button type="button" data-m="play">PLAY</button>
+      <button type="button" data-m="continue" id="mContinue" hidden>CONTINUE THE STORY</button>
+      <button type="button" data-m="new">THE STORY</button>
       <button type="button" data-m="second" id="mSecond" hidden>SECOND TRANSMISSION</button>
-      <div class="util"><button type="button" data-m="setup">SETUP</button><button type="button" data-m="registry">REGISTRY</button><button type="button" data-m="controls">CONTROLS</button><button type="button" data-m="options">OPTIONS</button></div>
+      <div class="util"><button type="button" data-m="options">OPTIONS</button></div>
     </nav>
     <p class="t-foot">↑ ↓ CHOOSE · ENTER SELECT</p>
   </section>
@@ -76,7 +81,7 @@
     <div class="rows" id="nwRows">
       <div class="row" data-k="view"><span>VIEW</span><b></b></div>
       <div class="row" data-k="activity"><span>MOOD</span><b></b></div>
-      <div class="row" data-k="music"><span>MUSIC</span><b></b></div>
+      <div class="row" data-k="music"><span>TAPE</span><b></b></div>
       <div class="row" data-k="duration"><span>TIME</span><b></b></div>
       <div class="row" data-k="focus"><span>FOCUS</span><b></b></div>
       <div class="row" data-k="objective"><span>OBJECTIVE</span><input type="text" id="nwObj" maxlength="40" placeholder="optional · one line" autocomplete="off" spellcheck="false" aria-label="Objective"></div>
@@ -88,11 +93,11 @@
   <section class="wui" id="wui" hidden>
     <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time"><b id="wTime"></b><span class="wt-track" id="wTrack"></span></span></div>
     <div class="wui-bar">
-      <div class="wui-more" id="wMore" hidden><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="rec" id="wRec">REC<em> · LONG TAKE</em></button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button></div>
-      <div class="wui-btns main"><button type="button" data-w="control" id="wControl">CONTROL</button><button type="button" data-w="mood" id="wMood">SCENE<em> · NIGHT WATCH</em></button><button type="button" data-w="sleep" id="wSleep">SLEEP</button><button type="button" data-w="end">END</button><button type="button" data-w="more" id="wMoreBtn" aria-expanded="false" aria-label="More">⋯</button></div>
-    </div>
+      <div class="wui-more" id="wMore" hidden><button type="button" data-w="int" id="wInt">INTENSITY<em> · FOCUS</em></button><button type="button" data-w="brown" id="wbrown">BROWN NOISE<em> · LOW</em></button><button type="button" data-w="pink" id="wpink">PINK NOISE<em> · LOW</em></button><button type="button" data-w="fade" id="wFade">FADE OUT<em> · OFF</em></button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" hidden aria-hidden="true"><button type="button" data-w="full">FULL<em>SCREEN</em></button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="rec" id="wRec">REC<em> · LONG TAKE</em></button><button type="button" data-w="menu">MENU</button></div>
+      <div class="wui-btns main"><button type="button" data-w="mood" id="wMood" class="m-listen">SCENE<em> · QUIET DRIFT</em></button><button type="button" data-w="listen" id="wListen" class="m-play on">◂ LISTEN</button><button type="button" data-w="sound" id="wSound">SOUND<em> · ON</em></button><button type="button" data-w="k9" id="wK9" class="m-play">CALL K9</button><button type="button" data-w="play" id="wPlay" class="m-listen on">PLAY ▸</button><button type="button" data-w="tape" id="wTape" class="adv">TAPE<em> · SPACE WAVE</em></button><button type="button" data-w="aud" id="wAud" class="m-listen adv">AUDIO ONLY</button><button type="button" data-w="more" id="wMoreBtn" class="adv" aria-expanded="false" aria-label="More">⋯</button><button type="button" id="wControl" hidden></button><button type="button" id="wSleep" hidden></button><button type="button" id="wTape2" hidden></button><button type="button" id="wLight" hidden></button><button type="button" id="wAmb" hidden></button></div>
   </section>
   <div class="dim" id="dim" hidden></div>
+  <div class="aonly" id="aonly" hidden><span>AUDIO ONLY · TAP TO RETURN</span></div>
   <span class="tag" id="wTag2" hidden>NIGHT WATCH // DSV HALCYON</span>
   <span class="focusline" id="wFocus" hidden></span>
   <section class="photo" id="photo" hidden><div class="ph-flash" id="phFlash"></div>
@@ -138,16 +143,16 @@
   <section class="controls" id="controls" hidden>
     <h2 class="c-title">CONTROLS</h2>
     <div class="cgrid">
-      <div class="cg"><span class="cl">MOVE</span><span class="dpad"><kbd class="kc">▲</kbd><span class="drow"><kbd class="kc">◀</kbd><kbd class="kc">▼</kbd><kbd class="kc">▶</kbd></span></span><span class="cn">↑ ↓ CLIMB · W A S D TOO</span></div>
+      <div class="cg"><span class="cl">DRIFT</span><span class="dpad"><kbd class="kc">▲</kbd><span class="drow"><kbd class="kc">◀</kbd><kbd class="kc">▼</kbd><kbd class="kc">▶</kbd></span></span><span class="cn">↑ ↓ RISE · SINK IN THE SHAFT · W A S D TOO</span></div>
       <div class="cg"><span class="cl">USE</span><kbd class="kc">E</kbd><span class="cn">OPEN · OPERATE · LOOK</span></div>
       <div class="cg"><span class="cl">SCANNER</span><kbd class="kc">Q</kbd><span class="cn">SWEEP · ON A STRONG SIGNAL THE DIAL OPENS: ◀ ▶ UNTIL IT LOCKS</span></div>
       <div class="cg"><span class="cl">FLASHLIGHT</span><kbd class="kc">F</kbd><span class="cn"><i class="pip amber"></i> ONE BEAM</span></div>
-      <div class="cg"><span class="cl">CAREFUL</span><kbd class="kc wide">SHIFT</kbd><span class="cn">MOVE QUIETLY</span></div>
+      <div class="cg"><span class="cl">REST</span><kbd class="kc">R</kbd><span class="cn">SIT · LISTEN · ANY KEY RETURNS</span></div>
       <div class="cg"><span class="cl">CAMERA</span><kbd class="kc wide">TAB</kbd><span class="cn">WHOLE SHIP / FOLLOW HER</span></div>
       <div class="cg"><span class="cl">TAPES</span><span class="krow"><kbd class="kc">N</kbd><kbd class="kc">M</kbd></span><span class="cn">NEXT TAPE · MUSIC ON / OFF</span></div>
       <div class="cg"><span class="cl">MENU</span><kbd class="kc wide">ESC</kbd><span class="cn">SCHEMATIC · PAUSE · TAPES</span></div>
     </div>
-    <p class="c-pad">🎮 A CONTROLLER WORKS · STICK MOVE · A USE · B SCANNER · X FLASHLIGHT · Y CAMERA · START MENU &nbsp;·&nbsp; K ON-SCREEN KEYS &nbsp;·&nbsp; NIGHT WATCH: C TAKES THE COMMANDER</p>
+    <p class="c-pad">🎮 A CONTROLLER WORKS · STICK MOVE · A USE · B SCANNER · X FLASHLIGHT · Y CAMERA · START MENU &nbsp;·&nbsp; K ON-SCREEN KEYS &nbsp;·&nbsp; NIGHT WATCH: C TAKES CONTROL</p>
     <p class="t-foot">ESC OR ENTER TO GO BACK</p>
   </section>
   </div>
@@ -163,63 +168,51 @@
   </footer>
  </div>
 </div>
-<section class="ab" id="about" aria-label="About DeadScout">
+<section class="ab" id="about" aria-label="About Driftnaut">
  <div class="ab-col">
-  <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>THE SHIP</span></h2>
-  <p>DSV HALCYON, deep survey vessel, registry DSV-0417. Presumed lost with all hands in 2291, 167 AU from Sol. Decades later a repeating low-power transmission was detected near her last position. DeadScout is what answers when you link to it: a living ship to walk, to listen to, and to leave running.</p>
-  <p><b>ENTER HALCYON</b> and you wake aboard, in the crew quarters, with a service robot at your heel. Read the terminals. Find the scanner and tune it into what the ship remembers. Play the crew's tapes. Notice what the cameras don't. There is no clock and nothing hunts you; the ship simply changes the longer you stay.</p>
-  <p><b>NIGHT WATCH</b> is where the ship starts: press start and HALCYON runs herself, crew routines, screens, lamps, weather outside, her lights following your own clock. Leave it on. Click anything: the monitors, the plant, the mug on the comms shelf, the ladder (it plays), the stars, the crew. Hold the bridge glass. Double-tap a floor and K9 comes to sit. SLEEP settles the ship for the night and fades to black; FOCUS keeps a study timer on the bridge. SETUP chooses the view, mood, music and length; TAKE CONTROL hands you the commander.</p>
-  <h2><i class="ic ic-keys" aria-hidden="true"></i><span>CONTROLS</span></h2>
+  <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>YOUR LITTLE PLACE IN SPACE</span></h2>
+  <p><b>DRIFTNAUT</b> is a cozy pixel spaceship that plays warm space-chill music. Press <b>LISTEN</b> and leave it running while you work, read or wind down: the crew of HALCYON go about their day, the drones keep the ship tidy, K9 potters about. Press <b>PLAY</b> and drift through the ship yourself.</p>
   <dl class="ab-keys">
-   <dt>← → ↑ ↓</dt><dd>walk and climb (W A S D too)</dd>
-   <dt>E</dt><dd>use · open · operate · look</dd>
-   <dt>Q</dt><dd>scanner sweep; on a strong signal the dial opens: ← → until the trace aligns, hold, it locks</dd>
-   <dt>F</dt><dd>flashlight</dd>
-   <dt>SHIFT</dt><dd>move carefully</dd>
-   <dt>TAB</dt><dd>the whole ship, or the camera on her</dd>
-   <dt>N · M</dt><dd>next tape · music on and off</dd>
-   <dt>ESC</dt><dd>schematic, pause, tapes</dd>
-   <dt>🎮</dt><dd>a controller works: stick move · A use · B scanner · X flashlight · Y camera · START menu</dd>
-   <dt>C</dt><dd>in Night Watch: take or release the commander</dd>
+   <dt>DRIFT</dt><dd>Move around the ship · arrow keys, or the on-screen pad</dd>
+   <dt>TOUCH</dt><dd>Click anything: screens, lamps, the plant, the mug, the ladder (it plays), the reactor · E uses what's nearby</dd>
+   <dt>LISTEN</dt><dd>SCENE changes the ship's mood and music · TAPE changes the music · SOUND balances music and noise · AUDIO ONLY turns the screen off</dd>
   </dl>
  </div>
  <div class="ab-col">
-  <h2><i class="ic ic-radio" aria-hidden="true"></i><span>TRANSMISSION NOTES</span></h2>
-  <p>DeadScout runs entirely in this browser. Nothing is uploaded, nothing is tracked, and after one visit it opens without a network. Your transmission saves itself as you go; CONTINUE picks it up where you left it. Finishing one unlocks a second.</p>
-  <p>The music is six tapes played by a band that lives in the page: no recordings, generated as you listen, the same hour from the same seed. The ship's ambience, the footsteps and the relays are made the same way. Everything you hear is yours to use in a video or a stream.</p>
-  <p><b>PHOTO MODE</b> (Options) saves the frame exactly as the ship draws it, at up to 4K. <b>RECORD A TAKE</b> captures the picture and the sound to a video file, made on your computer.</p>
-  <p>If the picture tears, a screen says the wrong thing or the ship counts someone who isn't there, that is HALCYON. If it stops altogether, that is your browser: reload the page and carry on from your save. Long watches depend on the computer staying awake and the tab staying open.</p>
-  <p class="ab-foot">OUTER SYSTEMS RESEARCH DIRECTORATE · HOS 4.1 · MONITOR UNIT MU-7 &nbsp;·&nbsp; <a href="privacy.html">PRIVACY &amp; TERMS</a> &nbsp;·&nbsp; TYPE: SILKSCREEN, IBM PLEX MONO</p>
+  <h2><i class="ic ic-radio" aria-hidden="true"></i><span>GOOD TO KNOW</span></h2>
+  <p>It runs in your browser: nothing is uploaded or tracked, and it works offline after one visit. The music is made live in the page, so it never repeats and is yours to use in a video or a stream. It remembers your scene, tape and sound. There's a short story too (MENU · THE STORY), if you ever want one.</p>
+  <p class="ab-foot">DSV HALCYON · 0417 &nbsp;·&nbsp; <a href="privacy.html">PRIVACY &amp; TERMS</a></p>
  </div>
 </section>
 <script src="mix.js?v=17"></script>
 <script src="space.js?v=5"></script>
 <script src="music.js?v=11"></script>
-<script src="deep.js?v=5"></script>
+<script src="deep.js?v=9"></script>
 <script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=54"></script>
+<script src="cut.js?v=58"></script>
 <script src="episode.js?v=3"></script>
-<script src="story/halcyon.js?v=11"></script>
-<script src="watch.js?v=10"></script>
-<script src="amb.js?v=3"></script>
+<script src="story/halcyon.js?v=13"></script>
+<script src="watch.js?v=16"></script>
+<script src="amb.js?v=4"></script>
 <script src="audio/sfx.js?v=6"></script>
 <script src="lc.js?v=12"></script>
 <script src="rec.js?v=9"></script>
 <script src="game/scanner.js?v=5"></script>
 <script src="game/power.js?v=4"></script>
-<script src="game/drift.js?v=2"></script>
+<script src="game/drift.js?v=3"></script>
 <script src="game/k9.js?v=4"></script>
-<script src="game/events.js?v=2"></script>
-<script src="game/story.js?v=15"></script>
+<script src="game/events.js?v=3"></script>
+<script src="game/story.js?v=17"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=44"></script>
+<script src="game.js?v=56"></script>
 <script src="game/pad.js?v=13"></script>
-<script src="game/toys.js?v=13"></script>
+<script src="game/toys.js?v=17"></script>
 <script src="game/clock.js?v=6"></script>
 <script src="game/k9nav.js?v=1"></script>
-<script src="game/joy.js?v=4"></script>
-<script src="game/town.js?v=1"></script>
+<script src="game/joy.js?v=7"></script>
+<script src="game/town.js?v=4"></script>
+<script>if(/[?&]studio\b/.test(location.search))document.body.classList.add('studio');</script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
 (function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=10',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');
@@ -227,22 +220,39 @@
   const target=()=>{const T=FILES.reduce((s,[f,d])=>s+(tot[f]||d),0),G=FILES.reduce((s,[f])=>s+Math.min(got[f]||0,tot[f]||1e9),0);return .12+.8*Math.min(1,G/T)+(ready()?.08:0);};
   function tick(){if(closed)return;const g=target();shown+=Math.max(0,g-shown)*.18+.002;shown=Math.min(shown,g);const n=Math.max(1,Math.floor(shown*16+1e-6));for(let i=0;i<16;i++)F.children[i].classList.toggle('on',i<n);
     if(SUB)SUB.textContent=n>=16?'FEED RECOVERED':n>9?'CONSTRUCTING CREW':n>4?'MAPPING HULL':'RECOVERING FEED';
-    if(ready()&&n>=16&&performance.now()-t0>900){closed=true;setTimeout(press,260);return;}requestAnimationFrame(tick);}
+    if(ready()){closed=true;press();return;}requestAnimationFrame(tick);}
   /* PRESS START (r28): the first tap both opens the sound and starts the watch with the last settings; MENU goes to the title */
   const shut=()=>{B.classList.add('out');setTimeout(()=>B.remove(),420);removeEventListener('keydown',go,true);};
-  const NAV=document.getElementById('bootNav');
-  const go=e=>{if(e&&e.target&&e.target.closest&&e.target.closest('.bt-nav'))return;if(e&&e.type==='keydown'){if(e.metaKey||e.ctrlKey||e.altKey)return;
-      const f=document.activeElement,inNav=f&&f.closest&&f.closest('.bt-nav');
-      if(/^Arrow(Left|Right|Up|Down)$/.test(e.code)||e.code==='Tab'){if(e.code!=='Tab'){e.preventDefault();const L=[...NAV.querySelectorAll('button')],k=inNav?L.indexOf(f):-1,d=/Left|Up/.test(e.code)?-1:1;L[(k+d+L.length)%L.length].focus();}return;}
-      if(inNav&&(e.code==='Enter'||e.code==='Space'))return;}
-    if(e)e.preventDefault();shut();try{window.__game.quickWatch();}catch(err){}};
-  /* r34: the start row. NIGHT WATCH is what a tap anywhere does; SCENE opens the watch setup; SLEEP starts a watch with the
-     30-minute sleep timer; ENTER HALCYON is the story; MENU is the title */
-  const act=b=>{shut();const G=window.__game,T=m=>{const el=document.querySelector('#tMenu [data-m="'+m+'"]');if(el)el.click();};
-    try{if(b==='watch')G.quickWatch();else if(b==='sleep')G.quickSleep();else if(b==='scene')T('setup');else if(b==='halcyon')T('new');}catch(err){}};
-  function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}document.getElementById('bootLoad').hidden=true;document.querySelector('.bt-bar').hidden=true;SUB.hidden=true;
-    document.getElementById('bootStart').hidden=false;document.getElementById('bootFoot').hidden=false;NAV.hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
-    NAV.addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(!b)return;e.stopPropagation();act(b.dataset.b);});}
+  /* r42 · two ways in: LISTEN (the ship, music, leave it running) and PLAY (drift through it as Driftnaut). A tap anywhere
+     else, or any key, is LISTEN; P is PLAY; arrows move between the two; MENU is the title (the story, options) */
+  const PICK=document.getElementById('bootStart'),FOOT=document.getElementById('bootFoot');
+  let live=false,pending=null;
+  const act=b=>{if(!live){pending=b;PICK.classList.add('wait');return;}shut();const G=window.__game;try{if(b==='play')G.quickPlay();else if(b==='menu'){}else G.quickWatch();}catch(err){}};
+  const go=e=>{if(e&&e.target&&e.target.closest&&e.target.closest('[data-b]'))return;
+    if(e&&e.type==='keydown'){if(e.metaKey||e.ctrlKey||e.altKey)return;const f=document.activeElement,on=f&&f.dataset&&f.dataset.b;
+      if(/^Arrow(Left|Right|Up|Down)$/.test(e.code)){e.preventDefault();const L=[...PICK.querySelectorAll('button')],k=on?L.indexOf(f):-1,d=/Left|Up/.test(e.code)?-1:1;L[(k+d+L.length)%L.length].focus();return;}
+      if(e.code==='Tab')return;if(on&&(e.code==='Enter'||e.code==='Space'))return;if(e.code==='KeyP'){e.preventDefault();act('play');return;}}
+    if(e)e.preventDefault();act('listen');};
+  /* r50: no loading screen. LISTEN and PLAY are there from the first frame; a choice made while the ship is still
+     arriving is kept and carried out the moment it is ready (usually well under a second) */
+  function open(){if(/[?&]broadcast=1/.test(location.search))return;document.getElementById('bootLoad').hidden=true;document.querySelector('.bt-bar').hidden=true;if(SUB)SUB.hidden=true;
+    PICK.hidden=false;FOOT.hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
+    for(const el of [PICK,FOOT])el.addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(!b)return;e.stopPropagation();act(b.dataset.b);});}
+  function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}live=true;window.__bootLive=true;if(!pending&&window.__bootQ)pending=window.__bootQ;startScene();if(pending){const b=pending;pending=null;act(b);}}
+  /* r44 · the start screen is the game itself: a live crop of HALCYON's crew quarters drawn by the engine, warm lamps on,
+     Driftnaut drifting by the desk and K9 beside her. It starts once the ship has loaded and stops when the card closes. */
+  function startScene(){const c=document.getElementById('bootLive');if(!c||!window.CUT||!window.NW||!window.DSE||!CUT.render)return;let P,T;
+    try{const man=NW.manifest({activity:'quiet',duration_minutes:60,seed:22910417});P=DSE.project(man);T=DSE.album(P).TIMES;const at=r=>CUT.place(r).ref;
+      P.script.push(...['pilot','systems','commander'].map(a=>({at:0,hide:a})),{at:0,move:'deadscout',to:at('quarters.terminal'),teleport:true},{at:0,show:'deadscout'});
+      /* r45: she drifts slowly between the desk and the bunk, past K9, and rests a few seconds at each end: leaning into the drift, then upright and bobbing */
+      for(let k=0,tt=4;k<80;k++,tt+=15)P.script.push({at:tt,move:'deadscout',to:at(k%2?'quarters.terminal':'quarters.bunk'),sneak:true});P.script.push(
+        {at:0,move:'k9',to:at('crew-quarters.table'),teleport:true},{at:.2,actor:'k9',do:'wait',for:9999});P.rev=(P.rev||0)+1;}catch(e){return;}
+    const x=c.getContext('2d'),t0=performance.now();let last=0;setTimeout(()=>c.classList.add('on'),60);
+    function f(now){if(!document.getElementById('boot'))return;requestAnimationFrame(f);if(now-last<33)return;last=now;const r=c.getBoundingClientRect();if(!r.width||!r.height)return;
+      const D=Math.min(2,window.devicePixelRatio||1),w=Math.min(1800,Math.round(r.width*D)),h=Math.round(w*r.height/r.width);if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
+      const tall=window.matchMedia('(max-aspect-ratio:4/5)').matches,V=tall?[520,604+(250-480*r.height/r.width)/2,480,480*r.height/r.width]:(()=>{const hh=540,ww=hh*r.width/r.height;return [Math.max(0,760-ww*.33),452,ww,hh];})();
+      try{CUT.exterior(0);CUT.solid(true);CUT.float(1);CUT.force(V);CUT.render(x,P,T,2+((now-t0)/1000)%1180,{x:0,y:0,w:w,h:h},1);}catch(e){}finally{CUT.force(null);CUT.solid(false);CUT.exterior(1);}}
+    requestAnimationFrame(f);}
   /* the sky behind the card: chunky stars, a few twinkling */
   (function(){const c=document.getElementById('bootSky');if(!c)return;const bx=c.getBoundingClientRect();c.width=240;c.height=Math.max(90,Math.round(240*(bx.height||200)/(bx.width||320)));const x=c.getContext('2d'),W=c.width,H=c.height;let seed=417;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
     const S=[];for(let i=0;i<90;i++)S.push([Math.floor(r()*W),Math.floor(r()*H),r()]);
@@ -253,7 +263,7 @@
       for(const [X,Y,b] of S){const dx=X-PX,dy=Y-PY;if(Math.hypot(dx,dy)<PR+1||Math.hypot(X-MX,Y-MY)<MR+2)continue;const tw=b>.92?(.5+.5*Math.sin(t*2.2+X)):1;
         x.globalAlpha=(b>.75?.9:b>.4?.45:.22)*tw;x.fillStyle=b>.8?'#e9d7c2':'#9aa3ad';x.fillRect(X,Y,1,1);}x.globalAlpha=1;}
     frame();const iv=setInterval(()=>{if(!document.getElementById('bootSky'))return clearInterval(iv);frame();},140);})();
-  requestAnimationFrame(tick);
+  open();requestAnimationFrame(tick);
   const tag=f=>new Promise(ok=>{const s=document.createElement('script');s.src=f;s.onload=s.onerror=()=>{got[f]=tot[f]=1;ok();};document.body.appendChild(s);});
   async function load([f]){try{const r=await fetch(f);if(!r.ok||!r.body)throw 0;tot[f]=+r.headers.get('content-length')||0;const rd=r.body.getReader(),parts=[];
       for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got[f]=(got[f]||0)+value.length;}

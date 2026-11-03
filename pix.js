@@ -1,4 +1,4 @@
-/* DeadScout · pixel helpers shared by the engine: the asset images (loaded as the bundles arrive), a 3x5 pixel font,
+/* Driftnaut · pixel helpers shared by the engine: the asset images (loaded as the bundles arrive), a 3x5 pixel font,
    procedural CRT content, the lamp palette and an irregular flicker. window.PX */
 (function(){
 "use strict";

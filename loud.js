@@ -1,4 +1,4 @@
-/* DeadScout · loudness (ITU-R BS.1770 / EBU R128, the measure YouTube normalises by). K-weighting, 400 ms gated blocks,
+/* Driftnaut · loudness (ITU-R BS.1770 / EBU R128, the measure YouTube normalises by). K-weighting, 400 ms gated blocks,
    the -70 LUFS absolute and -10 LU relative gates. Two uses:
      LOUD.measure(audioBuffer) -> integrated LUFS of a rendered buffer (how the tapes were calibrated: DEEP.LUFS)
      LOUD.meter(ctx, node)     -> {read() -> {m, s, i} (momentary, short-term, integrated LUFS), reset(), stop()}

@@ -1,4 +1,4 @@
-/* DeadScout · SHIP TIME (Nov 2026). Night Watch's clock, as ship instrumentation rather than a bedside appliance: a small
+/* Driftnaut · SHIP TIME (Nov 2026). Night Watch's clock, as ship instrumentation rather than a bedside appliance: a small
    seven-segment readout in the top-right status corner, beside the quick bar, labelled SHIP TIME, with the watch line
    (NIGHT WATCH // DSV HALCYON) under it. That line replaces the floating top-left label. Amber by default, matching the
    HUD; phosphor green, blue and white as options; red is kept for RED ALERT, when it takes the clock over. Click the clock

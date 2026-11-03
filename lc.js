@@ -1,4 +1,4 @@
-/* DeadScout · the picture: the cutaway engine (cut.js) drawn to a canvas with the transmission on top — the slow analog
+/* Driftnaut · the picture: the cutaway engine (cut.js) drawn to a canvas with the transmission on top — the slow analog
    life of an old signal (exposure breath, sync slips, tears, a chromatic split only during an event), the intro cards,
    the HALCYON open and the outro. window.LC.create(canvas) -> {setSize, setProject, render, chapterAt}. Design units
    are 1920x1080; the canvas can be any size. */
@@ -27,7 +27,7 @@ function create(canvas){
       c.font='400 30px Silk,"LR Clean",monospace';try{c.letterSpacing='9px';}catch(e){}c.fillStyle='#8fd8c0';c.fillText(b[0],150,DH-250);
       if(two){c.font='400 64px Silk,"LR Clean",monospace';try{c.letterSpacing='12px';}catch(e){}c.fillStyle=b[1]==='INTERNAL'||b[1]==='LOST'?'#e8a33a':'#e7dbc0';c.fillText(b[1],150,DH-160);}}
     try{c.letterSpacing='0px';}catch(e){}c.restore();}
-  function card(c,line,alpha){c.save();c.setTransform(scale,0,0,scale,0,0);c.globalAlpha=alpha;c.fillStyle='#0c0a09';c.fillRect(0,0,DW,DH);c.fillStyle='#e7dbc0';c.textAlign='center';c.font='400 58px Silk,monospace';try{c.letterSpacing='8px';}catch(e){}c.fillText('DEADSCOUT',DW/2+4,DH/2+8);
+  function card(c,line,alpha){c.save();c.setTransform(scale,0,0,scale,0,0);c.globalAlpha=alpha;c.fillStyle='#0c0a09';c.fillRect(0,0,DW,DH);c.fillStyle='#e7dbc0';c.textAlign='center';c.font='400 58px Silk,monospace';try{c.letterSpacing='8px';}catch(e){}c.fillText('DRIFTNAUT',DW/2+4,DH/2+8);
     c.font='400 20px Silk,monospace';try{c.letterSpacing='5px';}catch(e){}c.globalAlpha=alpha*.7;c.fillText(line,DW/2+3,DH/2+56);try{c.letterSpacing='0px';}catch(e){}c.restore();}
   const evt=(t,period,dur,sd,skip)=>{const n=Math.floor(t/period);for(const m of [n,n-1]){if(m<0||hash(m,sd)<skip)continue;const st=m*period+(.1+.6*hash(m,sd+1))*period,u=(t-st)/dur;if(u>=0&&u<1)return {u,m};}return null;};
   const reg=b=>({X:Math.floor(b.x*scale),Y:Math.floor(b.y*scale),W:Math.max(2,Math.ceil(b.w*scale)),H:Math.max(2,Math.ceil(b.h*scale))});

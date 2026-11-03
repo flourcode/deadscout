@@ -1,4 +1,4 @@
-/* DeadScout · MIX: the music engine. Synthwave, spacewave, chillwave and darksynth, generated as it plays.
+/* Driftnaut · MIX: the music engine. Synthwave, spacewave, chillwave and darksynth, generated as it plays.
    Every sound is synthesized here (oscillators, noise, filters, a generated reverb): no samples, no loops, no AI, nothing
    copied from any record. A mix is a run of original tracks, each with its own key, tempo, chord progression, motif and form,
    with the location's own machinery breathing in the gaps between them.

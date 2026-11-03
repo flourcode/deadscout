@@ -1,4 +1,4 @@
-/* Dead Scout · the environment engine (LiminalMix). A place that happens to be running: realistic, ordinary, mostly boring.
+/* Driftnaut · the environment engine (LiminalMix). A place that happens to be running: realistic, ordinary, mostly boring.
    The picture is the degraded transmission; the sound is the believable building. No tape hiss, no retro audio, no horror.
    Every sound here is made live with the Web Audio API: oscillators + noise + filters + slow modulation + probability.
    No recordings, no samples, no impulse responses, no music.

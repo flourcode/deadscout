@@ -1,4 +1,4 @@
-/* DeadScout · the ship's toys (Nov 2026, second cut). Not mysteries: switches. Every one makes a good sound and changes the
+/* Driftnaut · the ship's toys (Nov 2026, second cut). Not mysteries: switches. Every one makes a good sound and changes the
    mood of the ship. Each room has its light switch and at most a couple of things to play with: the drive (idle, full burn
    with a backfire and a heavy rumble, shutdown), the airlock hatches (they hiss), the computers (keys, then the machine
    talks back), the service pumps, the EVA beacon, the main lighting bus (the whole ship, bay by bay), and K9 (boop).
@@ -90,24 +90,55 @@ function tick(){const st=G.state,on=(st==='play'||st==='watch')&&!document.body.
     if(show){paint(T,e);if(!e.classList.contains('on')&&!seen.has(T.id)){seen.add(T.id);e.classList.add('ping');}}e.classList.toggle('on',show);}
   for(const [id,e] of Object.entries(EL))if(!live.has(id))e.classList.remove('on');}
 setInterval(tick,90);
-/* ---------- moods (Night Watch): one button, five presets, all made of the same switches ---------- */
-const MOODS=[{id:'watch',name:'NIGHT WATCH'},{id:'drift',name:'QUIET DRIFT'},{id:'engine',name:'ENGINE ROOM'},{id:'alert',name:'RED ALERT'}]; /* r28: sleeping is the SLEEP button's job now, not a scene */
-S.mood='watch';
+/* ---------- r39 · SCENES (Night Watch). One key; the camera never moves (the ant farm stays whole). A scene lights its room,
+   sets the bed, changes the tape (when MUSIC is AUTO) and sends a crew member and K9 there for a while. RED ALERT is back:
+   every lamp, the klaxon, the red wash. LIGHT steps WARM / LOW / OFF over whatever the scene lit. ---------- */
+const SC=window.NW&&NW.SCENES||{watch:{name:'NIGHT WATCH'}};
+const MOODS=Object.entries(SC).map(([id,v])=>({id,name:v.name}));
+const LOOK={drift:{lights:{},def:null,drive:1,mix:{machinery:.7,ventilation:.9,radio:.8}},
+  engine:{lights:{engineering:1,'central-shaft':.85},def:.45,drive:2,mix:{machinery:.7,ventilation:.8,radio:0}},
+  sleep:{lights:{'crew-quarters':.8},def:.3,drive:1,mix:{machinery:.5,ventilation:.8,radio:.4}},
+  outer:{lights:{eva:.5},def:.2,drive:1,mix:{machinery:.3,ventilation:.5,radio:.6}},
+  busy:{lights:{},def:null,drive:1,mix:null}};
+S.mood='drift';S.light='warm';
 function lightsTo(map,def){ROOMS.forEach((r,i)=>{const v=map[r]!==undefined?map[r]:def;later(80+i*110,()=>{CUT.toy({room:{[r]:v}});S.lit[r]=v===null||v>0?1:0;A.sfx('relay',v===0?.9:.6);});});}
 const MIXK=['machinery','ventilation','radio'];
 function mixTo(o){if(!S.mix0){S.mix0={};for(const k of MIXK)S.mix0[k]=A.mix(k);}for(const k of MIXK){const v0=S.mix0[k]==null?.5:S.mix0[k];A.mix(k,o&&o[k]!=null?Math.min(1,v0*o[k]):v0);}if(!o)S.mix0=null;}
-function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({alert:0});if(was==='sleep')A.dim(false);
-  if(!quiet)A.sfx('chunk',.7);
-  if(id==='watch'){lightsTo({},null);driveTo(1);mixTo(null);}
-  if(id==='drift'){lightsTo({bridge:.5},.2);driveTo(0);mixTo({machinery:.35,ventilation:.7,radio:1.4});}
-  if(id==='engine'){lightsTo({engineering:1,'central-shaft':.85},.4);driveTo(2);mixTo({machinery:1.8,ventilation:1,radio:.6});}
-  if(id==='alert'){lightsTo({},1);driveTo(1);mixTo(null);later(300,()=>{CUT.toy({alert:1});A.sfx('klaxon',1.1);});}
-  if(id==='sleep'){lightsTo({'crew-quarters':.5},.13);driveTo(1);mixTo({machinery:.5,ventilation:.8,radio:.5});A.dim(true);if(!S.k9slept){S.k9slept=1;A.k9rest();}}
-  if(A.watch())try{G.run(['+0 camera cutaway']);}catch(e){}
+function applyLights(){const L=LOOK[S.mood]||LOOK.drift,f=S.light==='off'?0:S.light==='low'?.4:1;
+  if(S.light==='warm'){lightsTo(L.lights,L.def);return;}
+  const m={};for(const r of ROOMS){const v=L.lights[r]!==undefined?L.lights[r]:L.def;m[r]=f===0?0:(v===null?1:v)*f;}lightsTo(m,f===0?0:.4*f);}
+/* someone wanders over: a crew member (not the one you're steering) and K9, by their own routes */
+function visit(id){const sc=SC[id]||{};try{if(sc.who&&!(A.steering()&&A.me()===sc.who)){G.beat({actor:sc.who,move_to:sc.spot,interrupt:true});const tt=A.travel(sc.who,sc.spot);G.beat({at:tt+1,actor:sc.who,action:sc.pose,for:90+Math.random()*90});}
+  if(sc.k9&&window.K9NAV&&!K9NAV.busy())K9NAV.go(sc.k9);}catch(e){}}
+function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({alert:0});
+  if(!quiet)A.sfx('chunk',.7);const L=LOOK[id]||LOOK.drift;applyLights();driveTo(L.drive);mixTo(L.mix);
+  if(A.watch()&&!quiet){const sc=SC[id]||{};if(sc.music&&A.tape){A.nw().music=sc.music;A.tape(sc.music);} /* a scene is something you hear, at once */
+    if(A.pace)A.pace(sc.pace||'routine');visit(id);if(A.nw){A.nw().scene=id;A.save();}}
   paintMood();}
-function paintMood(){const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+MOODS.find(m=>m.id===S.mood).name+'</em>';b.classList.toggle('on',S.mood!=='watch');}}
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood');if(!b)return;e.stopPropagation();const i=MOODS.findIndex(m=>m.id===S.mood);mood(MOODS[(i+1)%MOODS.length].id);},true);
-let wasWatch=false;setInterval(()=>{const w=document.body.classList.contains('watching');if(w!==wasWatch){wasWatch=w;if(!w&&S.mood!=='watch'){mood('watch',true);}S.k9slept=0;paintMood();}},400);
-window.__toys={mood,MOODS,S,TOYS,shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
-  sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{lightsTo({},null);mixTo(null);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
+function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+(SC[S.mood]||SC.drift).name+'</em>';b.classList.toggle('on',S.mood!=='drift');}
+  const l=document.getElementById('wLight');if(l){l.innerHTML='LIGHT<em> · '+S.light.toUpperCase()+'</em>';l.classList.toggle('on',S.light!=='warm');}}
+function light(){const L=['warm','low','off'];S.light=L[(L.indexOf(S.light)+1)%3];A.sfx('chunk',.6);applyLights();paintMood();}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood,#wLight');if(!b)return;e.stopPropagation();
+  if(b.id==='wLight'){light();return;}const i=MOODS.findIndex(m=>m.id===S.mood);mood(MOODS[(i+1)%MOODS.length].id);},true);
+/* a new watch starts on NIGHT WATCH with warm light, so the ship's own start of shift (the rooms lighting one by one) plays untouched */
+/* a new watch opens on its remembered scene: the ship's own start of shift plays first (rooms lighting one by one), then that scene's lights settle in */
+let wasWatch=false;setInterval(()=>{const w=document.body.classList.contains('watching');if(w!==wasWatch){wasWatch=w;S.k9slept=0;
+    if(w){const id=(A.nw&&A.nw().scene)||'drift';S.mood=id;S.light='warm';if(id!=='drift')setTimeout(()=>{if(document.body.classList.contains('watching')){const L=LOOK[id]||LOOK.drift;applyLights();driveTo(L.drive);mixTo(L.mix);}},13000);}
+    else{mixTo(null);S.mood='drift';S.light='warm';}paintMood();}},400);
+/* r39 · SOMEONE ELSE ABOARD. Very rarely in a Night Watch, Driftnaut is there: faint, somewhere the crew aren't, for a few
+   seconds. The crew never notice. K9 does. The security monitor shows one more person than the roster, the ship's count is
+   off by one, and then she isn't there. First after 8-20 minutes, then every 25-60. */
+const HAUNT=['upper-access.window','quarters.locker','airlock.prep','engineering.end','lower-access.east','sensor.rack','comms.right','quarters.terminal'];
+let nextHaunt=0,haunting=false;
+function haunt(){const t=G.now();if(!A.watch()||G.state!=='watch'||haunting||(window.__joy&&__joy.sleeping&&__joy.sleeping()))return;
+  try{const busy=new Set(['pilot','systems','commander'].map(a=>CUT.roomAt(G.P,G.TIMES,t,a)));const ok=HAUNT.filter(sp=>{const p=CUT.place(sp);return p&&!busy.has(CUT.roomOf(p.x,p.y-20));});
+    const sp=ok.length?ok[Math.floor(Math.random()*ok.length)]:null,P=sp&&CUT.place(sp);if(!P)return;haunting=true;const D=14+Math.random()*12;
+    G.beat({move:'deadscout',to:P.ref,teleport:true,interrupt:true});G.beat({at:.4,show:'deadscout'});G.beat({at:.6,actor:'deadscout',action:Math.random()<.5?'look-around':'observe',for:D});
+    const k=CUT.actorAt(G.P,G.TIMES,t,'k9');if(k&&Math.abs(k.y-P.y)<40){G.beat({at:2.5,actor:'k9',do:'signal-detect',for:3.2,face:P.x<k.x?'left':'right'});setTimeout(()=>{try{A.chirp();}catch(e){}},3200);}
+    G.beat({at:4,screen:'bridge.security',mode:'personnel',for:3});
+    if(Math.random()<.6)setTimeout(()=>{if(A.watch())G.say('HOS',Math.random()<.5?'CREW: 3 · COUNT: 4':'OCCUPANCY: 4 · RECOUNT: 3',3);},6500);
+    G.beat({at:D,hide:'deadscout'});setTimeout(()=>{haunting=false;},(D+1)*1000);}catch(e){haunting=false;}}
+setInterval(()=>{if(!A.watch()){nextHaunt=0;return;}const t=G.now();if(!nextHaunt){nextHaunt=t+480+Math.random()*720;return;}if(t>nextHaunt){nextHaunt=t+1500+Math.random()*2100;haunt();}},5000);
+window.__toys={mood,MOODS,S,TOYS,light,haunt,resume:()=>{},shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
+  sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{applyLights();mixTo((LOOK[S.mood]||LOOK.drift).mix);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
 })();

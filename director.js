@@ -1,4 +1,4 @@
-/* DeadScout Director · the authoring desk (§35). A manifest in, the ship on screen, beats typed per chapter or on the
+/* Driftnaut Director · the authoring desk (§35). A manifest in, the ship on screen, beats typed per chapter or on the
    absolute script, the band playing the same album the game would, a Night Watch generated on demand, a video recorded
    in real time. Everything is the same engine the game runs; the Director only writes the JSON. */
 (function(){
@@ -6,7 +6,7 @@
 const $=id=>document.getElementById(id),E=window.LMX,X=window.LMXS,M=window.LMXM,LR=window.LSR,DSE=window.DSE,STORE='deadScoutDirector';
 const mmss=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the DeadScout folder.</p>';return;}
+if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the Driftnaut folder.</p>';return;}
 /* ---------- the project ---------- */
 let P,AL,TIMES,TOTAL,selCh=0,man=null;
 const stage=$('stage'),LCV=LC.create(stage);
@@ -24,7 +24,7 @@ let trimG=null,lim=null,meterL=null;
 const LIM_MAKEUP=1.5; /* the browser's limiter adds about 1.5 dB of its own makeup gain (measured offline: the chain landed 1.5 dB hot without this) */
 const sleepy=()=>BC.profile==='sleep';
 function measured(){/* where the music sits as mixed (calibrated offline, BS.1770): deadwave per tape, the synthwave band about -21 */
-  if(P.style==='deadwave'&&window.DEEP&&DEEP.LUFS){const k=((P.music&&P.music.tape)||'orbital-cruise')+(sleepy()?':sleep':'');return DEEP.LUFS[k]!=null?DEEP.LUFS[k]:-22;}return -21;}
+  if(P.style==='deadwave'&&window.DEEP&&DEEP.LUFS){const k=((P.music&&P.music.tape)||'soft-orbit')+(sleepy()?':sleep':'');return DEEP.LUFS[k]!=null?DEEP.LUFS[k]:-22;}return -21;}
 function setTrim(){if(!trimG)return;const g=BC.loud==='off'?1:Math.pow(10,Math.max(-12,Math.min(12,(+BC.loud)-measured()-LIM_MAKEUP))/20);trimG.gain.setTargetAtTime(g,actx.currentTime,.3);if(meterL)meterL.reset();paintBroadcast();}
 function paintBroadcast(){$('bProfile').value=BC.profile;$('bLoud').value=BC.loud;$('bParts').value=BC.parts;$('bCards').value=BC.cards;
   const g=BC.loud==='off'?0:(+BC.loud)-measured()-LIM_MAKEUP;$('bHint').textContent=(sleepy()?'SLEEP: no impacts, radio, drums or dropouts; the picture calm and dimmed. ':'')+(BC.loud==='off'?'Loudness as mixed (about '+Math.round(measured())+' LUFS).':'Music lifted '+(g>=0?'+':'')+g.toFixed(1)+' dB to about '+BC.loud+' LUFS, with a safety limiter. The meter above the picture shows what it actually measures.')+(+BC.parts?' Long videos save as '+(+BC.parts/60)+'-hour parts as they go.':'');}
@@ -34,13 +34,13 @@ function cardAt(){const B=P.brand||{};return B.intro==='halcyon'?LC.HAL+LC.HAL_X
 function overlay(t){const c=stage.getContext('2d'),k=stage.width/LC.DW;c.save();c.setTransform(k,0,0,k,0,0);
   if(sleepy()){c.fillStyle='rgba(0,0,0,.34)';c.fillRect(0,0,LC.DW,LC.DH);}
   const a0=cardAt(),fade=(u,d)=>Math.max(0,Math.min(1,u/1.5,(d-u)/1.5));c.textBaseline='top';try{c.letterSpacing='6px';}catch(e){}
-  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'DEADSCOUT').slice(0,34),100,96);
+  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'DRIFTNAUT').slice(0,34),100,96);
     c.fillStyle='#8f8878';c.font='400 20px Silk,monospace';c.fillText(((P.watch?'NIGHT WATCH':'TRANSMISSION')+' // DSV HALCYON · DSV-0417 // '+(P.len>=60?(P.len/60)+(P.len>=120?' HOURS':' HOUR'):P.len+' MIN')).toUpperCase(),100,166);}
   if(BC.cards==='all'){for(let i=1;i<TIMES.length;i++){const s0=TIMES[i].start+1;if(t>=s0&&t<s0+6){const a=fade(t-s0,6);c.globalAlpha=a*.9;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,LC.DH-150,720,70);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 22px Silk,monospace';c.fillText(String(i+1).padStart(2,'0')+' · '+String(P.chapters[i].title||'').toUpperCase().slice(0,40),96,LC.DH-128);}}}
   c.restore();}
 const lufs=v=>isFinite(v)?v.toFixed(1):'—';
 function startBand(off){ensureAudio();if(actx.state!=='running')actx.resume();if(band){band.stop(.5);band=null;}
-  t0=actx.currentTime+.08-off;if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,master,{seed:P.seed,tape:(P.music&&P.music.tape)||'orbital-cruise',startAt:t0,fadeIn:off+1.2,sleep:sleepy()});curCh=-1;}else{const d=DSE.dna(P,AL.synthList&&AL.synthList.length?{trackList:AL.synthList}:null),o=X.opts(d);band=E.make(actx,master,Object.assign(o,{startAt:t0,fadeIn:off+1.2}));X.attach(band,d,0);if(off>0&&band.skip)band.skip(off);curCh=-1;}
+  t0=actx.currentTime+.08-off;if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,master,{seed:P.seed,tape:(P.music&&P.music.tape)||'soft-orbit',startAt:t0,fadeIn:off+1.2,sleep:sleepy()});curCh=-1;}else{const d=DSE.dna(P,AL.synthList&&AL.synthList.length?{trackList:AL.synthList}:null),o=X.opts(d);band=E.make(actx,master,Object.assign(o,{startAt:t0,fadeIn:off+1.2}));X.attach(band,d,0);if(off>0&&band.skip)band.skip(off);curCh=-1;}
   setTrim();clearInterval(sched);sched=setInterval(tick,200);tick();mode='play';}
 function stopBand(){if(band){band.stop(.6);band=null;}clearInterval(sched);sched=null;mode='idle';idle0=performance.now()/1000;}
 function tick(){if(!band)return;band.tick(actx.currentTime+band.ahead);const t=now(),k=LCV.chapterAt(t);
@@ -96,7 +96,7 @@ const STY=id=>id==='deadwave'?DW:(M.STYLES[id]||M.STYLES.synthwave);
 $('pStyle').innerHTML='<option value="deadwave">DEADWAVE</option>'+M.STYLE_IDS.map(id=>`<option value="${id}">${esc(M.STYLES[id].name)}</option>`).join('');
 if(window.DEEP)$('pTape').innerHTML=Object.entries(DEEP.TAPES).map(([id,T])=>`<option value="${id}">${esc(T.name)}</option>`).join('');
 $('pTape').addEventListener('change',e=>{P.music.tape=e.target.value;remusic();if(mode==='play')startBand(now());});$('cRole').innerHTML=DSE.ROLES.map(r=>`<option>${r}</option>`).join('');
-function paintProject(){$('pName').value=P.name;$('pYear').value=P.year;$('pLen').value=P.len;$('pSeed').value=P.seed;$('pStyle').value=P.style;$('pTape').value=(P.music&&P.music.tape)||'orbital-cruise';$('pTape').disabled=P.style!=='deadwave';$('pVibe').value=P.vibe;$('pDrums').value=P.music.drums;$('pSynth').value=P.music.synth;$('pAmb').value=P.music.ambience;
+function paintProject(){$('pName').value=P.name;$('pYear').value=P.year;$('pLen').value=P.len;$('pSeed').value=P.seed;$('pStyle').value=P.style;$('pTape').value=(P.music&&P.music.tape)||'soft-orbit';$('pTape').disabled=P.style!=='deadwave';$('pVibe').value=P.vibe;$('pDrums').value=P.music.drums;$('pSynth').value=P.music.synth;$('pAmb').value=P.music.ambience;
   $('pIntro').value=P.brand.intro==='halcyon'?'halcyon':P.brand.intro?'1':'0';$('pOutro').value=P.brand.outro===true||P.brand.outro==='card'?'card':P.brand.outro||'0';$('vfdName').textContent=P.name;}
 const remusic=()=>{man=DSE.manifest(P);const keep=P.rev;P=DSE.project(man);P.rev=keep+1;replan();paintAll();};
 $('pName').addEventListener('change',e=>{P.name=e.target.value.toUpperCase().slice(0,60)||'UNTITLED';paintAll();});
@@ -122,7 +122,7 @@ $('pDel').addEventListener('click',()=>{const S=saved(),i=+$('pSaved').value;if(
 /* ---------- publish ---------- */
 const ytTitle=()=>{const pb=P.publish||{};return (pb.title||((P.year?P.year+': ':'')+P.name))+' // '+(P.len>=120?Math.round(P.len/60)+' HOURS':P.len>=60?'1 HOUR':P.len+' MIN')+' '+STY(P.style).name.toUpperCase()+(pb.subtitle?' · '+pb.subtitle.split(' • ')[0]:'');};
 function ytDesc(){const St=STY(P.style),pb=P.publish||{};const tl=AL.tracks.map(T=>mmss(T.start<1?0:T.start)+' Track '+String(T.i+1).padStart(2,'0')+' — '+T.name).join('\n'),cl=P.chapters.map((c,k)=>mmss(TIMES[k]?TIMES[k].start:0)+' '+c.title).join('\n');
-  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'DeadScout')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nA DeadScout transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the DeadScout engine: no samples, no loops. Royalty-free.\nPlay DeadScout: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
+  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'Driftnaut')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nA Driftnaut transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the Driftnaut engine: no samples, no loops. Royalty-free.\nPlay Driftnaut: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
 function paintPublish(){$('yTitle').value=ytTitle();$('yDesc').value=ytDesc();}
 const copy=async(v,ok)=>{try{await navigator.clipboard.writeText(v);say(ok);}catch(e){say('SELECT AND COPY IT');}};
 $('cTitleBtn').addEventListener('click',()=>copy(ytTitle(),'TITLE COPIED'));$('cDescBtn').addEventListener('click',()=>copy(ytDesc(),'DESCRIPTION COPIED'));

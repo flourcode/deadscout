@@ -1,10 +1,10 @@
-/* DEADSCOUT · the game's own manifest. Same Director JSON the studio reads (cut.js beats), used here as the authored
+/* DRIFTNAUT · the game's own manifest. Same Director JSON the studio reads (cut.js beats), used here as the authored
    opening and the music arc. Everything after she wakes is the player's, with game/story.js putting the ship's changes
    on the same timeline. Times in `events` are absolute from the start of the transmission. */
 window.DS_GAME={
- deadscout_plan:4,game:true,title:'DEADSCOUT',year:'2291',length_minutes:110,location:'research',
+ deadscout_plan:4,game:true,title:'DRIFTNAUT',year:'2291',length_minutes:45,location:'research',
  ship:'DSV HALCYON',registry:'DSV-0417',
- music:{style:'deadwave',tape:'orbital-cruise',vibe:'dark',drums:'low',synth:'mid',ambience:'high'}, /* deep.js: the ship dreaming */
+ music:{style:'deadwave',tape:'soft-orbit',vibe:'calm',drums:'low',synth:'mid',ambience:'high'}, /* deep.js: the ship dreaming */
  format:'cutaway',
  cutaway:{era:'past',start:{pilot:'bridge.helm',systems:'bridge.nav',commander:'bridge.command',deadscout:'quarters.bunk'},
    rooms:{bridge:'normal',sensor:'normal','crew-quarters':'normal','central-shaft':'normal',engineering:'normal',service:'dim','lower-access':'normal','upper-access':'normal',comms:'normal',airlock:'normal'}},
@@ -46,5 +46,5 @@ window.DS_GAME={
   {title:'The Signal',role:'AFTERMATH',energy:.35,beat:'Source: internal.',story_mode:'EXPLORE',traffic:'off'}
  ],
  ending:{type:'hard-cut'},
- publish:{title:'DEADSCOUT',subtitle:'DSV HALCYON • 2291',series:'DeadScout'}
+ publish:{title:'DRIFTNAUT',subtitle:'DSV HALCYON • 2291',series:'Driftnaut'}
 };

@@ -1,6 +1,6 @@
-/* DeadScout Studio · the ship. One persistent world, two ways in:
+/* Driftnaut Studio · the ship. One persistent world, two ways in:
      DIRECTOR — beats (per chapter, on a 10:00 clock) or an absolute-time event list drive the actors, rooms and cameras;
-     PLAY     — a visitor clicks where DeadScout should go and what she should use.
+     PLAY     — a visitor clicks where Driftnaut should go and what she should use.
    Both become the same actor commands (moveTo, interact, climb, pose) on the same timeline, so a performed take and a
    scripted take behave identically. The ship has a PAST (lit, crewed) and a PRESENT (dark, aged, empty); memory echoes
    flash a room back into its past for a few seconds. Cameras: the full cutaway, a follow camera, or a room.
@@ -12,13 +12,13 @@
 const A=window.DS_ASSETS||{sheets:{},images:{}},PX=window.PX;
 /* the world: the canonical master cutaway with its map (world/deadscout-ship.json) */
 function worldSC(Wd){const m=Wd.map;return Object.assign({},m,{layers:['world/frame','world/front','world/grime'],world:1,hoist_x:null,sprite_scale:m.sprite_scale||1,crt_scale:m.crt_scale||1,speed:m.speed||((m.sprite_scale||1)*1.3)});}
-if(!(A.world&&A.world.map))throw new Error('DeadScout: the world map did not load (assets-core.js)');const SC=worldSC(A.world);
+if(!(A.world&&A.world.map))throw new Error('Driftnaut: the world map did not load (assets-core.js)');const SC=worldSC(A.world);
 if(!SC||!PX){window.CUT=null;return;}
 const SS=SC.sprite_scale||1,CS=SC.crt_scale||1,SPD=SC.speed||1;
 const IMG=PX.IMG,ready=PX.isReady,hash=PX.hash,vn=PX.vn,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),sm=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
 const W=SC.w,H=SC.h,NODES=SC.nodes,SPOTS=SC.spots,OBJ=SC.objects||{};
-const ACTORS=['pilot','systems','commander','scout','k9','k9m','deadscout'],CREW=['pilot','systems','commander','scout','k9m','k9']; /* k9: HALCYON's service quadruped (present); k9m: the clean 2291 one, only in a memory */ /* scout: her living self in a memory. Canon (visual lock): DeadScout IS the pilot of 2291, so she wears the pilot's sheet, and a memory never shows two of her */
-const NAMES={pilot:'PILOT',systems:'SYSTEMS TECH',commander:'COMMANDER',scout:'PILOT',k9:'K9-4',k9m:'K9-4',deadscout:'DEADSCOUT'};
+const ACTORS=['pilot','systems','commander','scout','k9','k9m','deadscout'],CREW=['pilot','systems','commander','scout','k9m','k9']; /* k9: HALCYON's service quadruped (present); k9m: the clean 2291 one, only in a memory */ /* scout: her living self in a memory. Canon (visual lock): Driftnaut IS the pilot of 2291, so she wears the pilot's sheet, and a memory never shows two of her */
+const NAMES={pilot:'PILOT',systems:'SYSTEMS TECH',commander:'COMMANDER',scout:'PILOT',k9:'K9-4',k9m:'K9-4',deadscout:'DRIFTNAUT'};
 const SHEET={pilot:'pilot',systems:'systems',commander:'commander',scout:'pilot',k9:'k9',k9m:'k9',deadscout:'commander'},FALLBACK={}; /* r23: she wears the commander's sheet, the one the night watch uses; the chibi production sheet is gone */
 /* she is never drawn in the commander's body: an action her sheet lacks borrows her nearest own frame */
 const ALIAS={run:'walk',turn:'look-around','climb-mount':'climb',operate:'interact',typing:'interact','terminal-idle':'interact',point:'reach',wave:'reach',hurt:'recoil',down:'crouch',jump:'idle','lie-down':'crouch',rest:'crouch','get-up':'crouch',wake:'idle',puzzled:'look-around',observe:'idle',kneel:'crouch',stand:'idle',breathe:'idle',comms:'interact'}; /* what a sheet lacks is played by its nearest pose (applied only when the sheet has no animation of that name) */
@@ -115,7 +115,7 @@ function parseLine(line){const raw=line.trim();if(!raw||raw.startsWith('#'))retu
   if(v==='echo'){const r=roomId(lw[1]);if(!SC.rooms[r])return {err:'NO SUCH ROOM: '+(lw[1]||'')};const pr=lw[2]&&!['for','over'].includes(lw[2])?lw[2]:'crew-routine';if(!ECHO_PRESETS.includes(pr))return {err:'ECHOES: '+ECHO_PRESETS.join(', ').toUpperCase()};return {at,echo:r,preset:pr,for:dur()||3};}
   if(v==='camera'){const md=lw[1],pace=lw.includes('cut')?'cut':lw.includes('scan')||lw.includes('xray')?'scan':lw.includes('quick')||lw.includes('fast')?'quick':null,P_=o=>{if(pace)o.pace=pace;return o;};if(md==='cutaway')return P_({at,camera:'cutaway'});if(md==='exterior'||md==='outside')return P_({at,camera:'exterior'});if(md==='follow'){const a=lw[2]||'deadscout';if(!ACTORS.includes(a))return {err:who};return P_({at,camera:'follow',actor:a});}
     if(md==='rect'){const r=lw.slice(2,6).map(Number);if(r.length<4||r.some(v=>!isFinite(v)))return {err:'CAMERA RECT X0 Y0 X1 Y1'};return P_({at,camera:'rect',rect:r});}
-    if(md==='room'||SC.rooms[roomId(md)]){const r=roomId(md==='room'?lw[2]:md);if(!SC.rooms[r]&&r!=='eva')return {err:'NO SUCH ROOM: '+(lw[2]||'')};return P_({at,camera:'room',room:r});}return {err:'CAMERA CUTAWAY, EXTERIOR, FOLLOW DEADSCOUT, OR ROOM BRIDGE'};}
+    if(md==='room'||SC.rooms[roomId(md)]){const r=roomId(md==='room'?lw[2]:md);if(!SC.rooms[r]&&r!=='eva')return {err:'NO SUCH ROOM: '+(lw[2]||'')};return P_({at,camera:'room',room:r});}return {err:'CAMERA CUTAWAY, EXTERIOR, FOLLOW DRIFTNAUT, OR ROOM BRIDGE'};}
   if(v==='set'){const k=worldId(lw[1]),raw=String(lw[2]||''),val=+raw;if(!(k in WORLD))return {err:'NO WORLD VALUE '+String(lw[1]||'').toUpperCase()};if(!isFinite(val))return {err:'SET NEEDS A NUMBER'};const o={at,set:{[k]:val}};if(raw[0]==='+')o.inc=true;const d=dur();if(d)o.over=d;return o;}
   if(v==='event'){if(!EVENTS.includes(lw[1]))return {err:'EVENTS: '+EVENTS.join(', ').toUpperCase()};return {at,event:lw[1]};}
   if(v==='mystery'){if(!MYST[lw[1]])return {err:'MYSTERIES: '+Object.keys(MYST).join(', ').toUpperCase()};return {at,mystery:lw[1]};}
@@ -194,7 +194,7 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
   const travel=(a,p,q,sn)=>legsBetween(a,p,q,sn).reduce((s,L)=>s+legTime(L.k,L.k==='walk'?dist(L.a,L.b)*Math.abs(L.f1-L.f0):Math.abs(NY(L.a)-NY(L.b))*Math.abs(L.f1-L.f0),sn,a),0);
   const doorAt=(d,t)=>{let st='open',ta=-1e9;for(const e of C.doors[d])if(e.at<=t&&e.at>=ta){ta=e.at;st=e.state;}return st;}; /* latest in time, not last in the list: auto-opens are pushed after the sorted script */
   const busy=[];
-  /* the crew first (their doors open for them); DeadScout last: doors don't sense her, she opens them by hand */
+  /* the crew first (their doors open for them); Driftnaut last: doors don't sense her, she opens them by hand */
   for(const a of ACTORS){const p0=place(start[a])||place(HOME[a][0])||place('quarters.bunk'),L=cmds[a].sort(byAt),all=[];let here=p0,free=0,ci=0,n=0;
     const hidden=t=>{let h=false;for(const e of C.vis[a])if(e.at<=t)h=!e.on;return h;};
     for(;;){const next=ci<L.length?L[ci]:null,limit=next?next.at:total-30,ch=chapAt(free),tr=ch?ch.traffic:'normal',gap=tr==='normal'?300:tr==='low'?560:1e9; /* r31: the crew run errands half as often */
@@ -218,7 +218,7 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
     const go=(t,target,sneak,viaPos,fast,coast)=>{const legs=viaPos?legsBetween(a,pos,viaPos,sneak).concat(legsBetween(a,viaPos,target.pos,sneak)):legsBetween(a,pos,target.pos,sneak);const V=vWalk(a,sneak,fast);
       if(!legs.length){const [ax,ay]=xyOf(pos),[bx,by]=xyOf(target.pos);if(Math.hypot(ax-bx,ay-by)>2){goShort=true;return t;}} /* r31: no route (K9 and a ladder) means stay, never jump */
       for(const L of legs){const [x0,y0]=xyOf({a:L.a,b:L.b,f:L.f0}),[x1,y1]=xyOf({a:L.a,b:L.b,f:L.f1}),len=L.k==='walk'?Math.hypot(x1-x0,y1-y0):Math.abs(y1-y0);if(len<.01)continue;
-        if(L.k==='walk'){/* doors on the way, in walking order: DeadScout opens closed ones herself; a locked one stops her with a hand on it (r22: a click-to-move walked straight through) */
+        if(L.k==='walk'){/* doors on the way, in walking order: Driftnaut opens closed ones herself; a locked one stops her with a hand on it (r22: a click-to-move walked straight through) */
           let f0=L.f0;if(a==='deadscout'){const dir=x1>x0?1:-1,lo=Math.min(x0,x1),hi=Math.max(x0,x1);
             const onWay=Object.entries(SC.doors).filter(([id,D])=>!D.floor&&!D.wall&&Math.abs(D.y-(y0+y1)/2)<=8*SS&&D.x>lo+1&&D.x<hi-1).sort((p,q)=>(p[1].x-q[1].x)*dir);
             for(const [id,D] of onWay){const fd=L.f0+(L.f1-L.f0)*((D.x-12*SS*dir)-x0)/(x1-x0),[xa,ya]=xyOf({a:L.a,b:L.b,f:f0}),[xb,yb]=xyOf({a:L.a,b:L.b,f:fd}),d=Math.hypot(xb-xa,yb-ya)/V,st=doorAt(id,t+d);if(st==='open')continue;
@@ -496,14 +496,14 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   if(present&&(ready(LG)||DARKART)){if(!DARKART)x.drawImage(LG,0,0,W,H);for(const [r,o] of Object.entries(ech)){x.save();x.clip(PATHS[r]||new Path2D());x.globalAlpha=o.e;x.drawImage(L1||L0,0,0,W,H);x.restore();}}
   const rs={};for(const r of Object.keys(SC.rooms))rs[r]=roomState(C,r,t);
   const engineWash=(m)=>{/* the same four beams in every view: same size, length, brightness and flow. Each art has its nozzles in a slightly different place, so the beams sit at the exterior's nozzles while the hull is up and at the cutaway's once it's peeled away */
-    const ext=clamp(exteriorAt(C,t),0,1),amp=(present&&FORCE!=='drift'?.3:1)*Math.max(pw,.6)*m*TOY.dv,X=SC.xnozzles||XNOZ,Cn=SC.engines;
+    const ext=clamp(exteriorAt(C,t),0,1);LASTEXT=ext;const amp=(present&&FORCE!=='drift'?.3:1)*Math.max(pw,.6)*m*TOY.dv,X=SC.xnozzles||XNOZ,Cn=SC.engines;
     for(let i=0;i<Cn.length;i++){const c=Cn[i],e=X[i]||c,ex=e[0]*ext+(c[0]-4)*(1-ext),ey=e[1]*ext+c[1]*(1-ext);ionBeam(Math.round(ex),Math.round(ey),64,150*(1+Math.max(0,TOY.dv-1)*.9),Math.min(amp,1.25),t);}} /* one set of beams, all alike: same nozzle height, same length, same flow */;engineWash(1-clamp(exteriorAt(C,t),0,1));
   if(SC.core){const [x0,y0,x1,y1]=SC.core,st=rs.engineering,F=STATES[st]||{},sp=(F.core||1)*(F.dead?.25:1),cont=Wv.contamination_level,base=st==='blackout'?.15:F.dead?.3:1;x.save();x.beginPath();x.rect(x0,y0,x1-x0+1,y1-y0+1);x.clip();x.globalCompositeOperation='lighter';
     for(let i=0;i<14;i++){const yy=y1-(((t*16*sp+i*9)%((y1-y0)+10))),w=(x1-x0)*(.4+.5*hash(i,77)),col=cont>2&&i%3===0?'120,240,210':'255,140,60';x.fillStyle=`rgba(${col},${(.35+.3*hash(i,78))*base*pw})`;x.fillRect(Math.round(x0+(x1-x0-w)/2),Math.round(yy),Math.round(w),2);}
     x.restore();x.save();x.globalCompositeOperation='lighter';glow((x0+x1)/2,(y0+y1)/2,64,'255,140,60',(.12+.05*Math.sin(t*1.3*sp))*base*pw);x.restore();
     if(SC.pump){const [pcx,pcy,pr]=SC.pump,an=t*1.6*sp*pw;x.fillStyle='#6b6e78';for(let k=0;k<4;k++){const a=an+k*Math.PI/2;for(let r=3;r<pr;r++)x.fillRect(Math.round(pcx+Math.cos(a)*r),Math.round(pcy+Math.sin(a)*r),1,1);}px(pcx-2,pcy-2,5,5,'#8c8f96');}}
   if(Wv.contamination_level>.3&&SC.conduit){const [[cx0,cy],[cx1]]=SC.conduit,ph=((t%11)/11),a=clamp(Wv.contamination_level,0,1);x.save();x.globalCompositeOperation='lighter';for(let i=0;i<3;i++){const p=cx1-(cx1-cx0)*((ph+i*.08)%1);x.fillStyle=`rgba(120,240,210,${.6*a*(1-i*.3)})`;x.fillRect(Math.round(p),cy,(6-i*2)*SS,2*SS);}x.restore();}
-  /* screens (camera feeds are drawn last, from a picture of the room taken before DeadScout is drawn) */
+  /* screens (camera feeds are drawn last, from a picture of the room taken before Driftnaut is drawn) */
   const camScreens=[];
   for(const [id,r] of Object.entries(SC.screens)){let s=screenMode(C,id,t,Wv),m=s.m;const room=id.split('.')[0];if(ech[room]&&ech[room].e>.4&&m==='offline')m='idle-grid';
     if(evNow&&evE>.3&&hash(id.length,Math.floor(t*6))<.7)m='noise';if(pw<.5&&m!=='offline'&&!screenAt(C,id,t).m&&hash(id.length*3,Math.floor(t*2))<.5)m='off'; /* low power: screens flicker off, except one that was just woken */
@@ -520,21 +520,32 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   {const lvl=Wv.contamination_level,S=A.sheets.growth;if(S)for(const [i,g] of SC.growth.entries()){const a=clamp((lvl-g.stage+.3)/.5,0,1);if(a<=0)continue;const ceil=g.ceil!=null?g.ceil:(SC.world?g.y<1000&&g.y>880||g.y<600:g.y<420);drawSprite('growth',g.kind,g.x,ceil?g.y+(S.frame_height-16)*SS:g.y,i%2===1,t*.3,i,a*(.75+.25*Math.sin(t*.9+i)));}}
   /* the past, for a moment */
   const herHere=visible(C,'scout',t);for(const [r,o] of Object.entries(ech))for(const [k,g] of echoCast(r,o.preset,C,t).filter(g=>!(herHere&&g.id==='pilot')).entries()){if(g.x0!=null){const u=((t*.08+k*.3)%1),X=g.x0+(g.x1-g.x0)*u;drawGhost(g.id,'walk',X,g.y,false,t,k+3,o.e*.75);}else drawGhost(g.id,g.anim,g.x,g.y,!!g.flip,t,k+3,o.e*.75);}
-  /* the crew, then a picture for any camera feed, then DeadScout */
+  /* the crew, then a picture for any camera feed, then Driftnaut */
   const AB={},drawActor=(a,i)=>{if(!visible(C,a,t))return;const st=actorAt(C,a,t);let anim,flip=false,an0=null;
     if(st.walk){anim=(a==='commander'||a==='deadscout'||a==='scout')&&st.sneak?'sneak':'walk';flip=st.left;} /* every sheet walks facing right and is mirrored to go left (r26: the pilot's 'walk-left' was the same frames unmirrored, so she walked backwards) */
     else if(st.climb){const S=A.sheets[SHEET[a]||a];anim=st.down?'climb-down':'climb';if(!(S&&S.animations[anim]))an0=CLIMBF[a];}
     else if(st.pause&&A.sheets[SHEET[a]||a]&&A.sheets[SHEET[a]||a].animations['climb-mount'])anim='climb-mount';
     else if(st.lift||st.pause)anim=a==='commander'||a==='deadscout'||a==='scout'||a==='k9'||a==='k9m'?'idle':'stand';
     else{anim=poseAt(C,a,st,t);flip=(actFace(C,a,st,t)||st.face)==='left';}
-    const mem=a==='scout'||a==='k9m';if(mem){x.save();x.globalCompositeOperation='lighter';glow(st.x,st.y-(a==='k9m'?16:34)*SS,(a==='k9m'?30:46)*SS,'200,240,230',.07+.03*Math.sin(t*2.1));x.restore();}
+    /* r36 · DRIFT. Driftnaut hovers: a few pixels off the deck with a slow bob, legs still, up the shaft without touching the
+       rungs. Nothing else aboard floats (the crew walk, K9 walks, mugs stay put), so this is the clue nobody says out loud */
+    /* r39 · GRADUAL DRIFT (DRIFTV 0..1, set by the game from the story's unease). 0: she walks like anyone. A little: the
+       same walk, a pixel or two off the deck, footsteps fading. Full: she drifts - leaning into the way she's going, arms a
+       little forward, legs trailing a little behind (the canon sheet's own zero-g frames), upright and bobbing when still,
+       rising and sinking beside the ladder instead of climbing it. Nothing else aboard floats. */
+    const dv=a==='deadscout'?DRIFTV:0,drift=dv>=.85,lifted=dv>.05&&!drift;
+    if(drift&&(st.walk||st.climb)){if(st.walk){flip=st.left;if(st.starting||st.ending){anim='eva-float';an0=[[16,9]];}else{anim='eva-float';an0=null;}}else{anim='idle';an0=null;flip=FACET[a]?FACET[a].flip:false;}}
+    const mem=a==='scout'||a==='k9m',seen=a==='deadscout'&&!present&&!SOLID; /* r39: in a 2291 watch she is something the ship half-remembers */if(mem||seen){x.save();x.globalCompositeOperation='lighter';glow(st.x,st.y-(a==='k9m'?16:34)*SS,(a==='k9m'?30:46)*SS,'200,240,230',(seen?.05:.07)+.03*Math.sin(t*2.1));x.restore();}
     /* a turn: she keeps the old facing for a beat, shows her front for a beat, then faces the new way (no instant flip) */
     let tt=t;const S_=A.sheets[SHEET[a]||a];
     /* the gait is driven by distance, not time: phase = distance / stride, stride = cruise speed × one cycle; slowing slows the feet, stopping plants them */
     if(st.walk&&st.dist!=null&&S_){const an=S_.animations[anim]||S_.animations.walk;if(an){const tot=an.reduce((p,f)=>p+f[1],0),stride=Math.max(1,vWalk(a,st.sneak,false)*tot);tt=(st.dist/stride)*tot-(i*5+1)*1.37;}}
-    if(!st.climb&&!st.lift){x.save();x.globalAlpha=.28;x.fillStyle='#06060a';x.fillRect(Math.round(st.x-6*SS),Math.round(st.y-1),12*SS,2);x.restore();} /* two dark pixels under the boots: contact, not a drop shadow */if(S_&&S_.animations.turn&&!an0){const F=FACET[a]||(FACET[a]={flip,t:-9});if(F.flip!==flip){F.flip=flip;F.t=t;}const u=t-F.t;if(u<.06)flip=!flip;else if(u<.13){anim='turn';flip=false;tt=u-(i*5+1)*1.37;}}
+    let dy=0;if(lifted&&!st.climb&&!st.lift){dy=Math.round(1+dv*1.6)*SS;x.save();x.globalAlpha=.2;x.fillStyle='#06060a';x.fillRect(Math.round(st.x-6*SS),Math.round(st.y-1),12*SS,2);x.restore();} /* just off the deck: the contact shadow stays, the boots don't quite meet it */
+    else if(drift){const bob=Math.sin(t*2.1)>.35?1:Math.sin(t*2.1)<-.35?-1:0,lean=st.walk&&!st.ending&&!st.starting?1:0;dy=(st.climb?2:/^(sit|crouch|kneel|seated)/.test(anim)?2:5+bob+lean)*SS; /* 5 px up, a 2 px bob; a touch higher at cruise */
+      if(!st.climb){x.save();x.fillStyle='#06060a';x.globalAlpha=.2-bob*.03;x.fillRect(Math.round(st.x-(5-bob)*SS),Math.round(st.y-1),(10-bob*2)*SS,2);x.globalAlpha=.1;x.fillRect(Math.round(st.x-(7-bob)*SS),Math.round(st.y-1),(14-bob*2)*SS,2);x.restore();}} /* her shadow on the deck, breathing with the bob */
+    else if(!st.climb&&!st.lift){x.save();x.globalAlpha=.28;x.fillStyle='#06060a';x.fillRect(Math.round(st.x-6*SS),Math.round(st.y-1),12*SS,2);x.restore();} /* two dark pixels under the boots: contact, not a drop shadow */if(S_&&S_.animations.turn&&!an0){const F=FACET[a]||(FACET[a]={flip,t:-9});if(F.flip!==flip){F.flip=flip;F.t=t;}const u=t-F.t;if(u<.06)flip=!flip;else if(u<.13){anim='turn';flip=false;tt=u-(i*5+1)*1.37;}}
     const dimK9=(a==='k9'||a==='k9m')&&/^(off|power-down|power-up)$/.test(anim);if(dimK9){const k=anim==='off'?.32:.55+.35*Math.abs(Math.sin(t*3));x.filter=`brightness(${k})`;} /* one pose until the production sheet: the engine dims it */
-    const r=drawSprite(a,anim,st.x,st.y,flip,tt,i*5+1,mem?.92:1,an0);if(dimK9)x.filter='none';if(r)AB[a]={x:st.x,y:st.y,h:r.h,flip,anim,ref:st.ref||''};};
+    const r=drawSprite(a,anim,st.x,st.y-dy,flip,tt,i*5+1,mem?.92:seen?.62+.1*Math.sin(t*1.3):1,an0);if(dimK9)x.filter='none';if(r)AB[a]={x:st.x,y:st.y,h:r.h,flip,anim,ref:st.ref||''};};
   CREW.forEach((a,i)=>drawActor(a,i));
   const camSnap={};for(const [id,,room] of camScreens){const R=(SC.cameras&&SC.cameras[room])||[0,0,W,H],w=R[2]-R[0],h=R[3]-R[1];let cc=CAMCV[id];if(!cc){cc=CAMCV[id]=document.createElement('canvas');}if(cc.width!==w||cc.height!==h){cc.width=w;cc.height=h;}else cc.getContext('2d').clearRect(0,0,w,h);cc.getContext('2d').drawImage(cv,R[0],R[1],w,h,0,0,w,h);camSnap[id]=cc;}
   drawActor('deadscout',3);
@@ -614,7 +625,10 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   else c.drawImage(cv,V[0],V[1],V[2],V[3],Math.round(box.x*scale),Math.round(box.y*scale),Math.round(box.w*scale),Math.round(box.h*scale));c.restore();
   return {x:box.x,y:box.y,w:box.w,h:box.h};}
 function report(P,times,t){const C=compile(P,times),o={};for(const a of ACTORS){if(!visible(C,a,t)){o[a]=a==='deadscout'?'—':'GONE';continue;}const s=actorAt(C,a,t);o[a]=s.walk?'WALKING':s.climb?'LADDER':s.lift?'HOIST':(ROOM_NAMES[(s.ref||'').split('.')[0]]||ROOM_NAMES[roomOf(s.x,s.y-20)]||'');}o.era=eraAt(C,t);return o;}
-window.CUT={toy:o=>{o=Object.assign({},o||{});if(o.room){for(const [r,v] of Object.entries(o.room)){if((TOY.room[r]==null?1:TOY.room[r])!==v)RLT[r]=performance.now();TOY.room[r]=v;}delete o.room;}if(o.door){Object.assign(TOY.door,o.door);delete o.door;}Object.assign(TOY,o);return TOY;},_sky:()=>skyMask(),_hash:(a,b)=>hash(a,b),tight:v=>{TIGHT=!!v;},focus:f=>{FOCUS=f||null;},frame:()=>LOWRES&&ic?ic:null,_loc:{mkRun,evalRun,xyOf:p=>xyOf(p)},setTape:n=>{TAPE=n;},drift:v=>{DRIFTL=v;},roomOf,gait:(P,times,t,a)=>{const C=compile(P,times),st=actorAt(C,a||'deadscout',t);if(!st.walk||st.dist==null)return null;const S=A.sheets[SHEET[a]||a];if(!S||!S.animations.walk)return null;const an=S.animations.walk,tot=an.reduce((p,f)=>p+f[1],0),stride=Math.max(1,vWalk(a,st.sneak,false)*tot);let u=((st.dist/stride)%1+1)%1*tot,i=0;for(const [f,d] of an){if(u<d)break;u-=d;i++;}return {i:Math.min(i,an.length-1),n:an.length,fast:st.fast,v:st.v};},render,compile,parse,format,formatBeat,eventAt,report,view,pick,neighbor,wakeAt,hereRef,farTarget,roomAt,nearby,snapshot,travelTime,MAP:SC,SS,uses:(P,times)=>compile(P,times).uses,doorStates:(P,times,t)=>{const C=compile(P,times),o={};for(const d of DOORS)o[d]=lastOf(C.doors[d],t).state;return o;},roomStates:(P,times,t)=>{const C=compile(P,times),o={};for(const r of Object.keys(SC.rooms))o[r]=roomState(C,r,t);return o;},screenModeAt:(P,times,t,id)=>screenAt(compile(P,times),id,t).m,objCount:(P,times,id)=>compile(P,times).obj[id]||0,force:v=>{FORCE=v;},exterior:v=>{EXTF=v;},light:v=>{LIT=!!v;},lowres:v=>{LOWRES=!!v;},palette:v=>{PALON=!!v;},PALETTE,IR,hasExterior:()=>!!LX,actorAt:(P,times,t,a)=>actorAt(compile(P,times),a||'deadscout',t),command,play:PLAY,mmss,secs,
+let DRIFTV=0;
+let LASTEXT=0,SOLID=false;
+window.CUT={solid:v=>{SOLID=!!v;},extAt:()=>LASTEXT, /* r41: how much of the last frame drawn was the outside of the hull (the opening's x-ray, the viewport look); the overlay layers fade with it */ /* r41: how much of the picture is the outside of the hull (the overlay layers fade with it) */
+  float:v=>{DRIFTV=Math.max(0,Math.min(1,+v||0));},toy:o=>{o=Object.assign({},o||{});if(o.room){for(const [r,v] of Object.entries(o.room)){if((TOY.room[r]==null?1:TOY.room[r])!==v)RLT[r]=performance.now();TOY.room[r]=v;}delete o.room;}if(o.door){Object.assign(TOY.door,o.door);delete o.door;}Object.assign(TOY,o);return TOY;},_sky:()=>skyMask(),_hash:(a,b)=>hash(a,b),tight:v=>{TIGHT=!!v;},focus:f=>{FOCUS=f||null;},frame:()=>LOWRES&&ic?ic:null,_loc:{mkRun,evalRun,xyOf:p=>xyOf(p)},setTape:n=>{TAPE=n;},drift:v=>{DRIFTL=v;},roomOf,gait:(P,times,t,a)=>{const C=compile(P,times),st=actorAt(C,a||'deadscout',t);if(!st.walk||st.dist==null)return null;const S=A.sheets[SHEET[a]||a];if(!S||!S.animations.walk)return null;const an=S.animations.walk,tot=an.reduce((p,f)=>p+f[1],0),stride=Math.max(1,vWalk(a,st.sneak,false)*tot);let u=((st.dist/stride)%1+1)%1*tot,i=0;for(const [f,d] of an){if(u<d)break;u-=d;i++;}return {i:Math.min(i,an.length-1),n:an.length,fast:st.fast,v:st.v};},render,compile,parse,format,formatBeat,eventAt,report,view,pick,neighbor,wakeAt,hereRef,farTarget,roomAt,nearby,snapshot,travelTime,MAP:SC,SS,uses:(P,times)=>compile(P,times).uses,doorStates:(P,times,t)=>{const C=compile(P,times),o={};for(const d of DOORS)o[d]=lastOf(C.doors[d],t).state;return o;},roomStates:(P,times,t)=>{const C=compile(P,times),o={};for(const r of Object.keys(SC.rooms))o[r]=roomState(C,r,t);return o;},screenModeAt:(P,times,t,id)=>screenAt(compile(P,times),id,t).m,objCount:(P,times,id)=>compile(P,times).obj[id]||0,force:v=>{FORCE=v;},exterior:v=>{EXTF=v;},light:v=>{LIT=!!v;},lowres:v=>{LOWRES=!!v;},palette:v=>{PALON=!!v;},PALETTE,IR,hasExterior:()=>!!LX,actorAt:(P,times,t,a)=>actorAt(compile(P,times),a||'deadscout',t),command,play:PLAY,mmss,secs,
   ROOMS:Object.fromEntries(Object.keys(SPOTS).map(r=>[r,{name:ROOM_NAMES[r]||r.toUpperCase(),spots:SPOTS[r]}])),ACTORS,NAMES,STORY_MODES,MODE_OF,STATES,WORLD,SCREEN_MODES,EVENTS,DOORS,ANOM,MYSTERIES:MYST,OBJECTS:OBJ,ECHO_PRESETS,ACTIONS,
   SCREENS:Object.keys(SC.screens),place,poses:AN,W,H};
 })();

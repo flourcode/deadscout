@@ -6,8 +6,8 @@
 const MEM=['first_memory_seen','eng_memory_seen','signal_layer_seen','past_deadscout_seen','signal_arrives_seen','final_eva_seen','last_walk_seen','k9_memory_seen'];
 const DISC=['found_photo','found_nav','found_patch','found_trace','found_eva'];
 function level(F,playT){const m=MEM.filter(k=>F[k]).length,d=DISC.filter(k=>F[k]).length;
-  if(F.camera_discrepancy_seen||F.past_deadscout_seen||F.identity_record_found||m>=3||playT>=1500)return 2;
-  if(F.any_memory_seen||d>=2||playT>=600||F.deck_found&&F.power_restored&&playT>=300)return 1;return 0;}
+  if(F.camera_discrepancy_seen||F.past_deadscout_seen||F.identity_record_found||m>=3||playT>=1080)return 2;
+  if(F.any_memory_seen||d>=2||playT>=420||F.deck_found&&F.power_restored&&playT>=240)return 1;return 0;}
 /* HOS, on entering a room; one line per level */
 const ROOM={bridge:['BRIDGE · PARTIAL POWER','BRIDGE · CAM 01 · OCCUPANCY: 0','BRIDGE · OCCUPANCY: 1 · RECOUNT: 0'],
   'crew-quarters':['CREW QUARTERS · OCCUPANCY: 0','CREW QUARTERS · BUNK: MADE · DENT: PRESENT','CREW QUARTERS · OCCUPANCY: 1 · RECOUNT: 0'],
@@ -18,7 +18,7 @@ const ROOM={bridge:['BRIDGE · PARTIAL POWER','BRIDGE · CAM 01 · OCCUPANCY: 0'
   service:['SERVICE TUNNEL · READINGS NOMINAL','SERVICE TUNNEL · READINGS UNSTABLE','SERVICE TUNNEL · K9-4 DECLINES'],
   'central-shaft':['CENTRAL SHAFT · LIFT: OFFLINE','CENTRAL SHAFT · MOTION: NONE','CENTRAL SHAFT · MOTION: ONE · UNLISTED'],
   'upper-access':['UPPER ACCESS · PRESSURE OK','UPPER ACCESS · DOOR LOG · OPENED FROM INSIDE','UPPER ACCESS · MOTION: ONE · UNLISTED'],
-  'lower-access':['LOWER ACCESS · PRESSURE OK','LOWER ACCESS · FOOTFALL · UNMATCHED','LOWER ACCESS · MOTION: ONE · UNLISTED'],
+  'lower-access':['LOWER ACCESS · PRESSURE OK','LOWER ACCESS · NO FOOTFALL · DOOR CYCLED','LOWER ACCESS · MOTION: ONE · UNLISTED'],
   eva:['OUTSIDE · TETHER: OK','OUTSIDE · TETHER: OK · STARS: FIXED','OUTSIDE · TETHER: UNUSED']};
 /* the ordinary things, by level: a routine first, then the same routine, wrong */
 const TEXT={'meal-unit':['MEAL UNIT · READY · ONE CUP · HOT','MEAL UNIT · READY · NO CUP DISPENSED','MEAL UNIT · LAST USER: PILOT · 2291 · READY'],

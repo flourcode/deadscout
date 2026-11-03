@@ -1,4 +1,4 @@
-/* DeadScout · one reading of a Director manifest for the game and the Director: the project the engine renders,
+/* Driftnaut · one reading of a Director manifest for the game and the Director: the project the engine renders,
    the music DNA the band plays, the album that sets the chapter clock. window.DSE */
 (function(){
 "use strict";

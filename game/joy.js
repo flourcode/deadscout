@@ -1,4 +1,4 @@
-/* DeadScout · JOY (release 28). The small pleasures of a ship left running: everything you click answers back, close-up
+/* Driftnaut · JOY (release 28). The small pleasures of a ship left running: everything you click answers back, close-up
    sounds made in the page, a sleep bed, the ship's day following your clock, weather outside, and things you'd miss.
    One transparent pixel layer over the picture (the ship's own renderer is untouched), one quiet bus into the master,
    so SOUND, the float window and recordings all hear it. Nothing is stored but a visit count for the plant.
@@ -107,7 +107,7 @@ for(const [id,[x0,y0,x1,y1]] of Object.entries(M.screens||{})){const cx=(x0+x1)/
 for(const [i,L] of (M.lamps||[]).entries())if(!L.warn)add({id:'lamp:'+i,at:at(L.x,L.y),r:16,act(){play('tick',L.x);setTimeout(()=>play('tick',L.x),90);flash(L.x,L.y+4,'255,190,110');}});
 /* the props, found by eye on the art */
 add({id:'plant',at:at(912,652),r:24,act(p){play('rustle',912);for(let i=0;i<5;i++)drop(912+rnd(-10,10),640,'#7ec4d8');if(p.n%5===0){bloom=performance.now();play('chime',912,1046);}}});
-add({id:'bunk-top',at:at(585,700),r:34,act(p){play('swish',585);sway(585,700);if(p.n%5===0){play('snore',585);zz(560,690,3);}}});
+add({id:'bunk-top',at:at(585,700),r:34,act(p){play('swish',585);sway(585,700);if(false){play('snore',585);zz(560,690,3);}}});
 add({id:'bunk-low',at:at(585,790),r:30,act(){play('page',585);for(let i=0;i<3;i++)mote(585+rnd(-6,6),785,'#e9d7c2',1.2);}});
 add({id:'desk',at:at(805,800),r:22,act(){play('cassette',805);note(805,770);}});
 add({id:'lockers',at:at(928,760),r:46,act(p){play('latch',928);shake(928,760);if(p.n%4===0){setTimeout(()=>play('thud',928),300);fall(940,700,'#c37b43');try{G.beat({actor:'k9',do:'scan',for:2.5});}catch(e){}}}});
@@ -190,7 +190,7 @@ function rhythm(t){
   if(bolt){const u=t-bolt.t0;if(u>5&&bolt.hop===0){bolt.hop=1;bolt.x+=rnd(60,100)*(Math.random()<.5?-1:1);const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');if(k)k9to(bolt.x,k.y);}
     if(u>10&&bolt.hop===1){bolt.hop=2;try{G.beat({actor:'k9',do:'scan',for:3});}catch(e){}try{G.toyApi().chirp();}catch(e){}}if(u>13)bolt=null;}
   /* Zz over a crew member who isn't going anywhere, at night or while you sleep */
-  if((night()||sleeping())&&t>nextZ){nextZ=t+rnd(5,9);for(const a of ['commander','pilot','systems']){try{const s=CUT.actorAt(G.P,G.TIMES,G.now(),a),r=CUT.report(G.P,G.TIMES,G.now())[a];if(s&&!s.walk&&r&&r!=='GONE'&&Math.random()<.5){zz(s.x+10,s.y-58*SS,1);break;}}catch(e){}}}
+  /* r42: no snoring, no floating Zs */
   /* sound by camera: the room in the middle of the frame sets the ambience; the crew murmur on the bridge; rain on the hull */
   if(audio()){beds();const v=view(),zoomed=v[2]<M.w*.72,cx=v[0]+v[2]/2,cy=v[1]+v[3]/2;let room=null;try{room=zoomed?CUT.roomOf(cx,cy):null;}catch(e){}
     const key=room||'*';if(key!==lastAmb){lastAmb=key;try{G.amb(room);}catch(e){}}
@@ -204,6 +204,7 @@ let sleepOn=false;const sleeping=()=>sleepOn;
 const SPACE=M.space||[];
 function draw(){requestAnimationFrame(draw);if(!VW)return;V=view();K=cv.width/V[2];x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.imageSmoothingEnabled=false;if(!live()&&G.state!=='photo')return;
   const t=now();
+  {let ext=0;try{ext=CUT.extAt(G.P,G.TIMES,G.now());}catch(e){}cv.style.opacity=String(1-ext);if(ext>.98)return;} /* r41: nothing of the inside is drawn over the hull */
   /* weather, clipped to open space */
   if(wx_.k){const u=(t-wx_.t0)/(wx_.until-wx_.t0),a=Math.min(1,u*4,(1-u)*4);x.save();x.beginPath();for(const [a0,b0,a1,b1] of SPACE)x.rect(sx(a0),sy(b0),(a1-a0)*K,(b1-b0)*K);x.clip();
     if(wx_.k==='ice')for(const q of ICE){const X=M.w*(1-((q.x+u*q.v*1.6)%1)),Y=q.y*M.h;dot0(X,Y,1+q.s*2.4,q.s>.7?'#c8dce6':'#6f8796',.65*a);}
@@ -300,5 +301,16 @@ let nextTrip=now()+rnd(600,1100),trip=null;
 setInterval(()=>{if(G.state!=='watch'||sleepOn||k9Bed||!window.K9NAV||K9NAV.busy()||bolt)return;const t=now();
   if(!trip&&t>nextTrip){const r=K9NAV.go('service.mid');if(r){trip={back:t+r.secs+rnd(120,240)};try{G.beat({at:r.secs+.5,actor:'k9',do:'scan',for:4});}catch(e){}}nextTrip=t+rnd(900,1500);}
   if(trip&&t>trip.back){if(K9NAV.go('engineering.pump'))trip=null;else trip.back=t+30;}},2000);
+/* r38 · bittersweet. The crew are gone but the ship still looks after them: the coffee machine still brews three cups;
+   the cards on the quarters table are still half played; now and then K9 goes to the bunk and waits a while. */
+const present=()=>{try{return CUT.report(G.P,G.TIMES,G.now()).era==='present';}catch(e){return false;}};
+let nextCoffee=now()+rnd(360,600),nextBunk=now()+rnd(1400,2200);
+setInterval(()=>{if(!(G.state==='watch'||G.state==='play')||sleepOn||!present())return;const t=now();
+  if(t>nextCoffee){nextCoffee=t+rnd(1100,1800);play('pour',1780);for(let i=0;i<6;i++)P_({k:'p',x:1780+rnd(-3,3),y:458,vx:rnd(-3,3),vy:rnd(-16,-9),g:-2,life:rnd(2,3.4),col:'#c6ab92',s:1.2,a:.5,delay:i*.4});
+    setTimeout(()=>{play('chime',1780,659.25);G.say('HOS',pick(['COFFEE READY · THREE CUPS','BEVERAGE READY · CREW: 0','COFFEE · KEPT WARM']),3.2);},1800);}
+  if(G.state==='watch'&&!k9Bed&&!trip&&!bolt&&window.K9NAV&&!K9NAV.busy()&&t>nextBunk){nextBunk=t+rnd(1500,2600);const r=K9NAV.go('crew-quarters.bunk');
+    if(r){try{G.beat({at:r.secs+.5,actor:'k9',do:'wait',for:26});}catch(e){}setTimeout(()=>{try{G.toyApi().chirp();}catch(e){}G.say('K9-4',pick(['BUNK 2 · WAITING','BUNK 2 · STILL MADE']),3);},(r.secs+3)*1000);
+      setTimeout(()=>{try{K9NAV.go('engineering.pump');}catch(e){}},(r.secs+32)*1000);}}},20000);
+add({id:'cards',at:at(744,818),r:16,act(p){play('page',744);for(let i=0;i<2;i++)fall(744+rnd(-6,6),812,'#e9d7c2',.5);G.say('NOTE',p.n%3===1?'A GAME OF CARDS · HALF PLAYED · HER TURN':p.n%3===2?'THE PILOT WAS WINNING':'NOBODY CLEARED THE TABLE',3.2,{panel:true});}});
 window.__joy={hatch:hatchSound,chute:chuteSound,sleep(on){sleepOn=!!on;audio();beds();if(brownG)fade(brownG,on?.055:0,on?30:6);if(on)fade(murG,0,4);bedtime(on);},endShift,play,sleeping:()=>sleepOn,pokes:POKES,leaves:()=>leaves};
 })();

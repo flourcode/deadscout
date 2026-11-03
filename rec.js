@@ -1,4 +1,4 @@
-/* Dead Scout · making the video file (from Small Beats' recorder). It records in real time: an hour takes an hour.
+/* Driftnaut · making the video file (from Small Beats' recorder). It records in real time: an hour takes an hour.
    LSR.record({canvas, ctx, source, fps, vbr}) -> {kind, mime, ext, start(), frame(t), bytes(), stop() -> Promise<Blob>} */
 (function(){
 "use strict";

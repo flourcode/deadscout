@@ -1,4 +1,4 @@
-/* DeadScout · K9 ROUTES (release 31). K9-4 is a ship resident with its own ways round the ship, not a follower.
+/* Driftnaut · K9 ROUTES (release 31). K9-4 is a ship resident with its own ways round the ship, not a follower.
      HUMAN ROUTES  doors · ladders · the airlock · EVA                     (cut.js's walk graph)
      K9 ROUTES     doors · the deck it is on · ONE maintenance chute
    The chute joins the middle deck (a hatch low in engineering's west wall, by the shaft) to the lower deck (a hatch at

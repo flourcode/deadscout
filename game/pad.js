@@ -1,4 +1,4 @@
-/* DeadScout · touch controls and the deck's own keys (UI pass, Nov 2026).
+/* Driftnaut · touch controls and the deck's own keys (UI pass, Nov 2026).
    In the picture, only on touch: one cross-shaped D-pad (lower left) and an action cluster around a large USE
    (lower right): LIGHT above, TUNE left, USE right. Hidden for keyboard/mouse and when a gamepad is connected; Options
    can force them ON or OFF (prefs.pad: auto | on | off). Every key sends the same keydown/keyup as the keyboard.

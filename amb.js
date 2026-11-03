@@ -1,4 +1,4 @@
-/* DeadScout · the ship's own sound. Six procedural layers, each on a fader, meant to run for hours without a seam:
+/* Driftnaut · the ship's own sound. Six procedural layers, each on a fader, meant to run for hours without a seam:
    ENGINE (a low hum that drifts), VENTILATION (slow air), MACHINERY (a pump cycling, relays, a distant motor),
    RADIO (channel noise, now and then a sweep), SIGNAL (rare tones, interference), HULL (a creak, a resonance).
    Nothing in it is sudden; the loudest thing it ever does is a relay click.
@@ -37,7 +37,7 @@ function start(c,dest,mix,opts){stop();ctx=c;out=g(1);out.connect(dest);alive=tr
   set(mix||MIX0,2);}
 function click(f,v){const s=src(),hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=1200;const k=g(0),n=ctx.currentTime;s.connect(hp);hp.connect(k);k.connect(f);k.gain.setValueAtTime(0,n);k.gain.linearRampToValueAtTime(v,n+.004);k.gain.setTargetAtTime(0,n+.01,.02);s.stop(n+.3);}
 /* faders: 0..1 each, eased, with a curve so the lower half is usable */
-function set(mix,secs){if(!ctx)return;for(const k in L){const v=Math.pow(Math.max(0,Math.min(1,mix[k]!=null?mix[k]:MIX0[k])),1.6)*({engine:.55,ventilation:.5,machinery:.7,radio:.5,signal:.6,hull:.7}[k]||.5);L[k].level=v;L[k].fader.gain.setTargetAtTime(v,ctx.currentTime,secs!=null?secs/3:.4);}}
+function set(mix,secs){if(!ctx)return;for(const k in L){const v=Math.pow(Math.max(0,Math.min(1,mix[k]!=null?mix[k]:MIX0[k])),1.6)*({engine:.4,ventilation:.45,machinery:.4,radio:0,signal:0,hull:.2}[k]||.5);L[k].level=v;L[k].fader.gain.setTargetAtTime(v,ctx.currentTime,secs!=null?secs/3:.4);}}
 function duck(amount,secs){if(!out)return;out.gain.setTargetAtTime(Math.max(0,1-amount),ctx.currentTime,(secs||10)/3);}
 function stop(){alive=false;timers.forEach(clearTimeout);timers=[];for(const k in L){try{L[k].fader.gain.setTargetAtTime(0,ctx.currentTime,.3);const F=L[k];setTimeout(()=>{try{F.fader.disconnect();F.nodes.forEach(n=>{try{n.stop();}catch(e){}});}catch(e){}},1500);}catch(e){}}L={};
   {const old=lfos;lfos=[];setTimeout(()=>{for(const o of old){try{o.stop();o.disconnect();}catch(e){}}},1500);}}

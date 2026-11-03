@@ -1,4 +1,4 @@
-/* Dead Scout · SPACE: the scene engine. Synthesizes a place out of the LiminalMix toolkit (mix.js).
+/* Driftnaut · SPACE: the scene engine. Synthesizes a place out of the LiminalMix toolkit (mix.js).
    Original sounds in the general vocabulary of retro-futurist science fiction: no samples, no recordings, nothing copied
    from any film or series. An ERA and a LANGUAGE of sound design, never somebody's specific sound.
 

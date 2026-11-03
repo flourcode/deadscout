@@ -1,4 +1,4 @@
-/* DeadScout · the game. One dark room, one picture, a few words in the margins. Nothing moves that isn't the ship. */
+/* Driftnaut · the game. One dark room, one picture, a few words in the margins. Nothing moves that isn't the ship. */
 @font-face{font-family:Silk;src:url(fonts/silkscreen-400.woff2) format("woff2");font-display:swap}
 @font-face{font-family:PlexMono;src:url(fonts/plexmono-400.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:PlexMono;src:url(fonts/plexmono-500.woff2) format("woff2");font-weight:500;font-display:swap}
@@ -362,3 +362,79 @@ body.watching.ui:not(.portrait) .tbot{bottom:calc(3.5% + 74px)}
 body.watching.ui:not(.portrait) #wui:has(#wMore:not([hidden])) ~ .talk .tbot,body.watching.ui:not(.portrait):has(#wMore:not([hidden])) .tbot{bottom:calc(3.5% + 132px)}
 body.watching.ui:not(.portrait) .compact .tbot,body.watching.ui:not(.portrait) #screen.compact .tbot{bottom:calc(3.5% + 52px)}
 body.portrait.watching .tbot{top:calc(100% + 132px)}
+
+/* r37 · REST from the story: the HUD withdraws, one chunky key brings her back */
+body.resting .hud,body.resting .restbtn,body.resting .iprompt{opacity:0;pointer-events:none;transition:opacity .8s}
+.restchip{position:absolute;left:50%;bottom:clamp(14px,4%,40px);transform:translateX(-50%);z-index:9;display:flex;flex-direction:column;align-items:center;gap:8px;font:400 9px/1 Silk;letter-spacing:3px;color:#8a8580}
+.restchip[hidden]{display:none}.restchip button{all:unset;cursor:pointer;padding:10px 20px;font:400 13px/1 Silk;letter-spacing:.24em;color:#f0962a;background:#0d1015;box-shadow:inset 0 0 0 2px #f0962a,3px 3px 0 #000}
+.restbtn{all:unset;cursor:pointer;position:absolute;right:clamp(10px,2%,24px);bottom:clamp(10px,3%,30px);z-index:8;padding:7px 12px;font:400 10px/1 Silk;letter-spacing:.22em;color:#efe2cf;background:#0d1015;box-shadow:inset 0 0 0 2px #8a8580,3px 3px 0 #000;display:none}
+
+/* r42 · LISTEN / PLAY: the bar shows only what this mode needs */
+body:not(.playing) .wui .m-play,body.playing .wui .m-listen{display:none!important}
+.aonly{position:fixed;inset:0;z-index:70;background:#000;display:grid;place-items:center;cursor:pointer}
+.aonly[hidden]{display:none}.aonly span{font:400 11px/1 Silk;letter-spacing:4px;color:#4e4a46;opacity:0}
+.aonly.hint span{animation:aoh 5s ease forwards}@keyframes aoh{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}
+body.aonly .wui,body.aonly .tag{opacity:0!important}
+
+/* r42 · the boot card's two doors */
+.bt-tag{margin:clamp(6px,1.4vh,12px) 0 0;font:400 clamp(9px,1.5vw,13px)/1 Silk;letter-spacing:.3em;color:#bfe0c8}
+.bt-pick{display:flex;gap:clamp(10px,2vw,22px);justify-content:center;width:100%}
+.bt-card{all:unset;cursor:pointer;box-sizing:border-box;width:min(270px,42vw);padding:clamp(12px,2.4vh,22px) 12px;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.2vh,10px);border-radius:6px;text-align:center;box-shadow:4px 4px 0 #000;transition:transform .08s}
+.bt-card svg{width:clamp(18px,3vw,26px);height:auto;shape-rendering:crispEdges}
+.bt-card b{font:400 clamp(20px,3.6vw,32px)/1 Silk;letter-spacing:.12em}.bt-card span{font:400 clamp(7px,1.2vw,10px)/1.4 Silk;letter-spacing:.14em}
+.bt-card.listen{background:#d8e7a4;color:#12322f;box-shadow:inset 0 0 0 2px #eef6cf,4px 4px 0 #000}
+.bt-card.play{background:#1e4a47;color:#e6efd6;box-shadow:inset 0 0 0 2px #5f9187,4px 4px 0 #000}
+.bt-card:hover,.bt-card:focus-visible{transform:translate(-1px,-1px)}.bt-card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.bt-card.listen:focus-visible{box-shadow:inset 0 0 0 3px #12322f,4px 4px 0 #000}.bt-card.play:focus-visible{box-shadow:inset 0 0 0 3px #d8e7a4,4px 4px 0 #000}
+.bt-foot{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;color:#8fbfa0}
+.bt-foot button{all:unset;cursor:pointer;padding:5px 10px;font:400 9px/1 Silk;letter-spacing:.2em;color:#efe2cf;box-shadow:inset 0 0 0 2px #3c3a40}
+.bt-pick[hidden]{display:none}
+@media (max-height:520px){.bt-tag{display:none}.bt-card{padding:8px}.bt-card b{font-size:18px}}
+.bt-art img{height:clamp(52px,11vh,110px)}.bt-ship{width:min(400px,76vw,40vh)}.bt-mid{margin:clamp(8px,2vh,20px) 0 clamp(6px,1.4vh,14px)!important;min-height:0}
+.bt-foot{margin-top:auto}
+
+/* ===================== r43 · the boot card as a cozy cabin: the art on the left, the doors on the right ===================== */
+.boot{background:#05090b}
+.bt-box{width:min(1240px,100%);height:auto;max-height:calc(100svh - 32px);aspect-ratio:1211/651;display:grid;grid-template-columns:45% 1fr;grid-auto-rows:min-content;align-content:center;align-items:center;justify-items:center;
+  padding:clamp(14px,3vw,40px) clamp(14px,3.4vw,46px);background:#0c1a1c;image-rendering:auto;border-radius:10px;box-shadow:0 0 0 3px #14181c,0 0 0 6px #4a5052,0 0 0 8px #1f2326}
+.bt-box>.bt-art,.bt-box>.bt-mid,.bt-box>.bt-foot{grid-column:2}
+.bt-sky,.bt-top,.bt-art img,.bt-ship{display:none!important}
+.bt-art{margin:0;gap:clamp(6px,1.4vw,14px)}
+.bt-kick{margin:0 0 clamp(4px,1vw,10px);padding:clamp(6px,1vw,10px) clamp(12px,2vw,22px);font:400 clamp(8px,1.2vw,13px)/1 Silk;letter-spacing:.32em;color:#cfe3d0;box-shadow:inset 0 0 0 2px #3f6a63;border-radius:4px;background:rgba(8,20,22,.6)}
+.bt-orb{width:clamp(44px,6vw,86px);height:auto;color:#efe2cf}
+.bt-name{font-size:clamp(30px,5.4vw,74px)!important;letter-spacing:.24em;margin-right:-.24em;color:#f2e6d2;text-shadow:4px 4px 0 #0b1214}
+.bt-tag{color:#e6efd6!important;letter-spacing:.34em;font-size:clamp(8px,1.2vw,14px)!important}
+.bt-rule{margin:clamp(6px,1.2vw,12px) 0 0;font:400 10px/1 Silk;letter-spacing:.1em;color:#6f8f86}
+.bt-mid{margin:clamp(12px,2.4vw,28px) 0 clamp(8px,1.6vw,18px)!important}
+.bt-card{width:min(270px,17vw);min-width:150px}
+.bt-foot{margin:0}.bt-foot span{color:#d6e2cc;letter-spacing:.26em}
+/* portrait: the title at the top, the cabin in the middle, the doors stacked at the bottom */
+@media (max-aspect-ratio:4/5){
+  .boot{padding:10px}.bt-box{aspect-ratio:auto;height:calc(100svh - 20px);max-height:none;width:100%;display:flex;flex-direction:column;justify-content:flex-start;background:#112a2b;padding:clamp(16px,5vw,26px) 16px}
+  .bt-art{margin-top:2vh}.bt-mid{margin:auto 0 12px!important;width:100%}
+  .bt-pick{flex-direction:column;align-items:center;gap:12px}.bt-card{width:min(360px,92%);min-width:0;flex-direction:row;justify-content:center;gap:18px;padding:10px 16px}
+  .bt-card b{font-size:clamp(20px,7vw,28px)}.bt-card svg{width:30px}.bt-card>b,.bt-card>span{grid-column:2}
+  .bt-card{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:16px;row-gap:6px;align-items:center}.bt-card svg{grid-row:1/3}
+  .bt-foot{flex-direction:column;gap:8px}.bt-foot span{box-shadow:inset 0 0 0 1px #3f6a63;padding:7px 10px;border-radius:4px;font-size:8px;letter-spacing:.18em}}
+@media (max-height:520px) and (min-aspect-ratio:4/5){.bt-kick,.bt-rule,.bt-orb{display:none}.bt-card{padding:10px 8px}}
+
+/* ===================== r44 · the start screen is a live window into the ship ===================== */
+.bt-box{background:#0a1214!important}
+.bt-box>.bt-live{position:absolute!important;inset:0;width:100%;height:100%;z-index:0!important;image-rendering:pixelated;opacity:0;transition:opacity 1.4s ease;border-radius:inherit}
+.bt-live.on{opacity:1}
+.bt-box::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(90deg,rgba(7,13,15,0) 28%,rgba(7,13,15,.78) 50%,rgba(7,13,15,.9) 100%),linear-gradient(180deg,rgba(7,13,15,.45),rgba(7,13,15,0) 18%,rgba(7,13,15,0) 82%,rgba(7,13,15,.55))}
+@media (max-aspect-ratio:4/5){
+  .bt-box{background:#0a1214!important}.bt-box::after{display:none}
+  .bt-box>.bt-live{position:relative!important;inset:auto;width:calc(100% + 32px);height:auto;aspect-ratio:480/290;margin:14px -16px 0;flex:none;border-radius:0;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent)}}
+
+/* r45 · no frame: the start screen is the whole window, edge to edge */
+.boot{padding:0!important}
+.bt-box{width:100vw!important;height:100svh!important;max-height:none!important;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}
+@media (max-aspect-ratio:4/5){.bt-box{height:100svh!important}}
+
+/* r47: three buttons. The rest (tape, audio only, more) only in studio mode: Shift+S or ?studio */
+body:not(.studio) .wui .adv,body:not(.studio) #wMore{display:none!important}
+#wSound.off{opacity:.55}
+.bt-pick.wait{cursor:progress;opacity:.85}
