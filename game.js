@@ -275,7 +275,7 @@ function takeControl(){if(!watch||state!=='watch')return;const t=now();P.script=
 function releaseControl(){if(!watch||state!=='play')return;const t=now();for(const d in keys)keys[d]=false;stopHere();
   const back=NW.schedule(watch.cfg,{from:t+3,only:'commander',at:{commander:CUT.hereRef(P,TIMES,t,'commander')}});P.script.push(...DSE.beatsIn(back).beats.map(b=>Object.assign(b,{at:CUT.secs(b.at)})));P.rev++;
   state='watch';show('hud',false);$('hPrompt').hidden=true;paintWatch();wake();fadeExterior(4000);}
-async function endWatch(){if(!watch)return;keepAwake(false);if(document.pictureInPictureElement)document.exitPictureInPicture().catch(()=>{});SLP=null;$('dim').style.opacity='';savePrefs();state='end';$('veil').classList.remove('clear');if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,.6);if(AMB)AMB.duck(1,2);await wait(1800);if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
+async function endWatch(){if(!watch)return;if(window.__joy&&__joy.endShift&&state==='watch'){try{__joy.endShift();}catch(e){}await wait(2600);} /* r29: the lights go out room by room first */keepAwake(false);if(document.pictureInPictureElement)document.exitPictureInPicture().catch(()=>{});SLP=null;$('dim').style.opacity='';savePrefs();state='end';$('veil').classList.remove('clear');if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,.6);if(AMB)AMB.duck(1,2);await wait(1800);if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
 /* ---------- the episode: beginning, resuming, ending ---------- */
 const loaded=()=>!!window.DS_ALL&&PX.ready();
 async function untilLoaded(){if(loaded())return;show('cards',true);$('cards').innerHTML='<p class="year" style="animation:none;opacity:.7;font-size:14px;letter-spacing:6px">RECOVERING HALCYON</p>';while(!loaded())await wait(120);show('cards',false);}
@@ -371,7 +371,7 @@ function petK9(e){if(state!=='play'&&state!=='watch')return false;const t=now(),
   if(Math.abs(e.clientX-sx)>Math.max(18,34*s)||e.clientY>sy+6||e.clientY<sy-Math.max(26,46*s))return false;
   if(performance.now()-petT<700)return true;petT=performance.now();sfx('chirp',null,1.6);
   const m=document.createElement('span');m.className='k9mark';m.textContent=Math.random()<.5?'♪':'!';const tr=$('talk').getBoundingClientRect();m.style.left=(sx-tr.left)+'px';m.style.top=(sy-tr.top-Math.max(30,52*s))+'px';$('talk').appendChild(m);setTimeout(()=>m.remove(),1400);return true;}
-function k9Rest(t,on){if(!watch)return;if(on){P.script.push({at:t,move:'k9',to:'crew-quarters.bunk',interrupt:true});const b=CUT.parse('00:00 k9 off for 3600s').beats[0];if(b){b.at=t+CUT.travelTime('k9',CUT.hereRef(P,TIMES,t,'k9'),'crew-quarters.bunk')+2;P.script.push(b);}}
+function k9Rest(t,on){if(!watch)return;if(on){P.script.push({at:t,move:'k9',to:'crew-quarters.bunk',interrupt:true,fast:true});const b=CUT.parse('00:00 k9 off for 3600s').beats[0];if(b){b.at=t+CUT.travelTime('k9',CUT.hereRef(P,TIMES,t,'k9'),'crew-quarters.bunk')+2;P.script.push(b);}}
   else{const b=CUT.parse('00:00 k9 power-up for 3s').beats[0];if(b){b.at=t;P.script.push(b);}}P.rev++;}
 function findLog(id){if(!window.SHIPCON||watch)return;const L=SHIPCON.logFor(id);if(!L)return;prefs.logs=prefs.logs||[];const fresh=!prefs.logs.includes(L.id);if(fresh){prefs.logs.push(L.id);savePrefs();}
   setTimeout(()=>say('LOG · '+L.who,L.text,Math.min(12,4+L.text.length*.045),{panel:true}),900);if(fresh)setTimeout(()=>note('LOG RECOVERED · '+prefs.logs.length+' / '+SHIPCON.LOGS.length+' · REGISTRY',6),1200);}

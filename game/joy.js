@@ -115,7 +115,11 @@ add({id:'vent-q',at:at(655,678),r:16,act(){play('puff',655);for(let i=0;i<10;i++
 add({id:'window',at:at(500,415),r:150,hit:[250,365,770,465],act(p){play('chime',500,pick([784,880,988,1175]));glint(rnd(270,750),rnd(375,455));if(p.n%7===0)star();},hold(){fog=performance.now();play('breath',500);}});
 add({id:'chair-b',at:at(520,492),r:18,act(){play('creak',520);}});
 add({id:'cabinet-b',at:at(760,432),r:18,act(){play('latch',760);}});
-add({id:'notes-c',at:at(1690,400),r:22,act(){play('rustle',1690);for(let i=0;i<2;i++)fall(1690+rnd(-10,10),395,'#e9d7c2',.6);}});
+const NOTES=["Water the plant. — P","K9 likes the warm spot by the reactor.","Coffee machine: hit it twice.","Whoever keeps humming on comms: keep humming.","Third shift is the best shift.","Remember to look out the window today.",
+  "Bunk 2 squeaks. Don't tell Systems.","Clean socks: locker 3. Probably.","Stars are the same as yesterday. Good.","Lights out at 23:00. Or whenever.","Say goodnight to K9.","Tape 04 is the good one.","The ladder plays a tune if you're patient.",
+  "Hull ticks are just the cold. Probably.","Leave the porthole a little foggy.","Someone ate the last ration bar.","Commander snores. Confirmed.","Breathe out slowly. The ship does.","If you're reading this, you're on watch. Thanks.","Today: nothing happened. Perfect."];
+const dayN=Math.floor(Date.now()/864e5);let noteSeen=false;
+add({id:'notes-c',at:at(1690,400),r:22,act(){play('rustle',1690);for(let i=0;i<2;i++)fall(1690+rnd(-10,10),395,'#e9d7c2',.6);G.say('NOTE',NOTES[(noteSeen?dayN+Math.floor(Math.random()*NOTES.length):dayN)%NOTES.length],3.6,{panel:true});noteSeen=true;}}); /* today's note first, then the older ones */
 add({id:'mug',at:at(1780,468),r:28,act(p){const [X,Y]=p.at();if(p.n%3===0){play('pour',X);setTimeout(()=>{play('drip',X);for(let i=0;i<6;i++)fall(X+rnd(-6,6),Y+6,'#8d4012',1.3);},700);G.say('HOS','BEVERAGE INCIDENT · COMMS · NO INJURIES',3.2);}else{play('pour',X);steam(X,Y-10,9);}}});
 add({id:'chair-c',at:at(1585,500),r:18,act(){play('creak',1585);}});
 add({id:'reactor',at:at(1720,760),r:70,act(p){play('hum',1720);for(let i=0;i<8;i++)spark(1720+rnd(-40,40),760+rnd(-20,20),'#ffb04a',1);if(p.n%6===0){play('seal',1720);steam(1690,705,24);G.say('HOS','CORE TEMPERATURE · NOMINAL · PLEASE STOP THAT',3.4);}}});
@@ -229,6 +233,7 @@ function draw(){requestAnimationFrame(draw);if(!VW)return;V=view();K=cv.width/V[
     else if(p.k==='note'){const X=p.x+p.vx*u0+Math.sin(u0*5)*3,Y=p.y+p.vy*u0;const A=1-u;dot(X,Y,2.4,'#ffb04a',A);dot(X+2,Y-6,1.4,'#ffb04a',A);dot(X+2,Y-3,1.4,'#ffb04a',A);}
     else if(p.k==='z'){const X=p.x+p.vx*u0+Math.sin(u0*2)*3,Y=p.y+p.vy*u0,A=Math.min(1,u*4)*(1-u),c='#c6ab92';for(const [a,b] of [[0,0],[2,0],[4,0],[2,2],[0,4],[2,4],[4,4]])dot(X+a,Y+b,1.6,c,A);}
     else if(p.k==='star'){const X=p.x+p.vx*u0,Y=p.y+p.vy*u0;for(let j=0;j<14;j++)dot(X-p.vx*j*.012,Y-p.vy*j*.012,j?1.6:2.6,j?'#c8dce6':'#ffffff',(1-j/14)*(1-u));}}
+  drawEye(t);
   /* the thing under the pointer: four corner ticks */
   if(hov&&live()){const p=hov,[X,Y]=p.at()||[0,0],R=Math.min(p.r,60),c=performance.now()%1000<500?'#7ee3e5':'#4fb7bb';for(const [ax,ay] of [[-1,-1],[1,-1],[-1,1],[1,1]]){dot(X+ax*R-(ax>0?4:0),Y+ay*R-(ay>0?1.6:0),1.6,c,.8);dot(X+ax*R-(ax>0?1.6:0),Y+ay*R-(ay>0?4:0),1.6,c,.8);dot(X+ax*R+(ax>0?-4:2),Y+ay*R-(ay>0?1.6:0),1.6,c,.8);}}
   x.globalAlpha=1;}
@@ -256,5 +261,26 @@ stage.addEventListener('pointerdown',e=>{if(!live())return;audio();const [wx,wy]
 window.addEventListener('pointerup',()=>{clearTimeout(holdT);holdT=null;});
 
 /* ============================== sleep, from the game ============================== */
-window.__joy={sleep(on){sleepOn=!!on;audio();beds();if(brownG)fade(brownG,on?.055:0,on?30:6);if(on)fade(murG,0,4);},play,pokes:POKES,leaves:()=>leaves};
+/* ============================== cozy (r29) ============================== */
+/* START OF SHIFT: as the opening dissolves into the ship the rooms are dark; then the lights come on room by room, the coffee
+   pours, someone says hello for the time of day, K9 chirps. END OF SHIFT: the lights go out the same way, K9 goes to its dock. */
+const HELLO=h=>h<5?["Still up? Me too.","Quiet one tonight."]:h<12?["Morning, shift.","Coffee's on."]:h<18?["Afternoon watch. All quiet.","Good to see you."]:h<22?["Evening, shift.","Lights are warm tonight."]:["Late watch. Settle in.","Night shift. Take it slow."];
+let wasW=false,shiftTimers=[];const T=(s,f)=>shiftTimers.push(setTimeout(()=>{if(G.state==='watch'||G.state==='play')f();},s*1000));
+function startShift(){shiftTimers.forEach(clearTimeout);shiftTimers=[];const Ty=window.__toys;if(!Ty||!Ty.shift||document.body.classList.contains('bc'))return;
+  T(6.2,()=>Ty.shift('dark'));T(10.6,()=>Ty.shift(true));
+  T(13.4,()=>{play('pour',1780);steam(1780,458,8);});
+  T(15.2,()=>{const r=CUT.report(G.P,G.TIMES,G.now()),who=['pilot','systems','commander'].filter(a=>r[a]&&r[a]!=='GONE');if(who.length)G.say(CREW[pick(who)],pick(HELLO(hour())),2.8);});
+  T(17.6,()=>{try{G.toyApi().chirp();}catch(e){}});}
+function endShift(){shiftTimers.forEach(clearTimeout);shiftTimers=[];const Ty=window.__toys;if(Ty&&Ty.shift)Ty.shift(false);
+  try{G.beat({move:'k9',to:'engineering.entry',interrupt:true});}catch(e){}G.say('HOS',hour()>=21||hour()<5?'END OF SHIFT · SLEEP WELL':'END OF SHIFT · SEE YOU NEXT WATCH',2.4);}
+setInterval(()=>{const w=watching()&&G.state==='watch';if(w&&!wasW)startShift();wasW=watching();},300);
+/* K9's bedtime: a goodnight chirp, the foot of the bunk, curled up; its eye-light blinks slowly while it sleeps */
+let k9Bed=0;
+function bedtime(on){if(on){try{G.toyApi().chirp();}catch(e){}setTimeout(()=>{try{G.toyApi().k9rest();}catch(e){}},900);k9Bed=performance.now()+9000;}else{k9Bed=0;try{G.beat({actor:'k9',do:'power-up',for:3});}catch(e){}}}
+function drawEye(t){if(!k9Bed||performance.now()<k9Bed)return;try{const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');if(!k||k.walk)return;const f=(k.face==='left'||k.left)?-1:1,a=.25+.6*Math.max(0,Math.sin(t*1.4));
+  x.globalCompositeOperation='lighter';dot(k.x+f*30-1,k.y-44,3,'#7ee3e5',a*.5);dot(k.x+f*30,k.y-43,1.6,'#c8ffff',a);x.globalCompositeOperation='source-over';}catch(e){}}
+/* little warmths: the mug steams on its own now and then; the bridge glass mists at night */
+setInterval(()=>{if(!watching()||G.state!=='watch')return;const v=view(),inv=1780>v[0]&&1780<v[0]+v[2]&&458>v[1]&&458<v[1]+v[3];if(inv&&!sleepOn&&Math.random()<.5)for(let i=0;i<3;i++)P_({k:'p',x:1780+rnd(-3,3),y:458,vx:rnd(-3,3),vy:rnd(-16,-9),g:-2,life:rnd(2.4,3.6),col:'#e9d7c2',s:2.2,a:.3,delay:i*.5});
+  if(night()&&!fog&&Math.random()<.04)fog=performance.now()-2500;},4000);
+window.__joy={sleep(on){sleepOn=!!on;audio();beds();if(brownG)fade(brownG,on?.055:0,on?30:6);if(on)fade(murG,0,4);bedtime(on);},endShift,play,pokes:POKES,leaves:()=>leaves};
 })();

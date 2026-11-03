@@ -15,10 +15,10 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=27">
+<link rel="stylesheet" href="game.css?v=28">
 </head>
 <body>
-<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p><p class="bt-foot" id="bootFoot" hidden><span>TAP · CLICK · ANY KEY · THE WATCH BEGINS</span><button type="button" id="bootMenu">MENU ▸</button></p></div></div>
+<div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png';}catch(e){}</script><p class="bt-name">DEAD<span>SCOUT</span></p></div><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p><p class="bt-foot" id="bootFoot" hidden><span>TAP · CLICK · ANY KEY · THE WATCH BEGINS</span><button type="button" id="bootMenu">MENU ▸</button></p></div></div>
 <div class="g" id="g">
  <div class="unit" id="unit">
   <header class="u-top">
@@ -212,11 +212,11 @@
 <script src="game/events.js?v=2"></script>
 <script src="game/story.js?v=15"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=40"></script>
+<script src="game.js?v=41"></script>
 <script src="game/pad.js?v=13"></script>
-<script src="game/toys.js?v=11"></script>
+<script src="game/toys.js?v=12"></script>
 <script src="game/clock.js?v=6"></script>
-<script src="game/joy.js?v=1"></script>
+<script src="game/joy.js?v=2"></script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
 (function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=9',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');

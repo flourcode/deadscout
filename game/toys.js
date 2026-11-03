@@ -106,5 +106,6 @@ function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({a
 function paintMood(){const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+MOODS.find(m=>m.id===S.mood).name+'</em>';b.classList.toggle('on',S.mood!=='watch');}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood');if(!b)return;e.stopPropagation();const i=MOODS.findIndex(m=>m.id===S.mood);mood(MOODS[(i+1)%MOODS.length].id);},true);
 let wasWatch=false;setInterval(()=>{const w=document.body.classList.contains('watching');if(w!==wasWatch){wasWatch=w;if(!w&&S.mood!=='watch'){mood('watch',true);}S.k9slept=0;paintMood();}},400);
-window.__toys={mood,MOODS,S,TOYS,sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{lightsTo({},null);mixTo(null);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
+window.__toys={mood,MOODS,S,TOYS,shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
+  sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{lightsTo({},null);mixTo(null);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
 })();
