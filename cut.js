@@ -518,7 +518,7 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   const herHere=visible(C,'scout',t);for(const [r,o] of Object.entries(ech))for(const [k,g] of echoCast(r,o.preset,C,t).filter(g=>!(herHere&&g.id==='pilot')).entries()){if(g.x0!=null){const u=((t*.08+k*.3)%1),X=g.x0+(g.x1-g.x0)*u;drawGhost(g.id,'walk',X,g.y,false,t,k+3,o.e*.75);}else drawGhost(g.id,g.anim,g.x,g.y,!!g.flip,t,k+3,o.e*.75);}
   /* the crew, then a picture for any camera feed, then DeadScout */
   const AB={},drawActor=(a,i)=>{if(!visible(C,a,t))return;const st=actorAt(C,a,t);let anim,flip=false,an0=null;
-    if(st.walk){anim=a==='deadscout'&&st.fast&&!st.sneak&&A.sheets.deadscout&&A.sheets.deadscout.animations.run?'run':(a==='commander'||a==='deadscout'||a==='scout')&&st.sneak?'sneak':a==='k9'||a==='k9m'?'walk':(a==='pilot'&&st.left?'walk-left':'walk');flip=st.left&&a!=='pilot';}
+    if(st.walk){anim=(a==='commander'||a==='deadscout'||a==='scout')&&st.sneak?'sneak':'walk';flip=st.left;} /* every sheet walks facing right and is mirrored to go left (r26: the pilot's 'walk-left' was the same frames unmirrored, so she walked backwards) */
     else if(st.climb){const S=A.sheets[SHEET[a]||a];anim=st.down?'climb-down':'climb';if(!(S&&S.animations[anim]))an0=CLIMBF[a];}
     else if(st.pause&&A.sheets[SHEET[a]||a]&&A.sheets[SHEET[a]||a].animations['climb-mount'])anim='climb-mount';
     else if(st.lift||st.pause)anim=a==='commander'||a==='deadscout'||a==='scout'||a==='k9'||a==='k9m'?'idle':'stand';

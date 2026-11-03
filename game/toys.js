@@ -9,15 +9,16 @@
 const G=window.__game;if(!G||!window.CUT)return;const A=G.toyApi(),scr=document.getElementById('screen'),M=CUT.MAP;if(!scr)return;
 const N=k=>M.nodes[k],up=(k,dy)=>()=>[N(k)[0],N(k)[1]-dy];
 const ROOMS=Object.keys(M.rooms).filter(r=>r!=='eva').sort((a,b)=>M.rooms[a].poly[0][0]-M.rooms[b].poly[0][0]);
-const S={drive:1,lit:Object.fromEntries(ROOMS.map(r=>[r,1])),beacon:false,busy:{}};
+const LROOMS=ROOMS.concat(M.rooms.eva?['eva']:[]); /* the main bus feeds the EVA dock as well; its own switch is the beacon */
+const S={drive:1,lit:Object.fromEntries(LROOMS.map(r=>[r,1])),beacon:false,busy:{}};
 const SFX=window.SFX,BED={},bed=(n,g,r)=>{BED[n]=g;try{SFX&&SFX.bed&&SFX.bed(n,A.soundOn()?g:0,r);}catch(e){}};
 const later=(ms,f)=>setTimeout(()=>{if(G.state==='title'||G.state==='end'||G.state==='setup'){S.busy={};return;}f();},ms); /* a toy's follow-through dies with the session it started in */
 /* ---------- moods ---------- */
 function hum(n){bed('hum',Math.min(.07,.03+.006*n),.12);clearTimeout(S.ht);S.ht=later(1600,()=>bed('hum',0,5));}
 function setRoom(r,on,quiet){if(S.lit[r]===on)return;S.lit[r]=on;CUT.toy({room:{[r]:on}});if(quiet)return;
   if(on){A.sfx('switchon',1.8);later(60,()=>A.sfx('tink',1.8));later(420,()=>A.sfx('tink',1.2));hum(1);}else{A.sfx('switchoff',1.7);bed('hum',0,.25);}}
-function allLights(on){A.sfx('chunk',1);bed('hum',0,.2);ROOMS.forEach((r,i)=>later(260+i*170,()=>{if(on){S.lit[r]=0;setRoom(r,1,true);A.sfx('tink',1.2);A.sfx('relay',1);}else{setRoom(r,0,true);A.sfx('relay',1.3);}}));
-  if(on)later(400,()=>{bed('hum',.075,1.2);clearTimeout(S.ht);S.ht=later(ROOMS.length*170+1400,()=>bed('hum',0,6));});}
+function allLights(on){A.sfx('chunk',1);bed('hum',0,.2);LROOMS.forEach((r,i)=>later(260+i*170,()=>{if(on){S.lit[r]=0;setRoom(r,1,true);A.sfx('tink',1.2);A.sfx('relay',1);}else{setRoom(r,0,true);A.sfx('relay',1.3);}}));
+  if(on)later(400,()=>{bed('hum',.075,1.2);clearTimeout(S.ht);S.ht=later(LROOMS.length*170+1400,()=>bed('hum',0,6));});}
 const DRIVE=['OFF','IDLE','FULL BURN'];
 function driveTo(n){if(S.drive===n)return;S.drive=n;clearTimeout(S.dt);
   if(n===2){A.sfx('breaker',.8);A.sfx('spool',1);CUT.toy({drive:1.35});S.dt=later(2650,()=>{if(S.drive!==2)return;A.sfx('backfire',1);CUT.toy({drive:1.9});bed('rumble',.55,.35);});}
@@ -30,7 +31,8 @@ function comp(id,snd,screens,msg){if(S.busy[id])return null;S.busy[id]=1;A.sfx(s
 /* ---------- the toys ---------- */
 const lamp=r=>{const L=M.lamps.find(l=>l.room===r&&!l.warn);if(L)return [L.x,L.y+30];const p=M.rooms[r].poly;return [(p[0][0]+p[1][0])/2,p[0][1]+40];};
 const TOYS=ROOMS.map(r=>({id:'light-'+r,room:r,light:1,at:()=>lamp(r),label:()=>'LIGHTS · '+(S.lit[r]?'ON':'OFF'),off:()=>!S.lit[r],act(){setRoom(r,S.lit[r]?0:1);return null;}})).concat([
- {id:'bus',room:'central-shaft',at:()=>[1104,700],label:()=>'ALL LIGHTS · '+(ROOMS.every(r=>S.lit[r])?'ON':'OFF'),act(){const on=!ROOMS.every(r=>S.lit[r]);allLights(on);return on?'MAIN LIGHTING BUS · ON':'MAIN LIGHTING BUS · OFF';}},
+ {id:'bus',room:'central-shaft',at:()=>[1104,700],label:()=>'ALL LIGHTS · '+(LROOMS.every(r=>S.lit[r])?'ON':'OFF'),act(){const on=!LROOMS.every(r=>S.lit[r]);allLights(on);return on?'MAIN LIGHTING BUS · ON':'MAIN LIGHTING BUS · OFF';}},
+ {id:'view',room:'bridge',at:up('b-window',70),label:()=>'VIEWPORT',act(){if(S.busy.v)return null;S.busy.v=1;A.look(8);A.sfx('click',.6);later(9500,()=>{S.busy.v=0;});return 'VIEWPORT · LOOKING OUT';}},
  {id:'drive',room:'engineering',at:up('e-reactor',80),label:()=>'DRIVE · '+DRIVE[S.drive],off:()=>!S.drive,act:drive},
  {id:'inner',room:'airlock',at:()=>[1506,1010],label:()=>'INNER HATCH',act:()=>hatch('airlock-inner')},
  {id:'outer',room:'airlock',at:()=>[1872,1010],label:()=>'OUTER HATCH',act:()=>hatch('airlock-outer')},

@@ -58,7 +58,7 @@ const STAGES=[
  {id:'d-trace',when:a=>a.used('tunnel-trace'),fire:a=>{a.flag('found_trace');a.note('SCORCH MARK · THE SHAPE OF A PERSON · NOBODY IS LISTED MISSING HERE',10);rehint(a);}},
  {id:'d-eva',when:a=>a.used('eva-look'),fire:a=>{a.flag('found_eva');a.note('THE STARS DO NOT MOVE · HALCYON HAS NOT DRIFTED IN YEARS',10);rehint(a);}},
  /* ---- idle things (§33): sitting, looking, listening. They do nothing. That is the point ---- */
- {id:'viewport',when:a=>a.used('viewport')&&a.usedAt('viewport')!==a.flags.view_t,repeat:true,fire:a=>{a.flags.view_t=a.usedAt('viewport');const n=(a.flags.views=(a.flags.views||0)+1);a.note(DRIFT.text('viewport',a.drift(),n-1),8);}},
+ {id:'viewport',when:a=>a.used('viewport')&&a.usedAt('viewport')!==a.flags.view_t,repeat:true,fire:a=>{a.flags.view_t=a.usedAt('viewport');const n=(a.flags.views=(a.flags.views||0)+1);a.run(['+0.4 camera exterior','+8 camera follow deadscout']);a.note(DRIFT.text('viewport',a.drift(),n-1),8);}}, /* she looks out: the cutaway gives way to the hull in space, then comes back */
  {id:'bunk',when:a=>a.used('bunk')&&a.usedAt('bunk')!==a.flags.bunk_t,repeat:true,fire:a=>{a.flags.bunk_t=a.usedAt('bunk');a.note(DRIFT.text('bunk',a.drift(),(a.flags.sits=(a.flags.sits||0)+1)),8);}},
  /* ---- the ordinary routines (§drift): a cup, a sweep, a charge. Familiar first; later the same thing, wrong ---- */
  {id:'meal',when:a=>a.used('meal-unit')&&a.usedAt('meal-unit')!==a.flags.meal_t,repeat:true,fire:a=>{a.flags.meal_t=a.usedAt('meal-unit');const l=a.drift();a.sfx('click',.8);a.later(.6,()=>a.sfx(l<2?'pump':'latch',.5));a.note(DRIFT.text('meal-unit',l),8);a.flag('meal_used');}},

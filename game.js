@@ -43,7 +43,7 @@ window.addEventListener('resize',fit);fit();if(document.fonts&&document.fonts.re
 loadWorld(window.DS_DEFAULT_EPISODE);
 /* ---------- the sound: the band on its own fader, the ship's ambience on six more ---------- */
 let actx=null,master=null,musicBus=null,band=null,t0=0,sched=null,curCh=-1,lastHero=0;
-const prefs=(()=>{try{return Object.assign({sound:true,camera:'ship',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4},JSON.parse(localStorage.getItem(PREF)||'{}'));}catch(e){return {sound:true,camera:'ship',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4};}})();
+const prefs=(()=>{try{return Object.assign({sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4},JSON.parse(localStorage.getItem(PREF)||'{}'));}catch(e){return {sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:30,focus:0,objective:''},tag:true,dim:false,photo:4};} /* r26: large print is the default for every message */})();
 const savePrefs=()=>{try{localStorage.setItem(PREF,JSON.stringify(prefs));}catch(e){}};
 function ensureAudio(){if(actx)return actx;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.gain.value=prefs.sound?1:0;master.connect(actx.destination);musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;musicBus.connect(musicMute);musicMute.connect(master);if(SFX)SFX.start(actx,master);return actx;}
 function startBand(off){ensureAudio();if(actx.state!=='running')actx.resume();if(band){band.stop(.5);band=null;}
@@ -442,7 +442,7 @@ async function broadcast(){const Q=BCQ;document.body.classList.add('bc');show('t
 /* ---------- the app (Nov 2026): installable and offline, fullscreen, the screen kept awake during a watch, the ship in a
    floating window while you work. All local; nothing leaves this browser. ---------- */
 if('serviceWorker' in navigator&&location.protocol!=='file:')try{navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
-function applyText(){document.body.dataset.text=prefs.text||'normal';}applyText();
+function applyText(){document.body.dataset.text=prefs.text||'large';}applyText();
 function toggleFull(){try{if(document.fullscreenElement)document.exitFullscreen();else (document.getElementById('g')||document.documentElement).requestFullscreen({navigationUI:'hide'});}catch(e){}}
 let wakeLk=null;async function keepAwake(on){try{if(on&&!wakeLk&&navigator.wakeLock){wakeLk=await navigator.wakeLock.request('screen');wakeLk.addEventListener('release',()=>{wakeLk=null;});}else if(!on&&wakeLk){await wakeLk.release();wakeLk=null;}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&watch)keepAwake(true);if(document.visibilityState==='hidden'&&!watch&&(state==='play'||state==='pause'))try{save();}catch(e){}}); /* a lunch break ends without warning: save the moment the tab goes away */
