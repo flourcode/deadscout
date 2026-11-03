@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=28">
+<link rel="stylesheet" href="game.css?v=29">
 </head>
 <body>
 <div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-name">DEAD<span>SCOUT</span></p></div><p class="bt-load" id="bootLoad">LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub">RECOVERING FEED</p><p class="bt-start" id="bootStart" hidden>PRESS START</p><p class="bt-foot" id="bootFoot" hidden><span>TAP · CLICK · ANY KEY · THE WATCH BEGINS</span><button type="button" id="bootMenu">MENU ▸</button></p></div></div>
@@ -88,7 +88,8 @@
   <section class="wui" id="wui" hidden>
     <div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time"><b id="wTime"></b><span class="wt-track" id="wTrack"></span></span></div>
     <div class="wui-bar">
-      <div class="wui-btns"><button type="button" data-w="control" id="wControl">TAKE CONTROL</button><button type="button" data-w="mood" id="wMood">SCENE<em> · NIGHT WATCH</em></button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="sleep" id="wSleep">SLEEP · OFF</button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button><button type="button" data-w="end">END<em> WATCH</em></button></div>
+      <div class="wui-more" id="wMore" hidden><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" placeholder="OBJECTIVE" autocomplete="off" spellcheck="false" aria-label="Objective"><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="full">FULL<em>SCREEN</em></button></div>
+      <div class="wui-btns main"><button type="button" data-w="control" id="wControl">CONTROL</button><button type="button" data-w="mood" id="wMood">SCENE<em> · NIGHT WATCH</em></button><button type="button" data-w="sleep" id="wSleep">SLEEP</button><button type="button" data-w="end">END</button><button type="button" data-w="more" id="wMoreBtn" aria-expanded="false" aria-label="More">⋯</button></div>
     </div>
   </section>
   <div class="dim" id="dim" hidden></div>
@@ -197,10 +198,10 @@
 <script src="deep.js?v=5"></script>
 <script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=51"></script>
+<script src="cut.js?v=53"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=11"></script>
-<script src="watch.js?v=8"></script>
+<script src="watch.js?v=9"></script>
 <script src="amb.js?v=3"></script>
 <script src="audio/sfx.js?v=6"></script>
 <script src="lc.js?v=12"></script>
@@ -208,15 +209,16 @@
 <script src="game/scanner.js?v=5"></script>
 <script src="game/power.js?v=4"></script>
 <script src="game/drift.js?v=2"></script>
-<script src="game/k9.js?v=3"></script>
+<script src="game/k9.js?v=4"></script>
 <script src="game/events.js?v=2"></script>
 <script src="game/story.js?v=15"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=41"></script>
+<script src="game.js?v=42"></script>
 <script src="game/pad.js?v=13"></script>
 <script src="game/toys.js?v=13"></script>
 <script src="game/clock.js?v=6"></script>
-<script src="game/joy.js?v=2"></script>
+<script src="game/k9nav.js?v=1"></script>
+<script src="game/joy.js?v=3"></script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
 (function(){const FILES=[['assets-world.js?v=10',450000],['assets-cast.js?v=9',530000]],got={},tot={},t0=performance.now(),B=document.getElementById('boot'),F=document.getElementById('bootFill'),SUB=document.getElementById('bootSub');

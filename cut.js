@@ -59,7 +59,7 @@ const CLIMBF={pilot:[[0,9]],systems:[[8,9]],commander:[[0,9]],deadscout:[[0,9]]}
 const ACTION_ALIAS={wake:'crouch','climb':'climb-up',cautious:'cautious',kneel:'kneel','eva':'eva-float',float:'eva-float',terminal:'interact',use:'interact',open:'open-hatch'};
 const HOME={pilot:['bridge.helm'],systems:['bridge.nav','sensor.console','utility.bench','engineering.panel'],commander:['bridge.command','quarters.table'],scout:['bridge.terminal'],k9:['engineering.pump'],k9m:['engineering.pump'],deadscout:[]};
 const ERRANDS={pilot:['bridge.window','bridge.nav','sensor.step','junction.mid'],systems:['utility.shelf','sensor.printer','sensor.rack','engineering.console','engineering.pump','airlock.prep','quarters.locker'],
-  commander:['upper.mid','quarters.locker','engineering.catwalk','airlock.prep','bridge.window','utility.bench','engineering.reactor','passage.mid'],deadscout:[],scout:[],k9:['engineering.pump','central-shaft.mid','lower-access.mid','airlock.center'],k9m:[],deadscout:[]};
+  commander:['upper.mid','quarters.locker','engineering.catwalk','airlock.prep','bridge.window','utility.bench','engineering.reactor','passage.mid'],deadscout:[],scout:[],k9:['engineering.pump','central-shaft.mid','crew-quarters.bunk','engineering.end'] /* r31: its own deck; the service tunnel is reached by the chute (game/k9nav.js) */,k9m:[],deadscout:[]};
 const STORY_MODES={ROUTINE:{name:'ROUTINE',traffic:'normal',rooms:{},world:{}},SIGNAL:{name:'SIGNAL',traffic:'low',rooms:{sensor:'signal'},world:{}},
   INVESTIGATE:{name:'INVESTIGATE',traffic:'normal',rooms:{engineering:'load'},world:{}},EVA:{name:'EVA',traffic:'low',rooms:{},world:{}},
   INTRUSION:{name:'INTRUSION',traffic:'low',rooms:{engineering:'alert'},world:{alert_state:.4}},AFTERMATH:{name:'AFTERMATH',traffic:'off',rooms:{},world:{}},
@@ -197,7 +197,7 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
   /* the crew first (their doors open for them); DeadScout last: doors don't sense her, she opens them by hand */
   for(const a of ACTORS){const p0=place(start[a])||place(HOME[a][0])||place('quarters.bunk'),L=cmds[a].sort(byAt),all=[];let here=p0,free=0,ci=0,n=0;
     const hidden=t=>{let h=false;for(const e of C.vis[a])if(e.at<=t)h=!e.on;return h;};
-    for(;;){const next=ci<L.length?L[ci]:null,limit=next?next.at:total-30,ch=chapAt(free),tr=ch?ch.traffic:'normal',gap=tr==='normal'?150:tr==='low'?280:1e9;
+    for(;;){const next=ci<L.length?L[ci]:null,limit=next?next.at:total-30,ch=chapAt(free),tr=ch?ch.traffic:'normal',gap=tr==='normal'?300:tr==='low'?560:1e9; /* r31: the crew run errands half as often */
       if(HOME[a].includes(here.ref)&&!hidden(free)&&tr!=='off'){const go=free+gap*(.55+.7*hash(n,a.length*17+3)),dest=place(ERRANDS[a][Math.floor(hash(n,a.length*31+5)*ERRANDS[a].length)]),stay=20+40*hash(n,a.length*7+11);
         const d1=dest?travel(a,here.pos,dest.pos):0,end=go+d1*2+stay;
         if(dest&&end+20<limit&&!hidden(go)&&chapAt(go)&&chapAt(go).traffic!=='off'&&!busy.some(b=>go<b[1]+20&&end>b[0]-20)){busy.push([go,end]);all.push({at:go,kind:'move',to:dest.ref});all.push({at:go+d1+stay,kind:'move',to:here.ref});free=end;n++;continue;}
@@ -216,6 +216,7 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
     const hold=(t,d,extra)=>{S.push(Object.assign({k:'hold',t0:t,t1:t+d,pos,face:'right',ref:null},extra||{}));return t+d;};
     let goShort=false; /* set when a walk ends early at a locked door: the caller leaves her there, not at the target */
     const go=(t,target,sneak,viaPos,fast,coast)=>{const legs=viaPos?legsBetween(a,pos,viaPos,sneak).concat(legsBetween(a,viaPos,target.pos,sneak)):legsBetween(a,pos,target.pos,sneak);const V=vWalk(a,sneak,fast);
+      if(!legs.length){const [ax,ay]=xyOf(pos),[bx,by]=xyOf(target.pos);if(Math.hypot(ax-bx,ay-by)>2){goShort=true;return t;}} /* r31: no route (K9 and a ladder) means stay, never jump */
       for(const L of legs){const [x0,y0]=xyOf({a:L.a,b:L.b,f:L.f0}),[x1,y1]=xyOf({a:L.a,b:L.b,f:L.f1}),len=L.k==='walk'?Math.hypot(x1-x0,y1-y0):Math.abs(y1-y0);if(len<.01)continue;
         if(L.k==='walk'){/* doors on the way, in walking order: DeadScout opens closed ones herself; a locked one stops her with a hand on it (r22: a click-to-move walked straight through) */
           let f0=L.f0;if(a==='deadscout'){const dir=x1>x0?1:-1,lo=Math.min(x0,x1),hi=Math.max(x0,x1);
@@ -439,6 +440,9 @@ function focusDraw(r,t){const [x0,y0,x1,y1]=r,w=x1-x0+1,h=y1-y0+1,F=FOCUS,T=(s,X
    rarely the dim silhouette of another ship crossing the distance. All from the clock: the same time, the same sky. */
 /* an ion beam (Nov 2026): straight out of the nozzle at its full height, no cone. Near the nozzle it is solid and white-hot;
    further out it breaks into pixels that thin away, flickering a little, like a stream of charged particles in the dark */
+/* r32: where the exterior art's engine barrels actually end (measured on world/exterior at 2x). The beams used the cutaway's
+   nozzles 14 px further in, so on the title and through the viewport they were painted over the barrels */
+const XNOZ=[[2144,372],[2192,540],[2164,680],[2180,806]];
 function ionBeam(ex,ey,eh,len,amp,t){if(amp<=.01)return;const c=2*SS,rows=Math.max(3,Math.round(eh/c)),y0=Math.round(ey-rows*c/2),cols=Math.round(len/c),fr=Math.floor(t*14);
   x.save();x.globalCompositeOperation='source-over';
   for(let k=0;k<cols;k++){const d=k/cols,keep=Math.pow(1-d,1.35),flow=Math.floor(t*40)-k;
@@ -492,8 +496,8 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
   if(present&&(ready(LG)||DARKART)){if(!DARKART)x.drawImage(LG,0,0,W,H);for(const [r,o] of Object.entries(ech)){x.save();x.clip(PATHS[r]||new Path2D());x.globalAlpha=o.e;x.drawImage(L1||L0,0,0,W,H);x.restore();}}
   const rs={};for(const r of Object.keys(SC.rooms))rs[r]=roomState(C,r,t);
   const engineWash=(m)=>{/* the same four beams in every view: same size, length, brightness and flow. Each art has its nozzles in a slightly different place, so the beams sit at the exterior's nozzles while the hull is up and at the cutaway's once it's peeled away */
-    const ext=clamp(exteriorAt(C,t),0,1),amp=(present&&FORCE!=='drift'?.3:1)*Math.max(pw,.6)*m*TOY.dv,X=SC.xnozzles||SC.engines,Cn=SC.engines;
-    for(let i=0;i<Cn.length;i++){const c=Cn[i],e=X[i]||c,ex=(e[0]-14)*ext+(c[0]-4)*(1-ext),ey=e[1]*ext+c[1]*(1-ext);ionBeam(Math.round(ex),Math.round(ey),64,150*(1+Math.max(0,TOY.dv-1)*.9),Math.min(amp,1.25),t);}} /* one set of beams, all alike: same nozzle height, same length, same flow */;engineWash(1-clamp(exteriorAt(C,t),0,1));
+    const ext=clamp(exteriorAt(C,t),0,1),amp=(present&&FORCE!=='drift'?.3:1)*Math.max(pw,.6)*m*TOY.dv,X=SC.xnozzles||XNOZ,Cn=SC.engines;
+    for(let i=0;i<Cn.length;i++){const c=Cn[i],e=X[i]||c,ex=e[0]*ext+(c[0]-4)*(1-ext),ey=e[1]*ext+c[1]*(1-ext);ionBeam(Math.round(ex),Math.round(ey),64,150*(1+Math.max(0,TOY.dv-1)*.9),Math.min(amp,1.25),t);}} /* one set of beams, all alike: same nozzle height, same length, same flow */;engineWash(1-clamp(exteriorAt(C,t),0,1));
   if(SC.core){const [x0,y0,x1,y1]=SC.core,st=rs.engineering,F=STATES[st]||{},sp=(F.core||1)*(F.dead?.25:1),cont=Wv.contamination_level,base=st==='blackout'?.15:F.dead?.3:1;x.save();x.beginPath();x.rect(x0,y0,x1-x0+1,y1-y0+1);x.clip();x.globalCompositeOperation='lighter';
     for(let i=0;i<14;i++){const yy=y1-(((t*16*sp+i*9)%((y1-y0)+10))),w=(x1-x0)*(.4+.5*hash(i,77)),col=cont>2&&i%3===0?'120,240,210':'255,140,60';x.fillStyle=`rgba(${col},${(.35+.3*hash(i,78))*base*pw})`;x.fillRect(Math.round(x0+(x1-x0-w)/2),Math.round(yy),Math.round(w),2);}
     x.restore();x.save();x.globalCompositeOperation='lighter';glow((x0+x1)/2,(y0+y1)/2,64,'255,140,60',(.12+.05*Math.sin(t*1.3*sp))*base*pw);x.restore();

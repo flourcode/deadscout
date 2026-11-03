@@ -330,3 +330,25 @@ body.portrait .ab{padding-top:24px}
 body.portrait .unit{clip-path:none} /* the housing's chamfer would clip the panels hanging below the picture */
 
 .menu .util{flex-wrap:wrap;justify-content:center}.bt-foot button{white-space:nowrap;flex:none} /* r28: four small items on a phone */
+
+/* ===================== r31 · the watch bar: four chunky keys and a ⋯ ===================== */
+.wui-bar{flex-direction:column;align-items:center;justify-content:flex-end;gap:10px}
+.wui-btns.main{gap:10px;justify-content:center}
+.wui-btns.main button,.wui-more button{font-size:12px;letter-spacing:4px;padding:12px 18px;color:var(--ink);background:rgba(11,14,17,.72);box-shadow:inset 0 0 0 2px rgba(231,219,192,.38),0 3px 0 #0b0e11;transition:transform .05s steps(1)}
+.wui-btns.main button:hover,.wui-more button:hover{box-shadow:inset 0 0 0 2px rgba(231,219,192,.8),0 3px 0 #0b0e11}
+.wui-btns.main button:active,.wui-more button:active{transform:translateY(2px);box-shadow:inset 0 0 0 2px rgba(231,219,192,.8),0 1px 0 #0b0e11}
+.wui-btns.main button.on,.wui-more button.on{color:var(--amber);box-shadow:inset 0 0 0 2px var(--amber),0 3px 0 #0b0e11}
+.wui-btns.main #wControl{color:var(--amber)}
+#wMoreBtn{font-size:16px;letter-spacing:0;padding:9px 14px}
+.wui-more{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;pointer-events:auto}.wui-more[hidden]{display:none}
+.wui-more input{all:unset;font-family:Silk;font-size:11px;letter-spacing:3px;color:var(--ink);padding:12px 14px;width:220px;background:rgba(11,14,17,.72);box-shadow:inset 0 0 0 2px rgba(231,219,192,.25)}
+.wui-more button[hidden],.wui-more input[hidden]{display:none}
+.wui-more em{font-style:normal}.compact .wui-more em{display:none}
+.compact .wui-btns.main{gap:6px}.compact .wui-btns.main button,.compact .wui-more button{font-size:9px;letter-spacing:2px;padding:9px 11px}.compact #wMoreBtn{font-size:13px;padding:6px 11px}
+.compact .wui-more input{width:150px;font-size:9px;padding:9px 10px}
+.wui-btns.main #wControl em,.wui-btns.main #wSleep em{display:none} /* the state is the colour; only SCENE names its value */
+/* r31: dialogue never sits on the watch bar: above it while the bar shows; on an upright phone, under it */
+body.watching.ui:not(.portrait) .tbot{bottom:calc(3.5% + 74px)}
+body.watching.ui:not(.portrait) #wui:has(#wMore:not([hidden])) ~ .talk .tbot,body.watching.ui:not(.portrait):has(#wMore:not([hidden])) .tbot{bottom:calc(3.5% + 132px)}
+body.watching.ui:not(.portrait) .compact .tbot,body.watching.ui:not(.portrait) #screen.compact .tbot{bottom:calc(3.5% + 52px)}
+body.portrait.watching .tbot{top:calc(100% + 132px)}

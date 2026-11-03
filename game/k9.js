@@ -14,7 +14,7 @@ function create(api){const M=api.map().k9;
     /* a signal nearby: stop, raise the head, one chirp (it sees residual activity before she does) */
     const src=api.nearestSource(me.x,me.y);if(src&&src.s>.35&&!K.reacted[src.id]&&!me.walk){K.reacted[src.id]=t;api.act('k9','signal-detect',2.4,src.x<me.x?'left':'right');api.sfx('chirp',me.x,.5);return;}
     if(api.tuning()&&t-K.scanT>14){K.scanT=t;api.act('k9','scan',3,her.x<me.x?'left':'right');return;}
-    if(dHer===dMe){K.waitRef=null;const dx=her.x-me.x,far=Math.abs(dx)>190*api.ss()/2;
+    if(dHer===dMe){K.waitRef=null;K.parted=null;K.tried=false;K.settled=false;const dx=her.x-me.x,far=Math.abs(dx)>190*api.ss()/2;
       if(far&&!me.walk){const side=dx>0?-1:1,ref=api.placeNear(her.x+side*80,her.y);if(ref)api.move('k9',ref,Math.abs(dx)>420);K.curT=t;}
       else if(!far&&me.walk&&Math.abs(dx)<120&&!K.wander){api.stop('k9');}
       /* curiosity: with nothing asked of it, it lives here. A few steps to a machine, a sniff, a look at her, a rest */
@@ -26,10 +26,16 @@ function create(api){const M=api.map().k9;
       /* guidance: she has not moved on for a while; walk a few steps toward the way, stop, look back, wait */
       const hint=api.hint();if(hint&&!me.walk&&!her.walk&&api.idleFor()>75&&t-K.guideT>60){K.guideT=t;const g=api.place(hint);if(g&&deckOf(M,g.y)===dMe){const dir=g.x>me.x?1:-1,ref=api.placeNear(me.x+dir*150,me.y);if(ref){api.move('k9',ref);api.later(2.6,()=>api.act('k9','wait',6,dir>0?'left':'right'));api.sfx('servo',me.x,.4);}}}
       return;}
-    /* different decks: wait at the shaft on its own deck; rejoin off-camera */
-    if(!on(me.x)&&!on(her.x-400)||!on(me.x)&&Math.abs(her.x-me.x)>900){const w=M.wait[dHer],p=api.place(w);if(p&&!on(p.x)){api.teleport('k9',w);return;}
-      const alt=api.offscreenOn(dHer,V);if(alt){api.teleport('k9',alt);return;}}
-    if(!K.waitRef){K.waitRef=M.wait[dMe];api.move('k9',K.waitRef);api.later(3,()=>{if(K.waitRef)api.act('k9','wait',40,her.x<me.x?'left':'right');});}}
+    /* different decks (r31): it never climbs her ladder and it never jumps. It goes to the foot of the ladder on its own
+       deck, looks up, chirps once, and waits. If she stays away and there is a K9 route (the chute, middle <-> lower), it
+       takes it: a hatch, servo steps behind the wall, the far hatch, and it trots up to her. No route: it waits. */
+    const NAV=window.K9NAV;if(NAV&&NAV.busy())return;
+    if(K.parted!==dHer){K.parted=dHer;K.partT=t;K.waitRef=M.wait[dMe];api.move('k9',K.waitRef);
+      api.later(3.2,()=>{if(K.parted!==dHer)return;api.act('k9','signal-detect',2.4,her.x<me.x?'left':'right');api.sfx('chirp',me.x,.45);});return;}
+    if(NAV&&t-K.partT>9&&NAV.route(dMe,dHer)&&!K.tried){K.tried=true;const side=her.x>1300?-1:1;NAV.go({x:her.x+side*80,y:her.y},{fast:true});return;}
+    if(t-K.partT>6&&!K.settled){K.settled=true;api.act('k9','wait',40,her.x<me.x?'left':'right');}
+    return;}
+  /* (same deck again: ready to part again) */
   return {update,get state(){return K.state;},set state(v){K.state=v;},get power(){return K.power;},set power(v){K.power=v;},reset(){Object.assign(K,{state:'off',power:'reserve',last:0,reacted:{},guideT:0,waitRef:null,scanT:0,curT:0,wander:false});}};}
 window.K9={create,deckOf};
 })();
