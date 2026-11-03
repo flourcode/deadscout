@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=23">
+<link rel="stylesheet" href="game.css?v=24">
 </head>
 <body>
 <div class="g" id="g">
@@ -135,23 +135,19 @@
   </section>
   <section class="con" id="con" hidden><div class="con-crt"><div class="con-out" id="conOut"></div><label class="con-in"><span>&gt;</span><input type="text" id="conIn" autocomplete="off" spellcheck="false" aria-label="Ship computer command"></label></div><p class="con-foot">TYPE HELP · ESC TO LEAVE</p></section>
   <section class="controls" id="controls" hidden>
-    <p class="t-kicker">CONTROLS</p>
-    <dl class="keys">
-      <dt>← →</dt><dd>walk</dd>
-      <dt>↑ ↓</dt><dd>climb</dd>
-      <dt>E</dt><dd>interact · open · operate · look</dd>
-      <dt>Q</dt><dd>scanner sweep · on a strong signal, opens the dial: ← → until the trace aligns, hold, it locks</dd>
-      <dt>F</dt><dd>flashlight</dd>
-      <dt>ESC</dt><dd>ship schematic · pause · tapes (or play them at the deck in the crew quarters)</dd>
-      <dt>🎮</dt><dd>a controller works: stick/d-pad move · A interact · B scanner · X flashlight · Y camera · START pause</dd>
-      <dt>TAB</dt><dd>the whole ship (the default: HALCYON as an ant farm) / follow her up close</dd>
-      <dt>SHIFT</dt><dd>move carefully</dd>
-      <dt>M</dt><dd>music on / off</dd>
-      <dt>N</dt><dd>next tape</dd>
-      <dt>K</dt><dd>on-screen keys on / off</dd>
-      <dt>C</dt><dd>in Night Watch: take or release control of the commander</dd>
-    </dl>
-    <p class="t-foot">W A S D work too · ESC or ENTER to go back</p>
+    <h2 class="c-title">CONTROLS</h2>
+    <div class="cgrid">
+      <div class="cg"><span class="cl">MOVE</span><span class="dpad"><kbd class="kc">▲</kbd><span class="drow"><kbd class="kc">◀</kbd><kbd class="kc">▼</kbd><kbd class="kc">▶</kbd></span></span><span class="cn">↑ ↓ CLIMB · W A S D TOO</span></div>
+      <div class="cg"><span class="cl">USE</span><kbd class="kc">E</kbd><span class="cn">OPEN · OPERATE · LOOK</span></div>
+      <div class="cg"><span class="cl">SCANNER</span><kbd class="kc">Q</kbd><span class="cn">SWEEP · ON A STRONG SIGNAL THE DIAL OPENS: ◀ ▶ UNTIL IT LOCKS</span></div>
+      <div class="cg"><span class="cl">FLASHLIGHT</span><kbd class="kc">F</kbd><span class="cn"><i class="pip amber"></i> ONE BEAM</span></div>
+      <div class="cg"><span class="cl">CAREFUL</span><kbd class="kc wide">SHIFT</kbd><span class="cn">MOVE QUIETLY</span></div>
+      <div class="cg"><span class="cl">CAMERA</span><kbd class="kc wide">TAB</kbd><span class="cn">WHOLE SHIP / FOLLOW HER</span></div>
+      <div class="cg"><span class="cl">TAPES</span><span class="krow"><kbd class="kc">N</kbd><kbd class="kc">M</kbd></span><span class="cn">NEXT TAPE · MUSIC ON / OFF</span></div>
+      <div class="cg"><span class="cl">MENU</span><kbd class="kc wide">ESC</kbd><span class="cn">SCHEMATIC · PAUSE · TAPES</span></div>
+    </div>
+    <p class="c-pad">🎮 A CONTROLLER WORKS · STICK MOVE · A USE · B SCANNER · X FLASHLIGHT · Y CAMERA · START MENU &nbsp;·&nbsp; K ON-SCREEN KEYS &nbsp;·&nbsp; NIGHT WATCH: C TAKES THE COMMANDER</p>
+    <p class="t-foot">ESC OR ENTER TO GO BACK</p>
   </section>
   </div>
   <footer class="u-deck">
@@ -166,13 +162,42 @@
   </footer>
  </div>
 </div>
+<section class="ab" id="about" aria-label="About DeadScout">
+ <div class="ab-col">
+  <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>THE SHIP</span></h2>
+  <p>DSV HALCYON, deep survey vessel, registry DSV-0417. Presumed lost with all hands in 2291, 167 AU from Sol. Decades later a repeating low-power transmission was detected near her last position. DeadScout is what answers when you link to it: a living ship to walk, to listen to, and to leave running.</p>
+  <p><b>ENTER HALCYON</b> and you wake aboard, in the crew quarters, with a service robot at your heel. Read the terminals. Find the scanner and tune it into what the ship remembers. Play the crew's tapes. Notice what the cameras don't. There is no clock and nothing hunts you; the ship simply changes the longer you stay.</p>
+  <p><b>NIGHT WATCH</b> lets HALCYON run herself: crew routines, screens, lamps, and once in a while something strange. Set a view, a mood, the music and a length, then leave it on for sleep, for a focus session with its own timer, or for an hour of music. TAKE CONTROL hands you the commander mid-watch.</p>
+  <h2><i class="ic ic-keys" aria-hidden="true"></i><span>CONTROLS</span></h2>
+  <dl class="ab-keys">
+   <dt>← → ↑ ↓</dt><dd>walk and climb (W A S D too)</dd>
+   <dt>E</dt><dd>use · open · operate · look</dd>
+   <dt>Q</dt><dd>scanner sweep; on a strong signal the dial opens: ← → until the trace aligns, hold, it locks</dd>
+   <dt>F</dt><dd>flashlight</dd>
+   <dt>SHIFT</dt><dd>move carefully</dd>
+   <dt>TAB</dt><dd>the whole ship, or the camera on her</dd>
+   <dt>N · M</dt><dd>next tape · music on and off</dd>
+   <dt>ESC</dt><dd>schematic, pause, tapes</dd>
+   <dt>🎮</dt><dd>a controller works: stick move · A use · B scanner · X flashlight · Y camera · START menu</dd>
+   <dt>C</dt><dd>in Night Watch: take or release the commander</dd>
+  </dl>
+ </div>
+ <div class="ab-col">
+  <h2><i class="ic ic-radio" aria-hidden="true"></i><span>TRANSMISSION NOTES</span></h2>
+  <p>DeadScout runs entirely in this browser. Nothing is uploaded, nothing is tracked, and after one visit it opens without a network. Your transmission saves itself as you go; CONTINUE picks it up where you left it. Finishing one unlocks a second.</p>
+  <p>The music is six tapes played by a band that lives in the page: no recordings, generated as you listen, the same hour from the same seed. The ship's ambience, the footsteps and the relays are made the same way. Everything you hear is yours to use in a video or a stream.</p>
+  <p><b>PHOTO MODE</b> (Options) saves the frame exactly as the ship draws it, at up to 4K. <b>RECORD A TAKE</b> captures the picture and the sound to a video file, made on your computer.</p>
+  <p>If the picture tears, a screen says the wrong thing or the ship counts someone who isn't there, that is HALCYON. If it stops altogether, that is your browser: reload the page and carry on from your save. Long watches depend on the computer staying awake and the tab staying open.</p>
+  <p class="ab-foot">OUTER SYSTEMS RESEARCH DIRECTORATE · HOS 4.1 · MONITOR UNIT MU-7 &nbsp;·&nbsp; <a href="privacy.html">PRIVACY &amp; TERMS</a> &nbsp;·&nbsp; TYPE: SILKSCREEN, IBM PLEX MONO</p>
+ </div>
+</section>
 <script src="mix.js?v=17"></script>
 <script src="space.js?v=5"></script>
 <script src="music.js?v=11"></script>
 <script src="deep.js?v=5"></script>
-<script src="assets-core.js?v=25"></script>
+<script src="assets-core.js?v=26"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=49"></script>
+<script src="cut.js?v=50"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=11"></script>
 <script src="watch.js?v=8"></script>

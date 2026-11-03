@@ -556,7 +556,7 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
     if(TOY.room[r]!=null)L=Math.max(L,.85*Math.max(full,.85)); /* once you've flipped a room's switch, its light is yours */
     {const tg=TOY.room[r]==null?1:TOY.room[r];let v=RLV[r]==null?1:RLV[r];const since=(performance.now()-(RLT[r]||-1e9))/1000;
      if(tg>=1&&since<1.1){v=hash(Math.floor(since*14),r.length*7+3)<(since<.5?.55:.25)?.12:(since<.5?.75:1);}else v+=(tg-v)*.35; /* a fluorescent tube finding itself */
-     RLV[r]=v;L*=.1+.9*v;}
+     RLV[r]=v;L*=.28+.72*v;} /* lights off is not black: the utility floor strips stay on (r25; was .1) */
     if(F.flicker&&hash(Math.floor(t*7),r.length*11)<.12)L*=.45;if(evNow&&evNow.type!=='signal-flash')L*=1-.45*evE*(evNow.type==='power-drop'?1.6:1);
     LREV[r]=L;x.save();x.clip(PATHS[r]);const [bx0,by0,bx1,by1]=BBOX[r],bw=bx1-bx0+1,bh=by1-by0+1; /* fills under the clip cover the room's box, not the whole hull */const dk=DARKART?clamp(.5-L,0,.6):clamp(1-L,0,.92);if(dk>.001){x.fillStyle=`rgba(4,3,8,${dk})`;x.fillRect(bx0,by0,bw,bh);}
     x.globalCompositeOperation='lighter';const tint=(col,a)=>{if(a>0){x.fillStyle=`rgba(${col},${a})`;x.fillRect(bx0,by0,bw,bh);}};const ec=ech[r]?ech[r].e:0;
@@ -566,6 +566,9 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
     const wk=TOY.room[Lp.room]!=null?1:(WAKE[Lp.room]||0);if(F.lampsOff&&!Lp.warn&&!(ech[Lp.room]&&ech[Lp.room].e>.3)&&wk<.05){if(F.emergency&&i%3===0){glow(Lp.x,Lp.y+4*SS,22*SS,'255,90,50',.05+.03*Math.sin(t*.7+i));}continue;}
     if(Lp.warn){const on=F.warn||al>.3;p=on?(Math.floor(t*1.6+i*.5)%2?1:.1):F.emergency?.35:.12;}
     if(Lp.flaky&&hash(Math.floor(t*3),i)<.06)p=0;let a=(.05+.1*p)*(.35+.65*pw)*(Lp.warn?1:(RLV[Lp.room]==null?1:RLV[Lp.room]));if(F.light!=null&&!Lp.warn)a*=F.light+(1-F.light)*.8*wk;if(F.lampsOff&&!Lp.warn)a*=wk;glow(Lp.x,Lp.y+4*SS,(Lp.warn?20+8*p:34+8*p)*SS*(Lp.soft?1.6:1),col.join(','),a*(Lp.soft?1.4:2.2));if(Lp.warn&&p>.5){x.fillStyle=`rgba(${col},${.6*p})`;x.fillRect(Lp.x-2*SS,Lp.y-SS,4*SS,3*SS);}}
+  /* utility floor strips (r25): in a room whose lights are switched off, low grey-blue lamps along the deck keep the floor readable; they fade as the tubes come back */
+  for(const [r,v] of Object.entries(RLV)){if(TOY.room[r]==null||v>.7||!BBOX[r])continue;const k=1-Math.max(0,(v-.1)/.6),[bx0,by0,bx1,by1]=BBOX[r],fy=by1-3*SS;if(k<=0)continue;
+    for(let X=bx0+40*SS;X<bx1-20*SS;X+=110*SS){glow(X,fy,34*SS,'120,150,165',.07*k);x.fillStyle=`rgba(150,190,200,${.5*k})`;x.fillRect(Math.round(X-3*SS),Math.round(fy-SS),6*SS,SS);}}
   if(PLAY.on&&PLAY.notes.length&&dsRoom){for(const n of PLAY.notes){const u=t-n.at;if(u<0||u>1.4)continue;const e=1-u/1.4,col=['255,190,90','120,240,210','255,140,60','170,160,255','255,110,90','150,200,255','200,255,170','255,230,160'][n.i%8];
       for(const Lp of SC.lamps)if(Lp.room===dsRoom)glow(Lp.x,Lp.y+6,30+30*e,col,.22*e);if(ds)glow(ds.x,ds.y-60,26,col,.12*e);}}
   if(LIT&&ds){x.save();x.globalCompositeOperation='lighter';glow(ds.x,ds.y-30*SS,72*SS,'255,236,200',.16);const dir=ds.flip?-1:1,hx=ds.x+dir*10*SS,hy=ds.y-36*SS,L=70*SS,g=x.createLinearGradient(hx,0,hx+dir*L,0);g.addColorStop(0,'rgba(255,240,200,.22)');g.addColorStop(1,'rgba(255,240,200,0)');x.fillStyle=g;x.beginPath();x.moveTo(hx,hy);x.lineTo(hx+dir*L,hy-18*SS);x.lineTo(hx+dir*L,hy+20*SS);x.closePath();x.fill();x.restore();}

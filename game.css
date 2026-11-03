@@ -5,8 +5,9 @@
 /* the UI lock: HALCYON hardware. Pixel font, flat instrument-panel blacks, 2 px borders (one UI pixel at 1080p), CRT green, amber, dull cyan. No gradients, no glows, no soft shadows. */
 :root{--ink:#e9d7c2;--dim:#907763;--cyan:#7ee3e5;--green:#7ee3e5;--amber:#ffb04a;--orange:#e47a1e;--red:#d0442e;--bg:#0b0e11;--panel:#14181c;--line:#3c3a40;--line2:#2895a8} /* the visual lock: reference palette */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 PlexMono,ui-monospace,monospace;overflow:hidden;-webkit-font-smoothing:antialiased}
-.g{position:fixed;inset:0;display:grid;place-items:center;background-color:#050508;background-image:linear-gradient(#0a0a10 1px,transparent 1px),linear-gradient(90deg,#0a0a10 1px,transparent 1px);background-size:24px 24px}
+html,body{min-height:100%;margin:0;color:var(--ink);font:400 14px/1.5 PlexMono,ui-monospace,monospace;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background-color:#050508;background-image:linear-gradient(#0a0a10 1px,transparent 1px),linear-gradient(90deg,#0a0a10 1px,transparent 1px);background-size:24px 24px} /* the grid runs under the housing and the copy below it */
+.g{position:relative;min-height:100vh;min-height:100svh;display:grid;place-items:center}
 /* THE UNIT (presentation pass): the game is a recovered HALCYON monitoring terminal. One housing, one display in its
    bezel, one control deck under it. Hard pixel edges, flat tones, two accent colours, small legends. Nothing glows. */
 .unit{--cut:10px;display:grid;grid-template-rows:auto auto auto;background:#191c21;padding:0 14px 12px;box-shadow:inset 0 2px 0 #3c3a40,inset 0 -2px 0 #0b0e11,inset 2px 0 0 #2e3134,inset -2px 0 0 #0b0e11;
@@ -80,6 +81,34 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 14
 .title[hidden],.pause[hidden],.controls[hidden]{display:none}
 .title{background:linear-gradient(rgba(6,6,10,.3) 0 22%,rgba(6,6,10,.8) 22% 80%,rgba(6,6,10,.3) 80%)} /* a hard band, not a fade: the title sits on a strip of dark glass */
 .pause,.controls{background:rgba(6,6,10,.86)}
+.controls#controls{background:rgba(6,6,10,.8);gap:14px;justify-content:center}
+.c-title{margin:0 0 10px;font:400 26px/1 Silk;letter-spacing:.3em;color:var(--amber);text-shadow:3px 3px 0 #0b0e11}
+.cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,300px));gap:14px 40px;text-align:left}
+.cg{display:grid;grid-template-columns:96px auto;grid-template-rows:auto auto;align-items:center;column-gap:14px;row-gap:4px}
+.cl{font-family:Silk;font-size:12px;letter-spacing:3px;color:var(--ink)}
+.cn{grid-column:1/-1;font-family:Silk;font-size:8px;letter-spacing:2px;color:var(--dim)}
+.kc{display:inline-grid;place-items:center;min-width:26px;height:24px;padding:0 6px;box-sizing:border-box;font-family:Silk;font-size:11px;letter-spacing:1px;color:var(--ink);background:#06060a;box-shadow:0 0 0 2px var(--ink),3px 3px 0 2px #0b0e11;margin:3px 5px 5px 2px}
+.kc.wide{padding:0 10px}.cg>.kc,.cg>.dpad,.cg>.krow{justify-self:start}
+.dpad{display:inline-grid;justify-items:center;gap:0}.drow{display:flex}.krow{display:flex}
+.c-pad{margin:6px 0 0;max-width:720px;font-family:Silk;font-size:8px;letter-spacing:2px;line-height:2;color:var(--dim)}
+.pip{display:inline-block;width:8px;height:8px;vertical-align:-1px;margin-right:4px;box-shadow:0 0 0 2px #0b0e11}.pip.amber{background:var(--amber)}
+@media (max-width:640px){.cgrid{grid-template-columns:1fr;gap:8px}.cg{grid-template-columns:84px auto}.c-title{font-size:16px}}
+/* the copy under the housing: three headings in the console's lettering, body in the terminal's mono */
+.ab{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px 56px;max-width:1080px;margin:0 auto;padding:36px clamp(16px,4vw,40px) 72px;color:var(--dim);font-size:14px;line-height:1.7}
+.ab h2{display:flex;align-items:center;gap:18px;margin:26px 0 12px;font:400 18px/1 Silk;letter-spacing:.28em;color:var(--amber)}
+.ab h2:first-child{margin-top:0}
+.ab h2 span{position:relative;padding:8px 44px 8px 14px;box-shadow:inset 0 0 0 2px var(--line);background:var(--panel)}
+.ab h2 span::after{content:'';position:absolute;right:10px;top:-6px;width:4px;height:12px;background:var(--amber);box-shadow:8px 0 0 var(--amber),16px 0 0 var(--amber)}
+.ab .ic{display:inline-block;width:32px;height:32px;position:relative;flex:none}
+.ab .ic::before{content:'';position:absolute;left:0;top:0;width:4px;height:4px}
+.ab p{margin:0 0 14px}.ab b{color:var(--ink);font-weight:400;font-family:Silk;font-size:10px;letter-spacing:2px}
+.ab-keys{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0 0 14px}.ab-keys dt{font-family:Silk;font-size:10px;letter-spacing:2px;color:var(--amber);padding-top:3px;white-space:nowrap}.ab-keys dd{margin:0}
+.ab-foot{margin-top:28px;font-family:Silk;font-size:8px;letter-spacing:2px;line-height:2.2;color:rgba(144,119,99,.7)}.ab-foot a{color:var(--dim);text-decoration:none}.ab-foot a:hover{color:var(--ink)}
+body.bc .ab,body.photo .ab,body:fullscreen .ab{display:none}
+.ab .ic-helmet::before{box-shadow:8px 0px 0 0 var(--amber),12px 0px 0 0 var(--amber),16px 0px 0 0 var(--amber),20px 0px 0 0 var(--amber),4px 4px 0 0 var(--amber),8px 4px 0 0 var(--amber),12px 4px 0 0 var(--amber),16px 4px 0 0 var(--amber),20px 4px 0 0 var(--amber),24px 4px 0 0 var(--amber),0px 8px 0 0 var(--amber),4px 8px 0 0 var(--amber),12px 8px 0 0 var(--amber),16px 8px 0 0 var(--amber),20px 8px 0 0 var(--amber),24px 8px 0 0 var(--amber),0px 12px 0 0 var(--amber),4px 12px 0 0 var(--amber),12px 12px 0 0 var(--amber),16px 12px 0 0 var(--amber),20px 12px 0 0 var(--amber),24px 12px 0 0 var(--amber),0px 16px 0 0 var(--amber),4px 16px 0 0 var(--amber),12px 16px 0 0 var(--amber),16px 16px 0 0 var(--amber),20px 16px 0 0 var(--amber),24px 16px 0 0 var(--amber),0px 20px 0 0 var(--amber),4px 20px 0 0 var(--amber),8px 20px 0 0 var(--amber),12px 20px 0 0 var(--amber),16px 20px 0 0 var(--amber),20px 20px 0 0 var(--amber),24px 20px 0 0 var(--amber),28px 20px 0 0 var(--amber),4px 24px 0 0 var(--amber),8px 24px 0 0 var(--amber),12px 24px 0 0 var(--amber),16px 24px 0 0 var(--amber),20px 24px 0 0 var(--amber),24px 24px 0 0 var(--amber),8px 28px 0 0 var(--amber),20px 28px 0 0 var(--amber)}
+.ab .ic-keys::before{box-shadow:0px 0px 0 0 var(--amber),4px 0px 0 0 var(--amber),8px 0px 0 0 var(--amber),12px 0px 0 0 var(--amber),16px 0px 0 0 var(--amber),20px 0px 0 0 var(--amber),24px 0px 0 0 var(--amber),28px 0px 0 0 var(--amber),0px 4px 0 0 var(--amber),8px 4px 0 0 var(--amber),20px 4px 0 0 var(--amber),28px 4px 0 0 var(--amber),0px 8px 0 0 var(--amber),4px 8px 0 0 var(--amber),8px 8px 0 0 var(--amber),12px 8px 0 0 var(--amber),16px 8px 0 0 var(--amber),20px 8px 0 0 var(--amber),24px 8px 0 0 var(--amber),28px 8px 0 0 var(--amber),0px 16px 0 0 var(--amber),4px 16px 0 0 var(--amber),8px 16px 0 0 var(--amber),12px 16px 0 0 var(--amber),16px 16px 0 0 var(--amber),20px 16px 0 0 var(--amber),24px 16px 0 0 var(--amber),28px 16px 0 0 var(--amber),0px 20px 0 0 var(--amber),12px 20px 0 0 var(--amber),16px 20px 0 0 var(--amber),28px 20px 0 0 var(--amber),0px 24px 0 0 var(--amber),4px 24px 0 0 var(--amber),8px 24px 0 0 var(--amber),12px 24px 0 0 var(--amber),16px 24px 0 0 var(--amber),20px 24px 0 0 var(--amber),24px 24px 0 0 var(--amber),28px 24px 0 0 var(--amber)}
+.ab .ic-radio::before{box-shadow:24px 0px 0 0 var(--amber),0px 4px 0 0 var(--amber),4px 4px 0 0 var(--amber),8px 4px 0 0 var(--amber),12px 4px 0 0 var(--amber),16px 4px 0 0 var(--amber),24px 4px 0 0 var(--amber),0px 8px 0 0 var(--amber),16px 8px 0 0 var(--amber),24px 8px 0 0 var(--amber),0px 12px 0 0 var(--amber),8px 12px 0 0 var(--amber),16px 12px 0 0 var(--amber),20px 12px 0 0 var(--amber),24px 12px 0 0 var(--amber),28px 12px 0 0 var(--amber),0px 16px 0 0 var(--amber),16px 16px 0 0 var(--amber),28px 16px 0 0 var(--amber),0px 20px 0 0 var(--amber),4px 20px 0 0 var(--amber),8px 20px 0 0 var(--amber),12px 20px 0 0 var(--amber),16px 20px 0 0 var(--amber),28px 20px 0 0 var(--amber),0px 24px 0 0 var(--amber),12px 24px 0 0 var(--amber),28px 24px 0 0 var(--amber),0px 28px 0 0 var(--amber),4px 28px 0 0 var(--amber),8px 28px 0 0 var(--amber),12px 28px 0 0 var(--amber),16px 28px 0 0 var(--amber),20px 28px 0 0 var(--amber),24px 28px 0 0 var(--amber),28px 28px 0 0 var(--amber)}
+
 .t-kicker{margin:0;font-family:Silk;font-size:11px;letter-spacing:5px;color:var(--cyan)}
 .t-name{margin:0 0 14px;font-family:Silk;font-weight:400;font-size:clamp(44px,8vw,86px);line-height:1;letter-spacing:.12em;color:var(--ink)}
 .t-name span{color:var(--dim)}
@@ -212,7 +241,7 @@ body.ui #wTag2{opacity:0}
 @media (max-height:520px){.title .t-foot{display:none}}
 
 /* broadcast (?broadcast=1): the picture and nothing else */
-body.bc .g{background:#000}
+body.bc{background:#000}body.bc .g{background:#000;min-height:100vh}
 body.bc .unit{padding:0;background:none;box-shadow:none}
 body.bc .u-top,body.bc .u-deck,body.bc .pad,body.bc #wui,body.bc #wFocus,body.bc .softkey,body.bc #tRec,body.bc .glass{display:none!important}
 body.bc .screen{border:0;box-shadow:none}
