@@ -24,8 +24,9 @@ const ACTIVITY={quiet:{name:'QUIET',music:'quiet-engines',gap:[480,1200],micro:[
 /* r31: quiet and routine happen half as often: long stretches where a room just breathes, so what does happen matters. STRANGE keeps its pace. */
 /* r40: the six tapes, one comfortable family (deep.js); the old ids still play their nearest new tape */
 const MT=(name,tape)=>({name,style:'deadwave',tape,vibe:'calm',drums:'low',synth:'low',ambience:'mid'});
-const MUSIC={'engine-sleep':MT('ENGINE GLOW','engine-sleep'),'space-wave':MT('SPACE WAVE','space-wave'),'soft-orbit':MT('SOFT ORBIT','soft-orbit'),'cabin-warmth':MT('CABIN WARMTH','cabin-warmth'),'slow-current':MT('SLOW CURRENT','slow-current'),'quiet-engines':MT('QUIET ENGINES','quiet-engines')};
-Object.assign(MUSIC,{drift:MUSIC['soft-orbit'],sleep:MUSIC['cabin-warmth'],'deep-signal':MUSIC['slow-current'],'empty-corridors':MUSIC['space-wave'],'outer-dark':MUSIC['quiet-engines'],spacewave:MUSIC['space-wave'],cruising:MUSIC['soft-orbit']}); /* old saved choices */
+const MUSIC={'soft-orbit':MT('SOFT ORBIT','soft-orbit'),'space-wave':MT('SPACE WAVE','space-wave'),'warm-transit':MT('WARM TRANSIT','warm-transit'),'night-cruise':MT('NIGHT CRUISE','night-cruise')}; /* r52: the station's four tracks */
+for(const k of ['engine-sleep','engine-room','orbital-cruise'])MUSIC[k]=MUSIC['soft-orbit'];for(const k of ['cabin-warmth','slow-current','quiet-engines','night-shift'])MUSIC[k]=MUSIC['space-wave'];
+Object.assign(MUSIC,{drift:MUSIC['soft-orbit'],sleep:MUSIC['space-wave'],'deep-signal':MUSIC['space-wave'],'empty-corridors':MUSIC['space-wave'],'outer-dark':MUSIC['space-wave'],spacewave:MUSIC['space-wave'],cruising:MUSIC['soft-orbit']}); /* old saved choices */
 const HOME={pilot:'bridge.helm',systems:'sensor.console',commander:'bridge.command'};
 /* the storylets: tiny non-canonical arcs, each ending back at a believable idle */
 const STORYLETS=[

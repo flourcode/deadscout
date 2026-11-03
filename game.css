@@ -438,3 +438,9 @@ body.aonly .wui,body.aonly .tag{opacity:0!important}
 body:not(.studio) .wui .adv,body:not(.studio) #wMore{display:none!important}
 #wSound.off{opacity:.55}
 .bt-pick.wait{cursor:progress;opacity:.85}
+
+/* r52 · now playing: a quiet label, top left of the ship, for a few seconds when a track starts */
+.np{position:absolute;left:calc(3% + 6px);top:calc(3% + 4px);z-index:6;pointer-events:none;font:400 clamp(9px,1vw,13px)/1.5 Silk,monospace;letter-spacing:.2em;color:#efe2cf;text-shadow:2px 2px 0 #0a0c10;opacity:0;transform:translateY(-4px);transition:opacity .9s,transform .9s}
+.np i{display:block;font-style:normal;font-size:.75em;color:#8fd6cf;letter-spacing:.3em}
+.np.on{opacity:.92;transform:none}
+#wNext{min-width:0;padding-left:14px;padding-right:14px}

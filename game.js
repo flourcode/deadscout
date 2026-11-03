@@ -14,8 +14,7 @@ window.DS_DEFAULT_EPISODE=window.DS_GAME||window.DS_DEFAULT_EPISODE;if(!window.C
 /* ---------- the project: one reading of a manifest, shared with the Director (episode.js) ---------- */
 let P,AL,TIMES,TOTAL,watch=null,events=null;
 /* the tapes (§38): six named mixes of the same engine; the player picks one from the pause menu, the story may duck it */
-const TAPES=[['SOFT ORBIT',{style:'deadwave',tape:'soft-orbit'}],['SPACE WAVE',{style:'deadwave',tape:'space-wave'}],['CABIN WARMTH',{style:'deadwave',tape:'cabin-warmth'}],
-  ['SLOW CURRENT',{style:'deadwave',tape:'slow-current'}],['ENGINE GLOW',{style:'deadwave',tape:'engine-sleep'}],['QUIET ENGINES',{style:'deadwave',tape:'quiet-engines'}]]; /* r40: six tapes of one warm family (deep.js) */
+const TAPES=[['SOFT ORBIT',{style:'deadwave',tape:'soft-orbit'}],['SPACE WAVE',{style:'deadwave',tape:'space-wave'}],['WARM TRANSIT',{style:'deadwave',tape:'warm-transit'}],['NIGHT CRUISE',{style:'deadwave',tape:'night-cruise'}]]; /* r52: the station's four tracks (deep.js) */
 /* r37: in a watch the TAPE key (or a scene) swaps the band without reloading the ship; the new tape fades in */
 /* r40 · THE BEDS. Brown noise (warm, low, enveloping) and pink noise (soft air moving through the ship), each on its own,
    breathing very slowly; they run under everything and never stop when the tape changes. OFF / LOW / MID / HIGH. */
@@ -33,7 +32,16 @@ function paintBeds(){const B=beds();if(!B)return;const T=actx.currentTime;for(co
 const INTS=['rest','focus','chill'],INTN={rest:'DEEP REST',focus:'FOCUS',chill:'SPACE CHILL'};const INT_N=()=>Math.max(0,INTS.indexOf(prefs.nw.intensity||'focus'));
 function setIntensity(v){prefs.nw.intensity=INTS.includes(v)?v:'focus';savePrefs();if(band&&band.setIntensity)band.setIntensity(INT_N());paintWatch();}
 const curTapeId=()=>{if(!watch)return 'drift';const c=watch.cfg;return c.music||NW.ACTIVITY[c.activity].music;};
-function watchTape(id){const mu=NW.MUSIC[id];if(!mu||!watch||!P)return;P.style=mu.style;P.music=Object.assign({},P.music||{},{mode:'generated',style:mu.style,tape:mu.tape,vibe:mu.vibe,drums:mu.drums,synth:mu.synth,ambience:mu.ambience});watch.tape=id;try{if(band)startBand(now(),10);}catch(e){} /* r40: a ten-second crossfade, no restart */
+/* r51 · THE STATION: SOFT ORBIT and SPACE WAVE take turns, about ten minutes each, with the usual ten-second crossfade. Scenes never change it;
+   each new pass of a tape gets a fresh hook (deep.js pass), so it does not come round exactly the same */
+/* r52: four tracks of one album, starting on SOFT ORBIT (Busy Ship), about eight minutes each; ⏭ (or N) skips with a short fade */
+const STN={pass:0,next:0,mins:8,order:['soft-orbit','space-wave','warm-transit','night-cruise']};window.__station=STN;
+function stationNext(xf){if(!watch)return;const cur=watch.tape||curTapeId(),L=STN.order,i=L.indexOf(cur);STN.pass++;watchTape(L[(i+1)%L.length],xf);}
+setInterval(()=>{try{if(!watch){STN.next=0;return;}if(!band||!actx||SLP)return;const t=actx.currentTime;if(!STN.next){STN.next=t+STN.mins*60;return;}if(t<STN.next)return;stationNext(10);}catch(e){}},5000);
+/* now playing: the track's name, a few seconds, top left of the ship */
+let npEl=null,npT=0;function nowPlaying(id){const T=window.DEEP&&DEEP.TAPES[DEEP.tapeOf(id)];if(!T)return;if(!npEl){npEl=document.createElement('div');npEl.className='np';npEl.setAttribute('aria-live','polite');(stage.parentElement||document.body).appendChild(npEl);}
+  npEl.innerHTML='<i>NOW PLAYING</i>'+T.name;npEl.classList.add('on');clearTimeout(npT);npT=setTimeout(()=>npEl.classList.remove('on'),4200);}
+function watchTape(id,xf){const mu=NW.MUSIC[id];if(!mu||!watch||!P)return;if(actx)STN.next=actx.currentTime+STN.mins*60*(.85+Math.random()*.3);P.style=mu.style;P.music=Object.assign({},P.music||{},{mode:'generated',style:mu.style,tape:mu.tape,vibe:mu.vibe,drums:mu.drums,synth:mu.synth,ambience:mu.ambience});watch.tape=id;try{if(band)startBand(now(),xf||10);}catch(e){}nowPlaying(id); /* r40: a crossfade, no restart */
   const tr=$('wTrack');if(tr)tr.textContent='▶ '+mu.name;paintWatch();}
 /* AMBIENCE: one stepped key for the whole room bed (the r27 sliders stay gone) */
 const AMBV={low:.45,mid:1,high:1.5};let ambTrim=null;const ambT=()=>{if(!ambTrim&&actx&&ambBus){ambTrim=actx.createGain();ambTrim.connect(ambBus);}return ambTrim;};function setAmbience(v){prefs.nw.ambience=AMBV[v]?v:'mid';savePrefs();const T=ambT();if(T)T.gain.setTargetAtTime(watch?AMBV[prefs.nw.ambience]:1,actx.currentTime,.4);paintWatch();}
@@ -46,7 +54,7 @@ const stage=$('stage'),LCV=LC.create(stage);const SP=CUT.play;let recording=null
 let musicMute=null;const padMode=()=>prefs.pad===true||prefs.pad==='on'?'on':prefs.pad===false||prefs.pad==='off'?'off':'auto'; /* the player's music switch: its own stage after every duck and fade the story makes */
 /* quick keys: N next tape, M music on/off, K on-screen keys; the quick bar shows what changed */
 function quickKey(k){const fl=window.__padFlash||(()=>{});ensureAudio();if(k==='KeyM'){setMusicOn(prefs.musicOn===false);fl(prefs.musicOn===false?'♪ MUSIC OFF':'♪ MUSIC ON');}
-  else if(k==='KeyN'){if(watch)return;if(prefs.musicOn===false)setMusicOn(true);setTape((prefs.tape||0)+1,true);fl('▶ TAPE '+String((prefs.tape||0)+1).padStart(2,'0')+' · '+TAPES[prefs.tape||0][0]);}
+  else if(k==='KeyN'){if(watch){stationNext(3);return;}if(prefs.musicOn===false)setMusicOn(true);setTape((prefs.tape||0)+1,true);fl('▶ TAPE '+String((prefs.tape||0)+1).padStart(2,'0')+' · '+TAPES[prefs.tape||0][0]);}
   else if(k==='KeyK'){const m=prefs.pad==='on'||prefs.pad===true?'off':'on';prefs.pad=m;savePrefs();fl(m==='on'?'ON-SCREEN KEYS · ON':'ON-SCREEN KEYS · OFF');}}
 function setMusicOn(on){prefs.musicOn=!!on;savePrefs();if(musicMute)musicMute.gain.setTargetAtTime(on?1:0,actx.currentTime,.25);}
 const BCQ=new URLSearchParams(location.search),BC=BCQ.get('broadcast')==='1';let watchSeed=0,sleepReq=false;
@@ -79,13 +87,15 @@ loadWorld(window.DS_DEFAULT_EPISODE);
 let actx=null,master=null,musicBus=null,band=null,t0=0,sched=null,curCh=-1,lastHero=0;
 const prefs=(()=>{try{return Object.assign({sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{era:'now',scene:'watch',view:'full-ship',activity:'routine',music:'auto',duration:360,focus:0,objective:'',light:'warm',ambience:'mid',intensity:'focus',brown:'low',pink:'off'},tag:true,dim:false,photo:4},JSON.parse(localStorage.getItem(PREF)||'{}'));}catch(e){return {sound:true,camera:'ship',text:'large',mix:Object.assign({},AMB?AMB.MIX0:{}),nw:{view:'full-ship',activity:'routine',music:'auto',duration:360,focus:0,objective:''},tag:true,dim:false,photo:4};} /* r26: large print is the default for every message */})();
 const savePrefs=()=>{try{localStorage.setItem(PREF,JSON.stringify(prefs));}catch(e){}};
+if(!prefs.r52){prefs.r52=1;prefs.r51=1;prefs.nw=prefs.nw||{};prefs.nw.music='soft-orbit';savePrefs();}
+if(!prefs.r51){prefs.r51=1;prefs.nw=prefs.nw||{};prefs.nw.music='soft-orbit';savePrefs();}
 if(!prefs.r48){prefs.r48=1;prefs.nw=prefs.nw||{};Object.assign(prefs.nw,{sound:'balanced',brown:'low',pink:'off',intensity:'focus'});savePrefs();} /* r48: the new chillhop tapes start from the calm default mix */
 let ambBus=null,focusM=null,focusA=null;
 function ensureAudio(){if(actx)return actx;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.gain.value=prefs.sound?1:0;master.connect(actx.destination);
   focusM=actx.createGain();focusM.connect(master);focusA=actx.createGain();focusA.connect(master);ambBus=focusA; /* r31: music and ambience each pass a duck stage; a touch pulls them back so the object is close */musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;{const soft=actx.createBiquadFilter();soft.type='lowpass';soft.frequency.value=6200;soft.Q.value=.5;musicBus.connect(soft);soft.connect(musicMute);} /* r28: the band without its sharpest edge */musicMute.connect(focusM);if(SFX)SFX.start(actx,master);return actx;}
 function startBand(off,xf){ensureAudio();if(actx.state!=='running')actx.resume();if(band){band.stop(xf||.5);band=null;}
   t0=actx.currentTime+.08-off;
-  if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,musicBus,{seed:P.seed,tape:(P.music&&P.music.tape)||'soft-orbit',startAt:t0,fadeIn:xf||off+1.2,intensity:INT_N()});curCh=-1;} /* the default: HALCYON dreaming */
+  if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,musicBus,{seed:P.seed,pass:STN.pass,tape:(P.music&&P.music.tape)||'soft-orbit',startAt:t0,fadeIn:xf||off+1.2,intensity:INT_N()});curCh=-1;} /* the default: HALCYON dreaming */
   else{const d=dna(null),o=X.opts(d);band=E.make(actx,musicBus,Object.assign(o,{startAt:t0,fadeIn:off+1.2}));X.attach(band,d,0);if(off>0&&band.skip)band.skip(off);curCh=-1;}
   clearInterval(sched);sched=setInterval(tick,200);tick();}
 function stopBand(){if(band){band.stop(.6);band=null;}clearInterval(sched);sched=null;}
@@ -238,7 +248,7 @@ $('oMenu').addEventListener('click',e=>{const b=e.target.closest('[data-o]');if(
   else if(o==='pad'){const m=padMode();prefs.pad=m==='auto'?'on':m==='on'?'off':'auto';savePrefs();paintMenus();}
   else if(o==='photo'){if(menuFrom==='pause'){enter('pause');photoOn();}}else if(o==='record'){if(menuFrom==='pause'){enter('pause');toggleRecord();}}else if(o==='full')toggleFull();else if(o==='text'){prefs.text=prefs.text==='large'?'xl':prefs.text==='xl'?'normal':'large';savePrefs();applyText();paintMenus();}else if(o==='back')enter(menuFrom);});
 /* ---------- NIGHT WATCH: setup ---------- */
-const NWOPT={view:['full-ship','bridge','engineering','outer-hull','auto'],activity:['quiet','routine','busy','strange'],music:['auto','soft-orbit','space-wave','cabin-warmth','slow-current','engine-sleep','quiet-engines'] /* r40: the six tapes */,duration:[30,60,120,360],focus:[0,25,45,60,90]};const NWK=['view','activity','music','duration','focus']; /* r39: back to release 35's five rows (VIEW only if you want one room; the default is the whole ship) */
+const NWOPT={view:['full-ship','bridge','engineering','outer-hull','auto'],activity:['quiet','routine','busy','strange'],music:['auto','soft-orbit','space-wave','warm-transit','night-cruise'] /* r40: the six tapes */,duration:[30,60,120,360],focus:[0,25,45,60,90]};const NWK=['view','activity','music','duration','focus']; /* r39: back to release 35's five rows (VIEW only if you want one room; the default is the whole ship) */
 let nwSel=0;
 function paintSetup(){const rows=[...$('nwRows').querySelectorAll('.row')];rows.forEach((r,i)=>{r.classList.toggle('sel',i===nwSel);const k=r.dataset.k,v=prefs.nw[k];
   if(k==='objective'){r.hidden=!prefs.nw.focus;const I=$('nwObj');if(document.activeElement!==I)I.value=prefs.nw.objective||'';if(i===nwSel&&state==='setup')I.focus();else if(document.activeElement===I)I.blur();return;}
@@ -299,11 +309,11 @@ $('photo').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(
 /* ---------- NIGHT WATCH: the watch itself ---------- */
 let uiT=null,wStart=0,endingSoon=false,uiKeep=false;
 async function beginWatch(o){o=o||{};ensureAudio();try{await actx.resume();}catch(e){}await untilLoaded();const nw=prefs.nw;if(!NW.SCENES[nw.scene])nw.scene='drift';nw.view='full-ship';const SCN=NW.SCENES[nw.scene];
-  const cfg={era:'2291',scene:nw.scene,view:'full-ship',activity:SCN.pace||'routine',music:NW.MUSIC[nw.music]?nw.music:SCN.music,duration_minutes:360, /* r42: no setup: the whole ship, endless, the last scene and tape */seed:watchSeed||22910000+Math.floor(Math.random()*89999)};
+  const cfg={era:'2291',scene:nw.scene,view:'full-ship',activity:SCN.pace||'routine',music:'soft-orbit',duration_minutes:360, /* r42: no setup: the whole ship, endless, the last scene and tape */seed:watchSeed||22910000+Math.floor(Math.random()*89999)};
   const man=NW.manifest(cfg);watch={cfg,man,seed:cfg.seed};session++;show('setup',false);show('title',false);show('opts',false); /* r28: a watch can start straight from the title */$('veil').classList.remove('clear');await wait(700);
   loadWorld(man);if(o.play&&P.brand)P.brand.intro=false; /* PLAY: no hull opening, straight in */SP.on=false;SP.cmds.length=0;SP.cams.length=0;me='commander';held=null;endingSoon=false;
   $('wName').textContent='DRIFTNAUT · '+SCN.name;document.body.classList.add('watching');state='watch';show('hud',false);
-  startBand(0);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,ambT(),prefs.mix,{mood:cfg.activity});ambT().gain.value=AMBV[prefs.nw.ambience]||1;}paintBeds();musicBus.gain.value=musicLevel();ambT().gain.value=SOUNDP[prefs.nw.sound||'balanced'].amb;
+  startBand(0);setTimeout(()=>{if(watch)nowPlaying(watch.tape||curTapeId());},2500);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,ambT(),prefs.mix,{mood:cfg.activity});ambT().gain.value=AMBV[prefs.nw.ambience]||1;}paintBeds();musicBus.gain.value=musicLevel();ambT().gain.value=SOUNDP[prefs.nw.sound||'balanced'].amb;
   keepAwake(true);setDim(prefs.dim&&cfg.activity==='quiet',true);SLP=null;sleeper=null;if(window.__town)__town.sleep('commander',false);$('dim').style.opacity='';if(sleepReq)setTimeout(()=>sleepStart(30),50);FOC.n=0;focusStart(0);paintWatch();wStart=performance.now();$('veil').classList.add('clear');wake();if(o.play)setTimeout(()=>enterPlay(),400);}
 function paintWatch(){/* full labels on a big screen; on a small one the words in <em> drop and an active button just turns amber */
   $('wControl').innerHTML=(state==='play'?'<em>RELEASE </em>':'<em>TAKE </em>')+'CONTROL';$('wControl').classList.toggle('on',state==='play');$('wSleep').innerHTML='SLEEP<em> · '+(SLP?SLP.min+' MIN':'OFF')+'</em>';$('wSleep').classList.toggle('on',!!SLP);$('wFocusBtn').innerHTML='FOCUS<em> · '+(FOC.phase?FOC.len+' MIN':'OFF')+'</em>';$('wFocusBtn').classList.toggle('on',!!FOC.phase);if(document.activeElement!==$('wObj'))$('wObj').value=prefs.nw.objective||'';$('wObj').hidden=!FOC.phase;$('wName').style.opacity=prefs.tag?1:0;$('wTag2').hidden=!(prefs.tag&&watch);$('wTag2').textContent=$('wName').textContent;
@@ -312,6 +322,7 @@ function wake(keep){if(BC)return;/* the mouse moved: show the few controls, then
   if(!watch)return;$('wui').hidden=false;$('wui').classList.add('on');document.body.classList.add('ui');clearTimeout(uiT);if(!keep&&!uiKeep)uiT=setTimeout(()=>{if(document.activeElement===$('wObj')){wake();return;}$('wui').classList.remove('on');document.body.classList.remove('ui');},4000);}
 document.addEventListener('pointermove',()=>{if(watch&&(state==='watch'||state==='play'))wake();});
 $('wui').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w;
+  if(w==='next'){stationNext(3);wake();return;} /* r52 ⏭ */
   if(w==='more'){const m=$('wMore'),open=m.hidden;m.hidden=!open;$('wMoreBtn').setAttribute('aria-expanded',String(open));$('wMoreBtn').classList.toggle('on',open);wake();return;} /* r31: the rest, out of the way */
   if(w==='play'){enterPlay();return;}if(w==='listen'){exitPlay();return;}if(w==='k9'){callK9();wake();return;}if(w==='sound'){ensureAudio();setSound(!prefs.sound);paintWatch();wake();return;} /* r47: SOUND is simply on/off */if(w==='aud'){audioOnly(true);return;}
   if(w==='fade'){const L=[0,30,60],i=L.indexOf(SLP?SLP.min:0);sleepStart(L[(i+1)%3]);wake();return;}if(w==='menu'){endWatch();return;}

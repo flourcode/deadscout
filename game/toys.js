@@ -112,7 +112,7 @@ function visit(id){const sc=SC[id]||{};try{if(sc.who&&!(A.steering()&&A.me()===s
   if(sc.k9&&window.K9NAV&&!K9NAV.busy())K9NAV.go(sc.k9);}catch(e){}}
 function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({alert:0});
   if(!quiet)A.sfx('chunk',.7);const L=LOOK[id]||LOOK.drift;applyLights();driveTo(L.drive);mixTo(L.mix);
-  if(A.watch()&&!quiet){const sc=SC[id]||{};if(sc.music&&A.tape){A.nw().music=sc.music;A.tape(sc.music);} /* a scene is something you hear, at once */
+  if(A.watch()&&!quiet){const sc=SC[id]||{}; /* r51: a scene is lights and pace only; the music station plays on untouched */
     if(A.pace)A.pace(sc.pace||'routine');visit(id);if(A.nw){A.nw().scene=id;A.save();}}
   paintMood();}
 function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+(SC[S.mood]||SC.drift).name+'</em>';b.classList.toggle('on',S.mood!=='drift');}

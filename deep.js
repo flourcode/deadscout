@@ -18,12 +18,11 @@ const Q={maj7:[0,4,7,11],maj9:[4,7,11,14],six9:[4,9,14,7],m7:[3,7,10,12],m9:[3,7
 /* the six tapes. key = semitones above C; prog = [degree above the key, shape, bars] */
 const TAPES={
   'soft-orbit':   {name:'SOFT ORBIT',   key:0,bpm:82,swing:.6, prog:[[5,'maj9'],[4,'m7'],[2,'m9'],[0,'maj9']],                 kit:'full', comp:'push',bass:'walk', mel:.8, pad:.22,bright:3200},
-  'cabin-warmth': {name:'CABIN WARMTH', key:5,bpm:76,swing:.62,prog:[[2,'m9'],[7,'d13'],[0,'maj9'],[9,'m9']],                  kit:'rim',  comp:'push',bass:'walk', mel:.7, pad:.25,bright:2900},
-  'space-wave':   {name:'SPACE WAVE',   key:2,bpm:78,swing:.58,prog:[[0,'maj9'],[9,'m9'],[2,'m9'],[7,'sus9']],                 kit:'full', comp:'hold',bass:'soft', mel:.75,pad:.3, bright:3000},
-  'slow-current': {name:'SLOW CURRENT', key:4,bpm:74,swing:.6, prog:[[0,'maj9',2],[5,'maj9',2]],                               kit:'rim',  comp:'hold',bass:'soft', mel:.6, pad:.3, bright:2800},
-  'quiet-engines':{name:'QUIET ENGINES',key:9,bpm:70,swing:.58,prog:[[0,'maj9',2],[9,'m9',2],[5,'maj9',2],[7,'sus9',2]],       kit:'soft', comp:'hold',bass:'soft', mel:.45,pad:.34,bright:2600},
-  'engine-sleep': {name:'ENGINE GLOW',  key:3,bpm:72,swing:.6, prog:[[0,'maj9'],[9,'m9'],[5,'maj9'],[7,'sus9']],                 kit:'warm', comp:'push',bass:'walk', mel:.55,pad:.2, bright:2800}};
-const ALIAS={'orbital-cruise':'soft-orbit','night-shift':'cabin-warmth','deep-signal':'slow-current','empty-corridors':'space-wave','outer-dark':'quiet-engines','engine-room':'engine-sleep'};
+  'warm-transit': {name:'WARM TRANSIT', key:9,bpm:80,swing:.6, prog:[[0,'maj9'],[4,'m7'],[9,'m9'],[5,'maj9']],                 kit:'full', comp:'push',bass:'walk', mel:.75,pad:.24,bright:3100},
+  'night-cruise': {name:'NIGHT CRUISE', key:7,bpm:84,swing:.6, prog:[[2,'m9'],[7,'d13'],[0,'maj9',2]],                         kit:'full', comp:'push',bass:'walk', mel:.8, pad:.22,bright:3200},
+  'space-wave':   {name:'SPACE WAVE',   key:2,bpm:78,swing:.58,prog:[[0,'maj9'],[9,'m9'],[2,'m9'],[7,'sus9']],                 kit:'full', comp:'hold',bass:'soft', mel:.75,pad:.3, bright:3000},};
+/* r51: one station of two tapes. Every older tape id (saves, the studio, episodes) plays one of the two */
+const ALIAS={'orbital-cruise':'soft-orbit','night-shift':'space-wave','deep-signal':'space-wave','empty-corridors':'space-wave','outer-dark':'space-wave','engine-room':'soft-orbit','cabin-warmth':'space-wave','slow-current':'space-wave','quiet-engines':'space-wave','engine-sleep':'soft-orbit'};
 const tapeOf=id=>TAPES[id]?id:ALIAS[id]||'soft-orbit';
 /* drum patterns, 16 steps; digits are velocities (1-9) */
 const KIT={
@@ -45,7 +44,7 @@ function roomIR(ctx){const sr=ctx.sampleRate,n=Math.floor(sr*1.5),b=ctx.createBu
   for(let i=0;i<n;i++){const w=Math.random()*2-1;lp+=.25*(w-lp);d[i]=lp*Math.pow(1-i/n,3.2)*(i<sr*.012?i/(sr*.012):1);}}return b;}
 
 /* each tape measured with loud.js (BS.1770, 4 minutes, seed 22910001) and trimmed to about -19.5 LUFS */
-const TRIM={"soft-orbit": 0.507, "cabin-warmth": 0.531, "space-wave": 0.537, "slow-current": 0.582, "quiet-engines": 0.61, "engine-sleep": 0.531};
+const TRIM={"soft-orbit": 0.513, "space-wave": 0.543, "warm-transit": 0.513, "night-cruise": 0.507};
 
 function make(ctx,dest,o){
   o=o||{};const TK=tapeOf(o.tape),T=TAPES[TK],seed=(o.seed>>>0)||22910001,SLEEP=!!o.sleep;
@@ -107,7 +106,7 @@ function make(ctx,dest,o){
     const ms=pcs.map(pc=>{let best=null;for(let m=53;m<=70;m++)if(m%12===pc&&(best==null||Math.abs(m-prevC)<Math.abs(best-prevC)))best=m;return best;}).sort((a,b)=>a-b);
     const uniq=[...new Set(ms)];prevC=uniq.reduce((a,b)=>a+b,0)/uniq.length*.5+61*.5;let bm=36+((root%12)+12)%12;if(bm>44)bm-=12;return {keys:uniq,bass:bm,root};});
   for(let i=0;i<BARS.length;i++)if(!VOX[i])VOX[i]=VOX[i-1];
-  const R0=RNG(seed^hashStr(T.name));
+  const R0=RNG(seed^hashStr(T.name)^Math.imul((o.pass|0)+1,40503)); /* each pass of the station gets its own hook */
   /* the hook: two bars of a pentatonic line, 5-7 notes, C5-C6 */
   const PEN=[];for(let m=70;m<=86;m++)if(PENT.includes(((m-T.key)%12+12)%12))PEN.push(m);
   function hook(R){const steps=[0,3,6,8,11,14,16,19,22,24,27];const n=5+Math.floor(R()*3);const pos=[0];while(pos.length<n){const c=steps[1+Math.floor(R()*(steps.length-1))];if(!pos.includes(c))pos.push(c);}pos.sort((a,b)=>a-b);
@@ -147,13 +146,13 @@ function make(ctx,dest,o){
   /* ---- clock ---- */
   const t0=o.startAt!=null?o.startAt:ctx.currentTime+.05;let bN=Math.max(0,Math.floor((ctx.currentTime-t0)/barDur));
   function tick(h){if(stopped)return;while(t0+bN*barDur<h){bar(bN,t0+bN*barDur);bN++;}}
-  function setState(s){state=s;M.lean=(s==='quiet'||s==='abandoned')?1:0;}
+  function setState(s){state=s;} /* r51: the ship's mood never changes the music */
   function setIntensity(n){M.int=SLEEP?0:Math.max(0,Math.min(2,n|0));}
   function hero(kind){if(stopped||!/^(relay|scanner|chime)$/.test(kind))return;const t=ctx.currentTime+.05,V=VOX[bN%BARS.length];rhodes(V.keys[V.keys.length-1]+12,t,1.2,.35);rhodes(V.keys[V.keys.length-2]+12,t+.18,1.2,.28);}
   function stop(f){if(stopped)return;stopped=true;const t=ctx.currentTime;out.gain.cancelScheduledValues(t);out.gain.setTargetAtTime(0,t,Math.max(.05,(f||.5)/3));
     setTimeout(()=>{for(const x of L){try{x.stop();}catch(e){}}try{out.disconnect();}catch(e){}},((f||.5)+.8)*1000);}
   const LV=TRIM[TK]||1;out.gain.setValueAtTime(0,ctx.currentTime);out.gain.linearRampToValueAtTime(LV,ctx.currentTime+Math.max(.3,Math.min(o.fadeIn||1.5,15)));
   return {tick,ahead:2,skip(){},setState,setIntensity,hero,stop,get state(){return state;},tape:T.name,plan:{ev:[]},bpm:T.bpm};}
-const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.9, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -22.9, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4};
+const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.7, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -22.9, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4, "warm-transit": -19.5, "warm-transit:sleep": -23.2, "night-cruise": -19.5, "night-cruise:sleep": -22.9};
 window.DEEP={make,TAPES,ALIAS,tapeOf,PENT,nearest,LUFS,TRIM};
 })();
