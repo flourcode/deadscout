@@ -72,19 +72,21 @@ function paint(T,e){e.querySelector('span').textContent=T.label();const off=!!(T
 function inPoly(p,x,y){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const [xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
 function roomAtScreen(cx,cy){const V=G.view(),r=scr.getBoundingClientRect(),wx=V[0]+(cx-r.left)/r.width*V[2],wy=V[1]+(cy-r.top)/r.height*V[3];for(const [id,R] of Object.entries(M.rooms))if(inPoly(R.poly,wx,wy))return id;return null;}
 let hoverRoom=null,tapRoom=null,tapUntil=0,allUntil=0;const seen=new Set();
-document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')hoverRoom=roomAtScreen(e.clientX,e.clientY);},{passive:true});
-scr.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hoverRoom=null;});
-document.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&!e.target.closest('.toy')){tapRoom=roomAtScreen(e.clientX,e.clientY);tapUntil=performance.now()+5000;}},{passive:true,capture:true});
+let ptr=null,ptrT=0;const NEAR=80; /* r30: a reticle shows only near the pointer (or a recent tap), never all at once */
+document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){hoverRoom=roomAtScreen(e.clientX,e.clientY);ptr=[e.clientX,e.clientY];ptrT=performance.now();}},{passive:true});
+scr.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){hoverRoom=null;ptr=null;}});
+document.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&!e.target.closest('.toy')){tapRoom=roomAtScreen(e.clientX,e.clientY);tapUntil=performance.now()+5000;ptr=[e.clientX,e.clientY];ptrT=performance.now();}},{passive:true,capture:true});
 /* held sounds stop when you leave the ship (title, pause, options) and come back when you return */
 let wasOn=false;
 function tick(){const st=G.state,on=(st==='play'||st==='watch')&&!document.body.classList.contains('photo')&&!document.body.classList.contains('bc');layer.hidden=!on;
-  if(on!==wasOn){wasOn=on;if(on&&!seen.size)allUntil=performance.now()+3500;bed('rumble',on&&S.drive===2?.55:0,.6);if(!on)bed('hum',0,.3);}
+  if(on!==wasOn){wasOn=on;bed('rumble',on&&S.drive===2?.55:0,.6);if(!on)bed('hum',0,.3);}
   if(!on)return;
   const snd=A.soundOn();if(snd!==S.snd){S.snd=snd;bed('rumble',BED.rumble||0,.4);}
-  const V=G.view(),r=scr.getBoundingClientRect(),now=performance.now(),room=now<tapUntil&&tapRoom?tapRoom:hoverRoom,all=now<allUntil,live=new Set();
+  const opening=st==='watch'&&G.now()<11.4; /* the hull is still closed: nothing inside to point at yet */
+  const V=G.view(),r=scr.getBoundingClientRect(),now=performance.now(),room=now<tapUntil&&tapRoom?tapRoom:hoverRoom,all=!opening&&now<allUntil,live=new Set();
   const k9=CUT.actorAt(G.P,G.TIMES,G.now(),'k9'),k9Room=k9?CUT.roomOf(k9.x,k9.y-20):null;
   for(const T of TOYS){if(T.hide&&T.hide())continue;const w=T.at();if(!w)continue;const sx=(w[0]-V[0])/V[2]*r.width,sy=(w[1]-V[1])/V[3]*r.height;if(sx<8||sy<8||sx>r.width-8||sy>r.height-8)continue;
-    const mine=T.room==='*'?(room&&k9Room===room):T.room===room,show=all||mine;const e=el(T);live.add(T.id);e.style.left=Math.round(sx)+'px';e.style.top=Math.round(sy)+'px';
+    const near=ptr&&(now-ptrT<(ptr&&now<tapUntil?5000:4000))&&Math.hypot(r.left+sx-ptr[0],r.top+sy-ptr[1])<NEAR*Math.max(.8,r.width/1280),show=all||(near&&!opening);const e=el(T);live.add(T.id);e.style.left=Math.round(sx)+'px';e.style.top=Math.round(sy)+'px';
     if(show){paint(T,e);if(!e.classList.contains('on')&&!seen.has(T.id)){seen.add(T.id);e.classList.add('ping');}}e.classList.toggle('on',show);}
   for(const [id,e] of Object.entries(EL))if(!live.has(id))e.classList.remove('on');}
 setInterval(tick,90);

@@ -60,6 +60,7 @@ def outline(img, al):
     for q in add: p[q] = PAL['ink0']; a[q] = 255
 
 # B: repaint the visor's glass. Keep the rim and the glare the source already has; the rest is deep glass with stars
+A0 = A.copy()
 B = A.copy(); bp = B.load(); random.seed(5)
 glass = lambda x, y, k=1.0: ((x + .5 - VC[0]) / (VR[0] * k)) ** 2 + ((y + .5 - VC[1]) / (VR[1] * k)) ** 2 < 1
 G0 = .9                                              # the glass inside the rim
@@ -81,24 +82,21 @@ for y in range(N):
 for gx, gy in ((9, -11), (11, -12), (10, -13)):     # a separate small glint
     X, Y = int(VC[0] + gx), int(VC[1] + gy)
     if glass(X, Y, G0): bp[X, Y] = PAL['suit4']
+GLASS = B.copy()   # the glass and glare, before the stars: what the ghost fades into
 # stars in the dark of the glass
 for _ in range(40):
     X, Y = random.randint(0, N - 1), random.randint(0, N - 1)
     if glass(X, Y, .82) and bp[X, Y] in (PAL['ink1'], PAL['ink2'], PAL['ink3']): bp[X, Y] = random.choice([PAL['suit3'], PAL['grey2'], PAL['grey1'], PAL['grey1']])
-# HALCYON reflected in the lower glass: a long hull, lit windows, an engine glow, bent a little to the curve
-ship = ["....hhhhhhhhhhhhhh....",
-        "..hHHHHHHHHHHHHHHHHh..",
-        ".hHwHwHwHwHwHHwHwHHHnc",
-        ".hHHHHHHHHHHHHHHHHHHnc",
-        "..hhhhhhhhhhhhhhhhhh..",
-        ".....ss.......ss......"]
-X0, Y0 = int(VC[0] - 11), int(VC[1] + 5)
-for j, row in enumerate(ship):
-    for i, ch in enumerate(row):
-        if ch == '.': continue
-        X, Y = X0 + i, Y0 + j + (1 if i < 3 or i > 18 else 0)
-        if not glass(X, Y, .86): continue
-        bp[X, Y] = {'h': PAL['suit0'], 'H': PAL['suit1'], 'w': PAL['amber'], 'n': PAL['blue1'], 'c': PAL['cyan'], 's': PAL['ink3']}[ch]
+# A, the ghost: inside the glass, each cell is a third skull, two thirds glass (with a little dither so it shimmers rather than bands)
+ap_, gp_, a0 = A.load(), GLASS.load(), A0.load()
+for y in range(N):
+    for x in range(N):
+        if not glass(x, y, G0): continue
+        g = gp_[x, y]
+        if g in (PAL['suit3'], PAL['suit4'], PAL['grey2']): ap_[x, y] = g; continue      # the glare stays crisp
+        k = .36 if (x + y) % 2 else .28
+        c = a0[x, y] if a0[x, y] != PAL['ink0'] else g
+        ap_[x, y] = nearest(tuple(int(g[i] * (1 - k) + c[i] * k) for i in range(3)))
 aA, aB = alpha.copy(), alpha.copy()
 for al, img in ((aA, A), (aB, B)):                   # the visor is glass, not a hole: every cell inside the rim is opaque
     a_ = al.load(); p_ = img.load()

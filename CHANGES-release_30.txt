@@ -1,0 +1,165 @@
+RELEASE 30
+- Boot art: the empty visor no longer shows the ship reflected, only the glass, its glare and a few stars. The skull
+  version (shown once you've finished the story) is now a ghost: two thirds glass, one third skull, dithered.
+- Toy reticles: no longer all shown when the ship loads (a 3.5 s showcase) or for the whole room under the cursor.
+  A reticle shows only when the pointer is near it, or near a recent tap on touch, and never during the opening.
+
+RELEASE 29 · COZY
+- Boot card art: the helmet, at the game's 64-pixel grain in the Halcyon palette (tools/helmet.py makes both from the
+  source art). The visor is empty, deep glass with stars and HALCYON reflected (boot-helmet.png). Once you have
+  finished the story, the visor shows what she is (boot-helmet-skull.png). DEADSCOUT is lettered under it.
+- Start of shift: as the opening dissolves into the ship the rooms are dark; the lights come on room by room with
+  their relays, the coffee pours on the comms shelf, a crew member says hello for the time of day, K9 chirps.
+- K9's bedtime: SLEEP sends K9 to the foot of the bunk with a goodnight chirp; it powers down and its eye-light
+  blinks slowly in the dark.
+- End of shift: END WATCH puts the lights out room by room, sends K9 to its dock, and HOS signs off ('SLEEP WELL'
+  late at night).
+- Little warmths: the mug on the comms shelf steams by itself now and then; the bridge glass mists at night; the
+  notes board on comms has a different note every day (click it), and older ones after that.
+
+RELEASE 28 · JOY (game/joy.js, new)
+- Everything answers back. 79 things to click, each with its own close-up sound (made in the page, all soft) and a
+  little pixel effect, and a ring pop so no click goes unanswered:
+    every monitor (flicker, new readout; every 5th reboots) and the keyboard under each wide one (typing);
+    every lamp (blinks); the plant (rustle, water; every 5th a flower); the bunks (curtain sway; snore and Zz on the 5th;
+    the lower one turns a page); the desk (cassette); the lockers (latch; on the 4th something falls out and K9 looks);
+    the quarters vent (dust); the bridge glass (a chime and a glint; every 7th a shooting star; HOLD it and it fogs);
+    chairs (creak); the comms notes (paper); the mug on the comms shelf (pour and steam; every 3rd a spill, and HOS
+    files a report); the reactor (hum and sparks; every 6th a steam burst and HOS asks you to stop); pipes (clank,
+    drip); the service crates (thud; on the 5th a rubber duck); the valve (ratchet); the airlock hatch (pressure seal);
+    the EVA suits (velcro); the dish (servo, ping); the shaft ladder plays a pentatonic scale by height; the stars
+    chime where you tap; the crew glance and say a line (night lines after 22:00).
+  Double-tap a floor in a watch and K9 trots over and sits. Hover shows four corner ticks and a faint tick sound.
+- SLEEP, designed. One button, 20 or 40 minutes: nothing strange is scheduled any more, the lights go down to the
+  quarters' lamp, a brown-noise bed comes up, the band drops to a drone and away, the picture dims to black and stays
+  black with the ship still breathing. A tap lifts the dark for eight seconds. The SLEEP DIM scene is gone (redundant).
+- Softer sound everywhere: a lowpass on the band and on every joy sound; ambience defaults lowered, the busy radio and
+  signal beds most. In a watch the ambience follows the room in the middle of the frame; the crew murmur when the
+  bridge is in view; rain-like ticks run on the hull in the whole-ship view.
+- The ship's day: a multiply tint follows your local clock (cool day, warm evening, a soft night). Weather outside,
+  every 10-20 minutes: an ice field drifting through open space, or an aurora off the gas giant. K9 sometimes chases a
+  floating bolt. Zz rises over a crew member who is staying put, at night or while you sleep. The plant in the crew
+  quarters grows a new leaf for every day you come back (sixteen at most; counted in this browser only).
+- Less friction. The boot card ends on PRESS START: one tap (or click, or any key) starts the watch with your last
+  settings; MENU goes to the title. NIGHT WATCH is first on the title and starts at once; SETUP is its own item. New
+  players get an endless watch. With the watch controls away, the quick keys and toy reticles fade off the glass.
+- A watch started from the title now hides the title (found while testing PRESS START).
+
+RELEASE 27
+- Night Watch bar: 11 buttons and 7 sound sliders -> 7 buttons. Removed the per-sound mixer, PHOTO (still P and
+  Options), CLOCK (tap the clock), and the dead SLEEP DIM / LABEL markup. MOOD in the bar is renamed SCENE (the setup
+  screen's MOOD is a different thing). FLOAT and FULLSCREEN only appear where the browser supports them. On small
+  screens the labels shorten (CONTROL SCENE FOCUS SLEEP FLOAT FULL END) and an active button turns amber.
+- FLOAT's mute: the floating window's video had no audio track, so its mute did nothing. While floating, the ship's
+  sound now plays through that window; its mute and its play/pause both switch SOUND, and SOUND switches it back.
+- Phones. The clock, quick keys and toy reticles were sized by the message text size (so large print inflated them);
+  they now scale with the picture (--ui). On small screens the clock shows digits only and the watch line shows time
+  left only. Held upright, the picture sits at the top and menus, setup, the watch bar, dialogue and on-screen keys
+  sit in the space below it. The NEXT and KEYS quick keys no longer show in a watch (a [hidden] override bug).
+- Boot screen: an arcade loading card (LOADING..., sixteen blocks) driven by the real download progress of the
+  world and crew bundles, then the title.
+- The walk, again: tools/walk.py rebuilt. The standing leg goes straight, the knee no longer balloons, legs are cut
+  at the belt (no seam), tapered and shaded in the suit's ramp, heel strike and toe-off, 2 px hip bob, timed so the
+  boots stay planted. Sneak redrawn the same way.
+- First-play tip no longer mentions K.
+
+RELEASE 26
+- The viewport. Using the bridge VIEWPORT (E, or the new VIEWPORT toy on the bridge in a watch) takes the camera out
+  to the hull in space for eight seconds, then dissolves back into the cutaway. (game/story.js viewport stage; the
+  toy calls the look() the toy API already had.)
+- Walking backwards. The pilot's 'walk-left' animation was the same right-facing frames as 'walk', and she was the
+  one actor the engine didn't mirror when walking left, so she moonwalked. Every sheet now walks facing right and is
+  mirrored to go left (cut.js drawActor).
+- The main lighting bus lights the EVA dock too (toys.js: LROOMS includes eva). The beacon stays its own switch.
+- Large print is the default text size for every message (Options still offers NORMAL / LARGE / TV).
+- The HALCYON open (the night watch and the Director's intro) ends on CURRENT STATUS · LOST: 7 s of text over the
+  hull instead of 12.6, then the 4.2 s dissolve. 'Last crew transmission' and 'source: internal' are gone.
+
+RELEASE 25
+- The walk. The commander sheet's eight walk frames barely moved the legs (a 10 px stride for a 64 px figure, both feet
+  planted), so she slid like a paper doll. tools/walk.py generates a new eight-pose cycle (contact, recoil, passing,
+  push-off, both sides) from the sheet's own upper body, two-bone legs in the suit ramp with its boots and outline, a
+  one-pixel bob; a sneak cycle the same way. Frames 39-54 appended to commander.png, the animation tables point at
+  them, timed so the feet lock to the floor at her measured 58 px/s (contacts on frames 0 and 4). The night watch's
+  commander and DeadScout both use it.
+- Lights off is not black. A room whose switch is off kept 7 % of its light (cut.js `L*=.1+.9*v`) and lost every
+  lamp. Now 28 %, and low grey-blue utility strips along the deck light the floor in switched-off rooms, fading as
+  the tubes come back.
+- CONTROLS card redrawn as an old console's instruction screen: keycaps with pixel bevels, a d-pad for MOVE, the
+  rest in two columns, the dim ship behind it. Same keys, same ESC/ENTER back.
+- The page scrolls: under the housing, THE SHIP / CONTROLS / TRANSMISSION NOTES in the console's lettering with
+  small pixel icons (CSS only, no new images); the grid background runs the length of the page. Hidden in broadcast,
+  photo and fullscreen modes. The privacy page is linked from the foot.
+
+SPRITES (release 24)
+- cut.js         DeadScout wears the commander's sheet, the one the night watch already uses (SHEET.deadscout='commander').
+                 The chibi production sheet is removed from assets-core.js (-220 KB on first load). Poses the sheet lacks
+                 play their nearest pose through the ALIAS table (run→walk, typing/terminal-idle→interact, kneel→crouch,
+                 wake→idle …), which now applies to any sheet, and an aliased pose is a legal script action.
+- game.js        Her footstep contact frames follow the commander's eight-frame walk.
+- assets-cast.js growth.png: two frames carried a checkerboard 'transparency' pattern and a square border baked in from
+                 the source image; removed, despeckled, re-outlined. growth, anomaly, crt-tiles reduced to 32 colours and
+                 tools to 24, no dither, hard alpha, so the props sit with the cast's locked palette instead of reading as
+                 painted. (-150 KB.)
+- The cast (commander, pilot, systems tech, K9) already shared one palette, one 1-px outline and one scale; the chibi was
+  the odd one out. If you want her told apart from the commander in the final EVA memory, a recolour of the commander's
+  sheet (orange patches, as the pilot's suit) is the next step; it needs a mask for which pixels are the patches.
+
+DeadScout · release 30 · changes from release 22 (releases 23-29, plus the helmet and reticle fixes)
+(every item verified in the source; the build was run headless end to end: title, new game, play, pause, photo,
+ save/continue, night watch, take/release control, broadcast mode, Director, privacy page: no errors, no 404s)
+
+GAMEPLAY / STORY
+- game/story.js  A save made during a memory (last walk, final EVA, the pilot, K9, any memory) no longer strands the
+                 thread: the stage stays out of `done` until its lock releases, so the source can be tuned again and
+                 the stage replays with its after-effects. (`a.pending`, `a.stage`, `a.locked`)
+- game.js save() Rooms saved mid-event in 'memory' or 'blackout' come back as 'low-power' (the shaft blackout could
+                 stay dark for ever after CONTINUE).
+- game/story.js  state() no longer throws on a stage id from an older story (which silently stopped all saving);
+                 restore() ignores unknown ids.
+- game/story.js  any-memory ignores the 'you' source (second transmission) and sources without a memory;
+                 tune-weak needs the scanner; signal-layer passes a duration to music('memory'); eng-memory-hint only
+                 during the engineering memory; self-lock's jitter is rolled once per firing, not once per frame.
+- cut.js         A locked door stops her (click-to-move and scripted moves walked straight through and unlocked it):
+                 she walks to it, reaches, a locked use is recorded (the latch sound). Doors on one leg are handled in
+                 walking order; the door's state is read at arrival time.
+- cut.js         doorAt() takes the latest event in time, not the last in the list.
+- cut.js         snapshot() stores the commanded room state, not the derived 'present-dark' (which, replayed by trim()
+                 every 60 commands or by CONTINUE, silenced every later soft room state).
+- cut.js         travelTime() applies the actor's speed factor; a bad start ref no longer throws.
+- game.js        End card counts k9_memory_seen (it said n / 9 over 8 flags); CUT.drift(0) on a new game (UNCANNY
+                 leaked into the next game); playT counts seconds, not frames (2x fast on 120 Hz).
+- game.js        Timers from a finished session (K9, the memory music, toys) do nothing in the next one.
+- watch.js       SCREENS_CALM named two screens that don't exist (utility.diag, engineering.flow): beats were dropped
+                 with a console warning every watch. Now quarters.monitor and engineering.panel.
+- game/pad.js    Hiding the on-screen pad releases a held direction too.
+- game.js        The registry shows the best transmission score (it was saved and never shown).
+
+AUDIO / RECORDING (long sessions)
+- deep.js        The bed's LFO is stopped with the band (it kept every old band's graph and reverb IR alive after each
+                 pause, resume and tape change). A chord rescued late keeps a positive length.
+- amb.js         The five modulator oscillators are stopped on AMB.stop() (one set leaked per title→play).
+- music.js       Every voice disconnects from the tape wobble when it ends (7 of 8 pad voices leaked).
+- mix.js         Layer tickers skip the past without scheduling: a resume or skip no longer fires every missed pulse
+                 at once (tape 07 / the synthwave bands).
+- rec.js         captureStream tracks are stopped and the WebCodecs encoders closed after a take; the worklet blob URL
+                 is revoked.
+- director.js    LR.cleanup() on start, as the game does (recording parts no longer pile up in OPFS).
+- loud.js        The loudness history is capped to the last hour.
+
+SHELL / PWA
+- game.css       .row[hidden] hides (the OBJECTIVE row showed with FOCUS off); keyboard focus is visible on the
+                 watch bar, photo bar and inputs; blinking LEDs respect prefers-reduced-motion.
+- game/clock.js  More room between the ship clock and the quick keys.
+- sw.js          One cache per release (deadscout-v23) precached from a file list; old caches deleted on activate;
+                 no more ignoreSearch (two versions could mix offline); navigations fall back to index.html so an
+                 installed app opens offline. KEEP THE FILE LIST IN STEP WITH index.html.
+- privacy.html   Rewritten for DeadScout (it was another product's page and linked a stylesheet that doesn't exist).
+- index.html, director.html   ?v= bumped on every changed file.
+- Text: 'play.html' → 'index.html' in messages and comments; RECOGNIZED; story/slice.js → game/story.js.
+
+NOT CHANGED (your call)
+- og.png is 1.2 MB with 62k colours; quantising to 256 colours would make it ~490 KB but is lossy. og:image is a
+  relative URL; most scrapers want an absolute one (needs your domain).
+- Dead CSS blocks under .u-deck{display:none!important}, unused exports (LMX.ENVS etc.), write-only story flags.
+- The Director's hidden video-making controls and their code.
