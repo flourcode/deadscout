@@ -455,8 +455,27 @@ body:not(.studio) #wName,body:not(.studio) #wTag2{visibility:hidden}  /* one lab
 .toast{position:absolute;left:50%;bottom:calc(3.5% + 96px);transform:translate(-50%,6px);z-index:7;pointer-events:none;max-width:min(92%,640px);text-align:center;
   font:400 clamp(11px,1.15vw,15px)/1.5 Silk,monospace;letter-spacing:.16em;color:#f3e6d2;background:rgba(11,14,17,.92);border:2px solid #d08a3a;padding:8px 14px;box-shadow:3px 3px 0 #000;opacity:0;transition:opacity .25s,transform .25s}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-body.portrait .toast{bottom:auto;top:calc(100% - 64px)}
+body.portrait .toast{bottom:auto;top:calc(100% + 190px);width:min(88vw,420px);max-width:none;box-sizing:border-box}
 .toy{width:calc(44px*var(--ui,1))!important;height:calc(44px*var(--ui,1))!important;margin:calc(-22px*var(--ui,1)) 0 0 calc(-22px*var(--ui,1))!important;display:flex!important;align-items:center;justify-content:center}
 .toy img{width:calc(30px*var(--ui,1))!important;height:calc(30px*var(--ui,1))!important}
 .toy:focus-visible{outline:2px solid #ffb45a;outline-offset:2px}
 body.ui .np{opacity:0!important;transition:none}  /* r53: with the controls up, the ♪ track label sits in the same corner */
+
+/* r54 · ship chores */
+.chores{position:absolute;left:calc(3% + 6px);top:calc(3% + 46px);z-index:6;cursor:pointer;font:400 clamp(9px,.95vw,12px)/1.6 Silk,monospace;letter-spacing:.16em;color:#efe2cf;
+  background:rgba(11,14,17,.86);border:2px solid #3a4148;box-shadow:3px 3px 0 #000;padding:6px 10px;min-width:11em;user-select:none;-webkit-tap-highlight-color:transparent}
+body:not(.playing) .chores{display:none}
+.chores b{display:flex;gap:.8em;align-items:baseline;font-weight:400;color:#ffb45a}
+.chores b i{font-style:normal;color:#efe2cf}.chores b u{text-decoration:none;margin-left:auto;color:#8a8f95}
+.chores ol{list-style:none;margin:6px 0 0;padding:0}
+.chores li{opacity:.92;transition:color .3s}.chores li.ok{color:#8fd6cf;opacity:.75}
+.chores li.pop{animation:chpop .7s steps(4) 1}@keyframes chpop{0%{transform:scale(1.15);color:#fff}100%{transform:none}}
+.chores.all{border-color:#8fd6cf}.chores.all b{color:#8fd6cf}
+body.ui .np{opacity:0!important}
+body.portrait .chores{top:calc(3% + 4px);right:calc(3% + 6px);left:auto;min-width:0;font-size:9px;padding:4px 8px}
+
+#hPrompt{pointer-events:auto;cursor:pointer}  /* r54: tap the prompt to use the thing (touch has no E key) */
+
+@media (max-height:500px){.toast{font-size:10px;padding:5px 10px;bottom:calc(3.5% + 70px);max-width:70%}
+  body.watching:not(.portrait) .talk .tbot{bottom:calc(3.5% + 56px)!important}}
+.toast{width:max-content}

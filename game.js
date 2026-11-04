@@ -36,11 +36,26 @@ const curTapeId=()=>{if(!watch)return 'drift';const c=watch.cfg;return c.music||
    each new pass of a tape gets a fresh hook (deep.js pass), so it does not come round exactly the same */
 /* r52: four tracks of one album, starting on SOFT ORBIT (Busy Ship), about eight minutes each; ⏭ (or N) skips with a short fade */
 const STN={pass:0,next:0,mins:8,order:['soft-orbit','space-wave','warm-transit','night-cruise']};window.__station=STN;
-function stationNext(xf){if(!watch)return;const cur=watch.tape||curTapeId(),L=STN.order,i=L.indexOf(cur);STN.pass++;watchTape(L[(i+1)%L.length],xf);}
-setInterval(()=>{try{if(!watch){STN.next=0;return;}if(!band||!actx||SLP)return;const t=actx.currentTime;if(!STN.next){STN.next=t+STN.mins*60;return;}if(t<STN.next)return;stationNext(10);}catch(e){}},5000);
+function stationNext(xf,dir){if(!watch)return;const cur=watch.tape||curTapeId(),L=STN.order,i=L.indexOf(cur);STN.pass++;watchTape(L[(i+(dir||1)+L.length)%L.length],xf);}
+/* r54 · MEDIA SESSION: the track on the lock screen and in the system media overlay; play/pause and next/previous keys work.
+   Browsers only show it while an <audio> element plays, so a silent one loops alongside the Web Audio music */
+const MS={a:null};
+function msStart(){if(!('mediaSession' in navigator))return;try{if(!MS.a){const sr=8000,n=sr,b=new ArrayBuffer(44+n*2),v=new DataView(b),W=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+      W(0,'RIFF');v.setUint32(4,36+n*2,true);W(8,'WAVE');W(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);W(36,'data');v.setUint32(40,n*2,true);
+      MS.a=new Audio(URL.createObjectURL(new Blob([b],{type:'audio/wav'})));MS.a.loop=true;MS.a.setAttribute('playsinline','');
+      const M=navigator.mediaSession,H=(k,f)=>{try{M.setActionHandler(k,f);}catch(e){}};
+      H('play',()=>{ensureAudio();setSound(true);paintWatch();MS.a.play().catch(()=>{});M.playbackState='playing';});
+      H('pause',()=>{setSound(false);paintWatch();M.playbackState='paused';});
+      H('nexttrack',()=>stationNext(3));H('previoustrack',()=>stationNext(3,-1));}
+    MS.a.play().catch(()=>{});navigator.mediaSession.playbackState=prefs.sound?'playing':'paused';msMeta();}catch(e){}}
+function msMeta(id){if(!('mediaSession' in navigator)||!window.MediaMetadata)return;try{const T=DEEP.TAPES[DEEP.tapeOf(id||(watch&&(watch.tape||curTapeId()))||'soft-orbit')];
+  navigator.mediaSession.metadata=new MediaMetadata({title:T.name.charAt(0)+T.name.slice(1).toLowerCase(),artist:'Driftnaut',album:'HALCYON · space chill',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'},{src:'icon-192.png',sizes:'192x192',type:'image/png'}]});}catch(e){}}
+setInterval(()=>{try{if(!watch){STN.next=0;STN.t0=0;return;}if(!STN.t0)STN.t0=performance.now();
+  if(state==='watch'&&!prefs.tipGame&&performance.now()-STN.t0>15*60000){prefs.tipGame=1;savePrefs();toast('LIKE IT HERE? PRESS GAME ▸ TO DRIFT THROUGH THE SHIP YOURSELF',8);}
+  if(!band||!actx||SLP)return;const t=actx.currentTime;if(!STN.next){STN.next=t+STN.mins*60;return;}if(t<STN.next)return;stationNext(10);}catch(e){}},5000);
 /* now playing: the track's name, a few seconds, top left of the ship */
 let npEl=null,npT=0;function nowPlaying(id){const T=window.DEEP&&DEEP.TAPES[DEEP.tapeOf(id)];if(!T)return;if(!npEl){npEl=document.createElement('div');npEl.className='np';npEl.setAttribute('aria-live','polite');(stage.parentElement||document.body).appendChild(npEl);}
-  npEl.innerHTML='<i>NOW PLAYING</i>'+T.name;npEl.classList.add('on');clearTimeout(npT);npT=setTimeout(()=>npEl.classList.remove('on'),4200);}
+  npEl.innerHTML='<i>NOW PLAYING</i>'+T.name;msMeta(id);npEl.classList.add('on');clearTimeout(npT);npT=setTimeout(()=>npEl.classList.remove('on'),4200);}
 function watchTape(id,xf){const mu=NW.MUSIC[id];if(!mu||!watch||!P)return;if(actx)STN.next=actx.currentTime+STN.mins*60*(.85+Math.random()*.3);P.style=mu.style;P.music=Object.assign({},P.music||{},{mode:'generated',style:mu.style,tape:mu.tape,vibe:mu.vibe,drums:mu.drums,synth:mu.synth,ambience:mu.ambience});watch.tape=id;try{if(band)startBand(now(),xf||10);}catch(e){}nowPlaying(id); /* r40: a crossfade, no restart */
   const tr=$('wTrack');if(tr)tr.textContent='▶ '+mu.name;paintWatch();}
 /* AMBIENCE: one stepped key for the whole room bed (the r27 sliders stay gone) */
@@ -152,7 +167,7 @@ function doorStop(ref,dir){const t=now(),s=CUT.actorAt(P,TIMES,t,me),g=CUT.place
 function coastRef(s,t){if(!s.walk||!(s.v>8)||watch)return null;const dir=s.left?-1:1,h=CUT.pick(P,TIMES,t,s.x+dir*s.v*.09,s.y-4);return h&&h.type==='place'?h.ref:null;}
 function stopHere(){const t=now(),s=CUT.actorAt(P,TIMES,t,me),r=coastRef(s,t);if(r){cmd({move:me,to:r,interrupt:true,coast:true});return;}cmd({move:me,to:CUT.hereRef(P,TIMES,t,me),interrupt:true});}
 function dirOf(k){return k==='ArrowLeft'||k==='KeyA'?'left':k==='ArrowRight'||k==='KeyD'?'right':k==='ArrowUp'||k==='KeyW'?'up':k==='ArrowDown'||k==='KeyS'?'down':null;}
-function use(){const n=CUT.nearby(P,TIMES,now(),me,disabled);if(n&&n.type==='ladder')return;if(n){cmd({actor:me,interact:n.id,interrupt:true});findLog(n.id);if(state==='play')setTimeout(()=>toast(answer(n)),450);}else{cmd({actor:me,do:'look-around',for:2.5});if(state==='play')toast('NOTHING TO USE HERE · DRIFT CLOSER TO SOMETHING');}}
+function use(){const n=CUT.nearby(P,TIMES,now(),me,disabled);if(n&&n.type==='ladder')return;if(n){useObject(n);}else{cmd({actor:me,do:'look-around',for:2.5});if(state==='play')toast('NOTHING TO USE HERE · DRIFT CLOSER TO SOMETHING');}}
 /* r53 · every action in GAME answers in words, fully formed, long enough to read */
 const ANSWER={'quarters-locker':'A SPARE SUIT AND A DENTED THERMOS','quarters-photo':'THE CREW, SMILING, THE DAY BEFORE LAUNCH','nav-log':'ON COURSE · 150 AU FROM SOL · ALL WELL',
   'mission-patch':'DSV-0417 · HALCYON · 2291','tunnel-trace':'AN OLD REPAIR, LONG COOLED','eva-look':'STARS, AND THE PLANET\'S BLUE RINGS','viewport':'STARS, AND THE PLANET\'S BLUE RINGS',
@@ -163,6 +178,40 @@ const ANSWER={'quarters-locker':'A SPARE SUIT AND A DENTED THERMOS','quarters-ph
 function answer(n){const O=CUT.MAP.objects[n.id]||{},nm=(n.name||O.name||'').split('·')[0].trim()||(n.type==='terminal'?'TERMINAL':'');
   if(n.type==='door')return /LOCKED/.test(n.name||'')?'LOCKED · THIS ONE STAYS SHUT':(/HATCH/.test(n.name||'')?'HATCH':'DOOR')+' · OPEN';
   const a=ANSWER[n.id]||(n.type==='terminal'?'SCREEN ON · ALL SYSTEMS NORMAL':/inspect|observe/.test(O.act||'')?'NOTHING UNUSUAL':'DONE');return (nm&&!a.startsWith(nm)?nm+' · ':'')+a;}
+/* r54: the switches, machines and things to look at have no hit box of their own; a tap near one (same deck, within reach) means it */
+const OBJXY={};function objAt(wx,wy){let best=null;for(const id in CUT.MAP.objects){const O=CUT.MAP.objects[id];if(!O.kind||!O.spot)continue;let p=OBJXY[id];if(p===undefined){try{p=CUT.place(O.spot);}catch(e){p=null;}OBJXY[id]=p;}if(!p)continue;
+    const dx=Math.abs(wx-p.x),dy=p.y-wy;if(dx<56&&dy>-24&&dy<170){const d=dx+Math.abs(dy-60)*.3;if(!best||d<best.d)best={d,id,O};}}
+  return best?{type:'switch',id:best.id,name:best.O.name}:null;}
+function useObject(n){const id=n.id;cmd({actor:me,interact:id,interrupt:true});findLog(id);if(state!=='play')return;
+  let d=0;try{const O=CUT.MAP.objects[id];d=O&&O.spot?(CUT.travelTime(me,CUT.hereRef(P,TIMES,now(),me),O.spot)||0):0;}catch(e){}
+  setTimeout(()=>{if(state!=='play')return;toast(answer(n));feel(id);choreDone(id);},(Math.min(d,20)+.45)*1000);}
+/* r54 · each thing responds in a way you can see and hear, not only in words */
+function feel(id){const O=CUT.MAP.objects[id];if(!O||!O.spot||!window.__town)return;let p=null;try{p=CUT.place(O.spot);}catch(e){}if(!p)return;const T=__town;
+  if(id==='meal-unit'){sfx('valve',p.x,.8);T.burst('steam',p.x,p.y-54,16);setTimeout(()=>T.burst('steam',p.x,p.y-54,10),700);}
+  else if(/breaker/.test(id)){sfx('breaker',p.x,.9);const room=p.room;if(room){CUT.toy({room:{[room]:0}});setTimeout(()=>{CUT.toy({room:{[room]:1}});sfx('switchon',p.x,.8);T.burst('spark',p.x,p.y-60,12);},800);}}
+  else if(id==='sensor-sweep'){sfx('sonar',p.x,.8);T.ring(p.x,p.y-30,'#8fd6cf',2.2,260);setTimeout(()=>T.ring(p.x,p.y-30,'#8fd6cf',2.2,260),600);}
+  else if(id==='nav-log'){sfx('teletype',p.x,.7);T.burst('flash',p.x,p.y-50);}
+  else if(id==='viewport'||id==='eva-look'){sfx('tink',p.x,.7);T.burst('spark',p.x,p.y-80,8);}
+  else if(/terminal/.test(id)){sfx('blip',p.x,.7);T.burst('flash',p.x,p.y-50);}
+  else{sfx('click',p.x,.7);T.ring(p.x,p.y,'#ffd08a',.9,30);}}
+/* r54 · SHIP CHORES: five cozy jobs, a few minutes of clear play. Their spots glow; each one ticks off with a chime; all five and the ship lights up */
+const CHORES=[{ids:['meal-unit'],label:'MAKE COCOA'},{ids:['nav-log'],label:'READ THE NAV LOG'},{ids:['quarters-breaker'],label:'RESET THE BREAKER'},{ids:['sensor-sweep'],label:'RUN A SENSOR SWEEP'},{ids:['viewport','eva-look'],label:'LOOK OUT THE WINDOW'}];
+const CHR={done:new Set(),el:null,open:null,finished:false,near:null};
+function choresPaint(){if(!CHR.el){CHR.el=document.createElement('div');CHR.el.className='chores';(stage.parentElement||document.body).appendChild(CHR.el);
+    CHR.el.addEventListener('click',e=>{e.stopPropagation();CHR.open=!CHR.open;choresPaint();});CHR.el.addEventListener('pointerdown',e=>e.stopPropagation());}
+  if(CHR.open==null)CHR.open=!(window.matchMedia&&matchMedia('(max-width:700px), (max-height:500px)').matches);
+  const n=CHR.done.size,all=n===CHORES.length;CHR.el.classList.toggle('open',CHR.open);CHR.el.classList.toggle('all',all);
+  CHR.el.innerHTML='<b>'+(all?'★ CHORES DONE':'SHIP CHORES')+' <i>'+n+'/'+CHORES.length+'</i><u>'+(CHR.open?'–':'+')+'</u></b>'+(CHR.open?'<ol>'+CHORES.map((c,i)=>'<li class="'+(CHR.done.has(i)?'ok':'')+'">'+(CHR.done.has(i)?'✓':'·')+' '+c.label+'</li>').join('')+'</ol>':'');
+  CHR.el.setAttribute('aria-label','Ship chores, '+n+' of '+CHORES.length+' done');}
+function choreDone(id){const i=CHORES.findIndex(c=>c.ids.includes(id));if(i<0||CHR.done.has(i))return;CHR.done.add(i);sfx('ping',null,.9);choresPaint();
+  const li=CHR.el&&CHR.el.querySelectorAll('li')[i];if(li){li.classList.add('pop');}
+  if(CHR.done.size===CHORES.length&&!CHR.finished){CHR.finished=true;setTimeout(choresFinish,1600);}}
+function choresFinish(){if(state!=='play')return;toast('ALL CHORES DONE · HALCYON HUMS HAPPILY',5.5);sfx('chirp',null,1.2);
+  try{(CUT.ROOMS||[]).forEach((r,k)=>setTimeout(()=>{CUT.toy({room:{[r]:1}});sfx('relay',null,.4);},k*140));}catch(e){}
+  try{const s=CUT.actorAt(P,TIMES,now(),me);__town.burst('spark',s.x,s.y-70,40);__town.mark(me,'★ WELL DONE',4.5);}catch(e){}
+  try{P.script.push({at:now()+.3,actor:'k9',do:'scan',for:3});P.rev++;}catch(e){}}
+window.__glowFn=()=>{if(state!=='play')return [];const L=[];CHORES.forEach((c,i)=>{if(CHR.done.has(i))return;const O=CUT.MAP.objects[c.ids[0]];if(O&&O.spot)L.push({ref:O.spot,kind:'chore'});});
+  if(CHR.near){const O=CUT.MAP.objects[CHR.near];if(O&&O.spot)L.push({ref:O.spot,kind:'near'});}return L;};
 let toastEl=null,toastT=0;function toast(text,secs){if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';toastEl.setAttribute('role','status');(stage.parentElement||document.body).appendChild(toastEl);}
   toastEl.textContent=text;toastEl.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('on'),(secs||3.4)*1000);}
 /* r37 · REST. From anywhere in the story: SIT / LISTEN. Driftnaut settles, the HUD withdraws, the camera holds her room,
@@ -176,7 +225,7 @@ setInterval(()=>{const b=$('restBtn');if(b)b.style.display=state==='play'&&!watc
 $('restBtn').addEventListener('click',e=>{e.stopPropagation();restOn();});$('restBack').addEventListener('click',e=>{e.stopPropagation();restOff();});
 document.getElementById('stage').addEventListener('pointerdown',()=>{if(resting)restOff();});
 function setCam(mode){prefs.camera=mode;savePrefs();if(watch){P.script.push({at:now(),camera:mode==='follow'?'follow':'cutaway',actor:me});P.rev++;}else{SP.cams.push({at:now(),mode:mode==='follow'?'follow':'cutaway',actor:me});SP.rev=(SP.rev||0)+1;}paintMenus();}
-function setSound(on){prefs.sound=on;savePrefs();if(master)master.gain.setTargetAtTime(on?1:0,actx.currentTime,.05);if(typeof pipV!=='undefined'&&pipV&&pipV.muted===on)pipV.muted=!on;paintMenus();}
+function setSound(on){prefs.sound=on;savePrefs();try{if(MS.a)navigator.mediaSession.playbackState=on?'playing':'paused';}catch(e){}if(master)master.gain.setTargetAtTime(on?1:0,actx.currentTime,.05);if(typeof pipV!=='undefined'&&pipV&&pipV.muted===on)pipV.muted=!on;paintMenus();}
 const controlling=()=>state==='play';
 document.addEventListener('keydown',e=>{if(document.body.classList.contains('watching')&&/^(Arrow(Up|Down|Left|Right)|Space|PageUp|PageDown|Home|End)$/.test(e.code)&&!(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)))e.preventDefault();},true); /* r53 */
 addEventListener('keydown',e=>{const k=e.code;if(e.metaKey||e.ctrlKey||e.altKey)return;
@@ -216,8 +265,9 @@ document.addEventListener('keyup',e=>{const k=e.code;if(state!=='play')return;co
   if(d){keys[d]=false;const other=['left','right','up','down'].find(x=>keys[x]);if(other)moveDir(other);else stopHere();hinted();}
   if(k==='ShiftLeft'||k==='ShiftRight'){careful=false;const d2=['left','right','up','down'].find(x=>keys[x]);if(d2)moveDir(d2);}});
 window.addEventListener('blur',()=>{for(const d in keys)keys[d]=false;if(state==='play')stopHere();});
-stage.addEventListener('pointerdown',e=>{if(petK9(e))return;if(state!=='play')return;const r=stage.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width*LC.DW,dy=(e.clientY-r.top)/r.height*LC.DH,t=now(),V=CUT.view(P,TIMES,t),hit=CUT.pick(P,TIMES,t,V[0]+dx/LC.DW*V[2],V[1]+dy/LC.DH*V[3]);if(!hit)return;
-  if(hit.type==='place')cmd({move:me,to:hit.ref,interrupt:true,sneak:careful});else{cmd({actor:me,interact:hit.id,interrupt:true});findLog(hit.id);}hinted();});
+stage.addEventListener('pointerdown',e=>{if(petK9(e))return;if(state!=='play')return;const r=stage.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width*LC.DW,dy=(e.clientY-r.top)/r.height*LC.DH,t=now(),V=CUT.view(P,TIMES,t),wx=V[0]+dx/LC.DW*V[2],wy=V[1]+dy/LC.DH*V[3];let hit=CUT.pick(P,TIMES,t,wx,wy);if(!hit||hit.type==='place'){const o=objAt(wx,wy);if(o)hit=o;}for(const d of [-30,30,-60,60]){if(hit)break;hit=CUT.pick(P,TIMES,t,wx,wy+d);}if(!hit)return;
+  if(hit.type==='place'){cmd({move:me,to:hit.ref,interrupt:true,sneak:careful});try{const pl=CUT.place(hit.ref);__town.ring(pl.x,pl.y,'#ffb45a',.8,24);}catch(_){}}else useObject(hit);hinted();});
+$('hPrompt').addEventListener('pointerdown',e=>{if(state!=='play')return;e.stopPropagation();e.preventDefault();use();});
 let hints=0;const hinted=()=>{if(++hints>=4)$('hHint').hidden=true;};
 /* the prompt, old-console style: [ WHAT ]  KEY : VERB */
 function promptOf(n){let name=n.name,verb='OPERATE';const O=CUT.MAP.objects[n.id];if(n.type==='door'){const locked=/LOCKED/.test(name);name=/HATCH/.test(name)?'HATCH':'DOOR';verb=locked?'LOCKED':'OPEN';}
@@ -321,12 +371,13 @@ function savePhoto(){const src=CUT.frame&&CUT.frame();if(!src)return;const k=pre
 $('photo').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const p=b.dataset.p;if(p==='save')savePhoto();else if(p==='less')photoScale(-1);else if(p==='more')photoScale(1);else photoOff();});
 /* ---------- NIGHT WATCH: the watch itself ---------- */
 let uiT=null,wStart=0,endingSoon=false,uiKeep=false;
-async function beginWatch(o){o=o||{};ensureAudio();try{await actx.resume();}catch(e){}await untilLoaded();const nw=prefs.nw;if(!NW.SCENES[nw.scene])nw.scene='drift';nw.view='full-ship';const SCN=NW.SCENES[nw.scene];
+async function beginWatch(o){o=o||{};ensureAudio();try{await Promise.race([actx.resume(),new Promise(r=>setTimeout(r,400))]);}catch(e){} /* r54: a deep link (?game) has no tap yet: don't wait for the sound, start it on the first touch */
+  if(actx.state!=='running'){const go=()=>{try{actx.resume();if(MS.a)MS.a.play().catch(()=>{});}catch(e){}removeEventListener('pointerdown',go,true);removeEventListener('keydown',go,true);};addEventListener('pointerdown',go,true);addEventListener('keydown',go,true);}await untilLoaded();const nw=prefs.nw;if(!NW.SCENES[nw.scene])nw.scene='drift';nw.view='full-ship';const SCN=NW.SCENES[nw.scene];
   const cfg={era:'2291',scene:nw.scene,view:'full-ship',activity:SCN.pace||'routine',music:'soft-orbit',duration_minutes:360, /* r42: no setup: the whole ship, endless, the last scene and tape */seed:watchSeed||22910000+Math.floor(Math.random()*89999)};
   const man=NW.manifest(cfg);watch={cfg,man,seed:cfg.seed};session++;show('setup',false);show('title',false);show('opts',false); /* r28: a watch can start straight from the title */$('veil').classList.remove('clear');await wait(700);
   loadWorld(man);if(o.play&&P.brand){P.brand.intro=false;extT0=0;CUT.exterior(null);} /* PLAY: no hull opening, straight in (r53: and the hull really opens: it was left closed) */SP.on=false;SP.cmds.length=0;SP.cams.length=0;me='commander';held=null;endingSoon=false;
   $('wName').textContent='DRIFTNAUT · '+SCN.name;document.body.classList.add('watching');state='watch';show('hud',false);
-  startBand(0);setTimeout(()=>{if(watch)nowPlaying(watch.tape||curTapeId());},2500);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,ambT(),prefs.mix,{mood:cfg.activity});ambT().gain.value=AMBV[prefs.nw.ambience]||1;}paintBeds();musicBus.gain.value=musicLevel();ambT().gain.value=SOUNDP[prefs.nw.sound||'balanced'].amb;
+  startBand(0);msStart();setTimeout(()=>{if(watch)nowPlaying(watch.tape||curTapeId());},2500);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,ambT(),prefs.mix,{mood:cfg.activity});ambT().gain.value=AMBV[prefs.nw.ambience]||1;}paintBeds();musicBus.gain.value=musicLevel();ambT().gain.value=SOUNDP[prefs.nw.sound||'balanced'].amb;
   keepAwake(true);setDim(prefs.dim&&cfg.activity==='quiet',true);SLP=null;sleeper=null;if(window.__town)__town.sleep('commander',false);$('dim').style.opacity='';if(sleepReq)setTimeout(()=>sleepStart(30),50);FOC.n=0;focusStart(0);paintWatch();wStart=performance.now();$('veil').classList.add('clear');wake();if(o.play)setTimeout(()=>enterPlay(),400);}
 function paintWatch(){/* full labels on a big screen; on a small one the words in <em> drop and an active button just turns amber */
   $('wControl').innerHTML=(state==='play'?'<em>RELEASE </em>':'<em>TAKE </em>')+'CONTROL';$('wControl').classList.toggle('on',state==='play');$('wSleep').innerHTML='SLEEP<em> · '+(SLP?SLP.min+' MIN':'OFF')+'</em>';$('wSleep').classList.toggle('on',!!SLP);$('wFocusBtn').innerHTML='FOCUS<em> · '+(FOC.phase?FOC.len+' MIN':'OFF')+'</em>';$('wFocusBtn').classList.toggle('on',!!FOC.phase);if(document.activeElement!==$('wObj'))$('wObj').value=prefs.nw.objective||'';$('wObj').hidden=!FOC.phase;$('wName').style.opacity=prefs.tag?1:0;$('wTag2').hidden=!(prefs.tag&&watch);$('wTag2').textContent=$('wName').textContent;
@@ -356,7 +407,8 @@ const PLAY_AT='quarters.locker',CREW3=['pilot','systems','commander'];
 function enterPlay(){if(!watch){beginWatch({play:true});return;}if(state==='play')return;audioOnly(false);const t=now(),p=CUT.place(PLAY_AT);if(!p)return;
   P.script.push({at:t,move:'deadscout',to:p.ref,teleport:true,interrupt:true},{at:t+.05,show:'deadscout'},...CREW3.map(c=>({at:t,hide:c})));P.rev++;if(CUT.solid)CUT.solid(true); /* r43: in PLAY the ship is yours: just you and K9 (the crew are LISTEN's) */
   extT0=0;if(P.brand)P.brand.intro=false;CUT.exterior(null);me='deadscout';lit=false;crouched=false;careful=false;state='play';show('hud',false);document.body.classList.add('playing');paintWatch();wake();setTimeout(()=>{try{__town.mark('deadscout','YOU',5);}catch(e){}},250);
-  if((prefs.playHints||0)<3){prefs.playHints=(prefs.playHints||0)+1;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;say('DRIFTNAUT',touch?'Tap the arrows to drift. Tap anything.':'Arrows to drift. E to use. Click anything.',5);}}
+  if((prefs.playHints||0)<3){prefs.playHints=(prefs.playHints||0)+1;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;setTimeout(()=>toast(touch?'TAP ANYWHERE TO DRIFT THERE · TAP THINGS TO USE THEM':'CLICK TO DRIFT THERE · ARROWS WORK TOO · E USES THINGS',6),900);}
+  choresPaint();}
 function exitPlay(){if(!watch||state!=='play')return;for(const d in keys)keys[d]=false;const t=now();P.script.push({at:t+.4,hide:'deadscout'},...CREW3.map(c=>({at:t+.4,show:c})));P.rev++;if(CUT.solid)setTimeout(()=>CUT.solid(false),500);
   if(prefs.camera==='follow')setCam('ship');state='watch';me='commander';$('hPrompt').hidden=true;document.body.classList.remove('playing');paintWatch();wake();}
 /* CALL K9: it comes by its own routes; it never climbs a ladder, so from another deck it says so and waits */
@@ -560,7 +612,7 @@ function frame(){requestAnimationFrame(frame);driftTick();if(DT&&state!=='play'&
   if(state==='play'){if(!watch&&t>=TOTAL-3){end();return;}if(!watch){const pn=performance.now();if(playPn&&pn-playPn<2000)playT+=(pn-playPn)/1000;playPn=pn;} /* seconds, not frames: r22 counted 2× fast on a 120 Hz display */
     if(!(hudN%8)){const o=CUT.report(P,TIMES,t);$('hRoom').textContent=o[me]||'';const T=AL.tracks.find(x=>t>=x.start&&t<x.start+x.dur);
       if(T&&T.i!==lastTrack&&!watch){lastTrack=T.i;$('hTrack').textContent='♪ '+String(T.i+1).padStart(2,'0')+' · '+T.name.toUpperCase();$('hTrack').classList.add('on');clearTimeout($('hTrack')._t);$('hTrack')._t=setTimeout(()=>$('hTrack').classList.remove('on'),5000);}
-      const n=CUT.nearby(P,TIMES,t,me,disabled);if(n){$('hPrompt').innerHTML=promptOf(n);$('hPrompt').hidden=false;}else $('hPrompt').hidden=true;}
+      const n=CUT.nearby(P,TIMES,t,me,disabled);CHR.near=n&&CUT.MAP.objects[n.id]?n.id:null;if(n){$('hPrompt').innerHTML=promptOf(n);$('hPrompt').hidden=false;}else $('hPrompt').hidden=true;}
     if(!(saveN++%1800))save();
     if(!watch&&!prefs.hint1&&t>22){prefs.hint1=true;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;note(touch?'TAP THE KEYS TO MOVE · ♪ TOP RIGHT':'← → MOVE · E USE · N NEXT TAPE · M MUSIC',11);}}
   if(talkWho&&!(hudN%2))placeBubble();hudN++;}

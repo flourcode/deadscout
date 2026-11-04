@@ -1,0 +1,586 @@
+DRIFTNAUT — RELEASE 54
+=======================
+1 · Phones and the YouTube link
+- Tap anywhere on the ship to drift there (a ring marks the spot); tap a
+  thing to drift to it and use it. Taps now reach the switches, machines
+  and things to look at, not just screens and doors. A tap on the floor
+  line between decks finds the nearest deck.
+- The "E · USE ..." prompt can be tapped (phones have no E key).
+- driftnaut.com/?game opens straight into GAME, skipping the start screen.
+  Sound starts on the first touch (browsers require one).
+- Bug: starting without a tap (a deep link) could hang on the title menu
+  waiting for sound; it no longer waits.
+- The GAME hint is now a readable box: "TAP ANYWHERE TO DRIFT THERE · TAP
+  THINGS TO USE THEM" (or the click/arrows/E version on a computer).
+
+2 · Ship chores
+- A small SHIP CHORES list in GAME: MAKE COCOA · READ THE NAV LOG · RESET
+  THE BREAKER · RUN A SENSOR SWEEP · LOOK OUT THE WINDOW. Spread over the
+  three decks; each ticks off with a chime. All five: "ALL CHORES DONE ·
+  HALCYON HUMS HAPPILY", the lights come up room by room, sparks, a WELL
+  DONE tag, K9 does a happy scan. Tap the list to fold it (folded by default
+  on phones).
+
+3 · Obvious, satisfying things
+- Each chore's spot has a glowing amber diamond and a soft ring; whatever
+  is in reach glows brighter.
+- Things respond, not only in words: the cocoa machine steams, the breaker
+  clunks the room dark then back on with sparks, the sensor sweep sends a
+  big sonar ring across the deck, the nav log and terminals flash, the
+  window sparkles.
+
+4 · Background listeners
+- Media keys and lock screen: the track name shows on the phone lock screen
+  and the computer's media overlay; play/pause, next and previous keys work.
+- After 15 minutes of LISTEN, once ever: "LIKE IT HERE? PRESS GAME ▸ TO
+  DRIFT THROUGH THE SHIP YOURSELF".
+- About text updated.
+- Cache bumped (driftnaut-v54).
+
+DRIFTNAUT — RELEASE 53
+=======================
+Labels
+- PLAY is now GAME everywhere (start screen card, the bar, the menu), so it
+  can't be mistaken for a play-music button.
+- ⏭ is now a SKIP button.
+- SOUND is now MUTE / UNMUTE (it was always an on/off switch).
+- The scene button keeps the scene's name on narrow screens (QUIET DRIFT
+  instead of just SCENE).
+
+From the play-test report
+- Bug: starting GAME from the start screen left the hull closed, so you
+  could not see inside the ship at all. Fixed; entering GAME from LISTEN
+  during the hull opening also goes straight inside.
+- The page no longer scrolls while the ship is up: arrow keys and Space move
+  you, not the page, and the About text stays on the start page.
+- YOU: entering GAME puts a "YOU" tag and a pulsing ring on Driftnaut for a
+  few seconds.
+- Every E / USE now answers in words, fully formed, for a few seconds
+  (e.g. "LOCKER · A SPARE SUIT AND A DENTED THERMOS", "NAV LOG · ON COURSE ·
+  150 AU FROM SOL"). Nothing nearby: "NOTHING TO USE HERE · DRIFT CLOSER".
+- CALL K9: "K9 IS COMING", a K9 tag follows it, "K9 IS HERE" when it
+  arrives; a second call says "K9 IS ALREADY ON THE WAY"; when it can't
+  reach your deck it says so plainly.
+- One label for the music: ♪ track name (top left with the controls up) and
+  NOW PLAYING when a track starts; the old album-track name is gone.
+- Ship toys (the small lights) have accessible names and 44 px tap targets.
+- About text rewritten to match the real controls.
+- Cache bumped (driftnaut-v53).
+
+Not changed on purpose: no scene picker menu (one tap to cycle keeps the bar
+simple), no music/ambience sliders.
+
+DRIFTNAUT — RELEASE 52
+=======================
+- The station is now a four-track album in the Busy Ship style, always
+  starting on SOFT ORBIT (Busy Ship):
+    SOFT ORBIT · 82 BPM · C  (Fmaj9 Em7 Dm9 Cmaj9)
+    SPACE WAVE · 78 BPM · D  (the Quiet Drift tape)
+    WARM TRANSIT · 80 BPM · A (Amaj9 C#m7 F#m9 Dmaj9)       new
+    NIGHT CRUISE · 84 BPM · G (Am9 D13 Gmaj9)               new
+  About eight minutes each with a slow crossfade; each time a track comes
+  round it gets a new melody hook.
+- ⏭ next-track button in the bar (LISTEN: SCENE · ⏭ · SOUND · PLAY;
+  PLAY: LISTEN · ⏭ · SOUND · CALL K9). N on the keyboard does the same.
+  Skipping fades over 3 seconds.
+- NOW PLAYING: the track's name shows top left of the ship for a few seconds
+  whenever a track starts.
+- All four tracks levelled to about -19.5 LUFS.
+- Cache bumped (driftnaut-v52).
+
+DRIFTNAUT — RELEASE 51
+=======================
+- One music station. SOFT ORBIT (the Busy Ship tape) and SPACE WAVE (the
+  Quiet Drift tape) take turns, about ten minutes each, with a slow
+  ten-second crossfade. It always starts on SOFT ORBIT.
+- Each new turn of a tape gets its own melody hook, so it never comes round
+  exactly the same.
+- Scenes (Quiet Drift, Busy Ship, Engine Room, Cabin, Outer Dark, red alert,
+  lights) change only the ship: lights, crew pace, ambience. They never
+  change, restart or thin out the music.
+- The other four tapes (Cabin Warmth, Slow Current, Quiet Engines, Engine
+  Glow) are gone; old saves that picked one now play the station.
+- Cache bumped (driftnaut-v51).
+
+DRIFTNAUT — RELEASE 50
+=======================
+- No loading screen. The start screen opens straight onto LISTEN and PLAY
+  (about 0.15 s instead of a 16-block loading bar). The live cabin scene fades
+  in behind them as soon as the ship has loaded.
+- A tap (or key) made while the ship is still loading is remembered and
+  carried out the moment it is ready, so nothing is ever ignored.
+- Cache bumped (driftnaut-v50).
+
+DRIFTNAUT — RELEASE 49
+=======================
+Tuning from listening notes (Quiet Drift and Busy Ship kept as they are).
+- CABIN (Cabin Warmth): the rimshot on 2 and 4 (it sounded like a wood
+  block) is replaced by a soft, muted snare. Same for Slow Current.
+- OUTER DARK (Quiet Engines): the brush hits (filtered noise, heard as
+  static) are replaced by the same soft snare; the hats are a little steadier.
+- ENGINE ROOM: new tape, ENGINE GLOW. A mellow 72 BPM groove in Eb
+  (Ebmaj9 - Cm9 - Abmaj9 - Bbsus9) with Rhodes, walking bass, a soft beat and
+  the bell hook now and then. Replaces the drumless high piano arpeggios.
+  The engine-room machinery sound is turned well down.
+- All tapes re-levelled to about -19.5 LUFS.
+- Cache bumped (driftnaut-v49).
+
+DRIFTNAUT — RELEASE 48
+=======================
+- New music engine: space chillhop instead of ambient drift. The old tapes held
+  slow pads over a drone with long space reverb and random sparse notes, which
+  is the recipe for eerie. Each tape is now a short jazzy loop that repeats:
+  - chords: maj9 / m9 / 13 / sus9, changing every bar or two, voice-led so the
+    hands barely move (e.g. Fmaj9 - Em7 - Dm9 - Cmaj9)
+  - warm Rhodes, gently strummed, with a few cents of tape wobble
+  - round bass on the root, sitting under the keys
+  - swung, laid-back boom-bap beat (soft kick, rimshot/snare/brush, quiet hats),
+    lowpassed, gently ducking the keys
+  - a two-bar pentatonic hook on a soft bell with a short echo, now and then
+  - vinyl crackle, a small warm room, nothing above ~7 kHz
+  - 66-82 BPM; two bars of keys before the beat comes in
+- The six tapes: SOFT ORBIT (82, full beat), CABIN WARMTH (76, rimshot, ii-V-I),
+  SPACE WAVE (78), SLOW CURRENT (74, two-chord float), QUIET ENGINES (70,
+  brushes), ENGINE SLEEP (66, no drums, slow Rhodes arpeggios).
+- Each tape levelled to about -19.5 LUFS (measured offline, BS.1770).
+- Ship ambience: the radio static, signal tones and hull creaks are off; the
+  engine hum and air are lower. Pink noise is off by default (brown noise stays
+  low).
+- Removed the sonar horizon waveform.
+- Cache bumped (driftnaut-v48).
+
+DRIFTNAUT — RELEASE 47
+=======================
+- Three buttons. LISTEN: SCENE · SOUND · PLAY. PLAY: LISTEN · SOUND · CALL K9.
+  Everything else (tape, audio only, noise levels, intensity, fade out, focus,
+  float, REC, menu) is gone from the bar. Creator/studio mode brings them
+  back: press Shift+S while listening, or open index.html?studio
+- SOUND is now a plain on/off. (Fixed a bug where two functions shared the
+  name setSound, so the old mute switch never worked.)
+- The sonar horizon is always on (no toggle). It hides only while the
+  controls are showing (they fade 4 s after the mouse stops) so the buttons
+  stay readable.
+- Cache bumped (driftnaut-v47).
+
+DRIFTNAUT — RELEASE 46
+=======================
+- Sonar horizon: a pixel equalizer under the ship that moves with what you
+  hear (the music plus the brown/pink noise beds), read straight from the
+  audio. Bass in the middle, highs toward the edges, mirrored into a dimmed
+  pixel reflection. 12 fps, quick rise and slow fall, so it breathes.
+- Colour follows the scene: teal (Quiet Drift), amber (Cabin, Engine Room),
+  green (Outer Dark), warm red (Busy Ship).
+- Desktop: a band in the space below the hull; captions move to the top so
+  they don't overlap it. It fades while the controls are showing.
+- Phones (portrait): a larger version in the empty space under the controls.
+  Phones (landscape): the band, hidden while a caption is up.
+- PLAY: dimmed so it doesn't compete with moving around.
+- Included in REC / long-take recordings.
+- MORE → WAVE · ON/OFF (remembered). Reduced-motion users get a slower,
+  gentler version.
+- Cache bumped (driftnaut-v46).
+
+DRIFTNAUT — RELEASE 45
+=======================
+- Start screen: Driftnaut now drifts slowly back and forth between the desk
+  and the bunk, past K9, in the drift pose (arms forward, legs trailing).
+- Start screen is frameless: the live cabin scene fills the whole window,
+  edge to edge, on desktop and phone. No bordered card.
+- Cache bumped (driftnaut-v45).
+
+RELEASE 44 · A LIVE WINDOW
+- The start screen is the game itself now, not a painting: a live crop of HALCYON's crew quarters drawn by the engine,
+  warm lamps on, Driftnaut drifting by the desk with her slow bob and K9 at her feet. It fades in once the ship has
+  loaded (the chunky bar shows until then) and stops the moment you choose. Desktop: the quarters on the left, the
+  title and LISTEN / PLAY on a darkened right side. Phone: the title, then the quarters as a band across the middle,
+  then the two doors. What you see is the ship you'll be in.
+- The mockup cabin art from release 43 is removed (it showed a different K9 and a room HALCYON doesn't have).
+- The link-preview image (og.png) is a frame of the live start screen.
+
+RELEASE 43 · THE CABIN
+- The start screen is a cozy cabin now: an astronaut in an armchair at a big window onto a planet, K9 beside them, a
+  steaming mug, plants and warm lamps (art from your mockup, with its text taken out so the real title and buttons sit
+  on it). Desktop: the cabin on the left, DSV-0417 // HALCYON, DRIFTNAUT, YOUR LITTLE PLACE IN SPACE and the LISTEN /
+  PLAY doors on the right. Phone: the title at the top, the cabin in the middle, the two doors stacked below it.
+  Landscape phones get the desktop layout, compacted. While loading, the chunky bar sits where the doors will be.
+- A new link-preview image (og.png, 1200x630) in the same style, and large-image previews for social links.
+- PLAY is yours alone: the 2291 crew step out while you drift, so it's just Driftnaut and K9 aboard (they come back
+  when you return to LISTEN). The commander wears the same suit as Driftnaut, which is why PLAY looked like two
+  astronauts.
+
+RELEASE 42 · CASUAL FIRST
+- Two ways in. After loading, the boot card offers LISTEN (relax · study · drift) and PLAY (explore · touch ·
+  discover). A tap anywhere else or any key is LISTEN; P is PLAY; MENU is the title. No setup, no story required.
+  The title menu is LISTEN · PLAY · THE STORY · OPTIONS (registry, setup, controls card and the rest are gone from it).
+- LISTEN is the whole ship as an ant farm, endless, with the music on after one click. It remembers your scene, tape and
+  sound. The bar is SCENE · TAPE · SOUND · AUDIO ONLY · PLAY · ⋯ and hides itself when you leave it alone.
+    SCENE  QUIET DRIFT · ENGINE ROOM · CABIN · OUTER DARK · BUSY SHIP. A scene changes the whole ship's lights, sound
+           and pace and plays its own tape at once; the camera never moves. BUSY SHIP gives the crew more to do.
+    TAPE   the next of the six tapes, crossfaded
+    SOUND  MUSIC (tape forward, noise low) · BALANCED · NOISE (brown and pink forward, the band back)
+    AUDIO ONLY  the screen goes black, the sound carries on; tap or press anything to come back
+    ⋯      intensity, brown and pink noise on their own, FADE OUT (30 / 60 min), focus timer, fullscreen, float,
+           long-take recording, MENU
+  Gone from the bar: CONTROL, SLEEP, LIGHT, AMBIENCE, the objective box. Red Alert and the strange events are out of
+  listening; room flickers and ghost echoes no longer happen in the ordinary day.
+- PLAY: you are Driftnaut, drifting through the same ship while the crew go about their day around you. It starts at
+  once (no opening, no tutorial): arrows to drift, E to use what's nearby, click anything. The bar is ◂ LISTEN · TAPE
+  · SOUND · CALL K9 · ⋯. CALL K9 brings K9 by its own routes; from another deck it says it can't climb ladders and
+  waits. Esc or L goes back to listening, instantly.
+- Nobody slumps. No sitting on the floor (the quarters table and terminal are standing places now), no one sleeping or
+  reading in the bunks, no commander turning in on SLEEP, no snoring, no floating Zs. REST in the story keeps her
+  upright. Kneeling to repair things stays.
+- The homepage copy is three short ideas: DRIFT · TOUCH · LISTEN.
+
+RELEASE 41
+- SLEEP: the commander turns in properly. When you press SLEEP in a Night Watch he walks down to the crew quarters and
+  lies in the bottom bunk under the blanket (helmet on the pillow, breathing, the odd snore and Zz), instead of
+  slumping on the floor. If the night schedule has others asleep they take the other bunk. Turn SLEEP off (or take
+  control) and he gets up and carries on his routine from the bunk.
+- The drones, the scrubber, the trolley, the welding arm, the capsules and the click effects were drawn over the outside
+  of the hull during the opening and the bridge VIEWPORT look (their layer didn't know the picture had become the
+  exterior). The layers now fade out with the hull and back in as it opens. Recordings follow the same rule.
+
+RELEASE 40 · SPACE CHILL
+- The music is rebuilt as one sonic family: warm deep-space ambient for focus, study, reading and rest. A comfortable
+  room that happens to be travelling through space. All of it is consonant now: major 7th, major 9th, sus2 and add9
+  chords that change slowly and overlap (the old engine was minor-key throughout); a low, mellow electric piano that
+  says a few notes and stops; a soft, rounded, sustained bass in the low mids (the drone never goes under 60 Hz, so no
+  constant sub rumble); long pads with slow attacks and long releases; nothing high or sparkling.
+- Gone from the music: the unstable "ghost" voice, radio and signal stings, distant impacts, tape dropouts, bright
+  hats and cracking snares, the machinery drum kit, big swells. The ship is part of the music instead: a slow,
+  distant reactor hum (ENGINE SLEEP, QUIET ENGINES, a little in CABIN WARMTH), the odd soft relay far away, coolant
+  moving through a pipe. Eerie sounds stay with the story, never in the tapes or the sleep modes.
+- Six tapes, six rooms of the same ship (58-72 BPM, or beatless):
+    ENGINE SLEEP   the warmest and deepest; slow chords, the reactor; no drums
+    SPACE WAVE     soft overlapping pads, a quiet repeating two-note bass; barely any rhythm
+    SOFT ORBIT     warm electric piano, a rounded downtempo beat (soft kick, brushed snare, lowpassed shaker)
+    CABIN WARMTH   mellow sustained keys, soft chord changes, faint mechanical textures; beatless
+    SLOW CURRENT   a soft pulsing bass, long chords, minimal percussion
+    QUIET ENGINES  near-beatless: a few warm tones and a low, steady machinery bed
+  Old saves and studio episodes that name the old tapes play the nearest new one.
+- BROWN NOISE and PINK NOISE beds, each OFF / LOW / MID / HIGH on its own (⋯ in Night Watch; LOW by default). Brown
+  is warm and low; pink is soft air moving through the ship. They breathe very slowly (±10% over half a minute), loop
+  without a seam, and keep running under everything when the tape changes.
+- INTENSITY: DEEP REST · FOCUS · SPACE CHILL (⋯ in Night Watch; FOCUS by default). It changes how much is playing
+  without changing the mood or restarting the tape: DEEP REST has no drums and a sparse melody; FOCUS keeps the rhythm
+  to a breath; SPACE CHILL plays everything. SLEEP plays the tape at DEEP REST.
+- Changing the tape in a watch crossfades over ten seconds, no restart. Moods and scenes pick tapes from the new
+  family (QUIET: Quiet Engines · ROUTINE: Soft Orbit · BUSY: Slow Current · SIGNALS: Space Wave; Quiet Drift: Space
+  Wave · Engine Room: Engine Sleep · Sleep Station: Cabin Warmth · Deep Signals: Slow Current). The synthwave bands are
+  retired from the catalogue. YouTube titles read e.g. ... · SOFT ORBIT TAPE · SPACE CHILL FOR FOCUS & STUDY.
+- Every tape is levelled to the same loudness, and the studio's loudness table is re-measured.
+
+RELEASE 39 · CALM AGAIN
+- Night Watch is the ant farm again: HALCYON in 2291 with her crew going about their day, the whole ship in frame.
+  The NOW / 2291 ERA choice is gone (Driftnaut's quiet present lives in the story, with R to rest).
+- Release 35's navigation is back. The watch bar is CONTROL · SCENE · SLEEP · END · ⋯ (TAPE, LIGHT, AMBIENCE, FOCUS,
+  REC, FLOAT and FULLSCREEN live under ⋯). Setup is VIEW · MOOD · TAPE · TIME · FOCUS again; the whole ship is the
+  default, and VIEW is there only if you want a one-room video.
+- SCENES never move the camera. They change the mood of the whole ship - NIGHT WATCH, QUIET DRIFT, ENGINE ROOM, SLEEP
+  STATION, DEEP SIGNALS, RED ALERT - its lights, bed and tape (when TAPE is AUTO), and a crew member and K9 wander
+  over to that room for a while. RED ALERT is back as it was: every lamp, the klaxon, the red wash. BUSY works as before.
+- The start of shift plays untouched again: the rooms dark, then lighting one by one with their relays, the coffee,
+  a hello for the time of day, K9's chirp. A watch always starts on NIGHT WATCH with warm light.
+- GRADUAL DRIFT in the story. Driftnaut walks like anyone at first, footsteps and all. Once the ship starts counting
+  wrong she walks a pixel or two off the deck and her footsteps fade. After the camera that can't see her she drifts:
+  leaning into the way she's going, arms a little forward and legs trailing a little behind (the sheet's own zero-g
+  frames), upright with a slow bob when still, rising beside the ladder instead of climbing it, a soft tone instead of
+  steps. It changes over about half a minute, so nobody sees the moment. A second transmission starts drifting.
+- SOMEONE ELSE ABOARD. Very rarely in a Night Watch (first after 8-20 minutes, then every 25-60), Driftnaut is there,
+  faint and half-transparent, somewhere the crew aren't, for fifteen or twenty seconds. The crew never notice. K9 does.
+  The bridge security monitor shows one more person, the ship's count is off by one (CREW: 3 · COUNT: 4), and then
+  she isn't there.
+- Kept from 36-38: the Driftnaut name, the gentler story, the chillhop tapes and their names, the coffee, the cards,
+  REST in the story, the residents and the long take.
+
+RELEASE 38 · SCI-FI CHILLHOP
+- A GROOVE layer in the music engine (deep.js), on top of the ambient one: a dusty kit (a rounded kick, a brushed
+  snare, swung hats, ghost notes and small fills, a breath every eight bars), a round bass that walks the chord's root,
+  and warm Rhodes stabs, all on one bar grid so a chord change never stumbles. It comes and goes with the music's
+  phases; a quiet phase drops to keys and bass. The sleep profile never plays drums or bass.
+    ORBITAL DRIFT and HOME FREQUENCY: steady, swung chillhop. NIGHT SIGNALS and LAST TRANSMISSION: a sparse half-time
+    kit under keys and static. ENGINE SLEEP: a loose machine rhythm. OUTER DARK: no beat, pads and silence.
+    A tape that wants a beat now starts on one.
+- Every tape is levelled to about -19 LUFS (the groove added weight unevenly; HOME FREQUENCY had come out 3 dB hot),
+  and the loudness table the studio uses for broadcasts is re-measured. Peaks stay under -5 dBFS.
+- A 30-60 minute story: the ship's unease arrives sooner (the drift levels at 7 and 18 minutes, not 10 and 25), and
+  the music arc is planned for 45 minutes, not 110.
+- Bittersweet details. The coffee machine in comms still brews, three cups, now and then (COFFEE READY · THREE
+  CUPS). The cards on the quarters table are still half played; click them. In a NOW watch K9 sometimes goes to the
+  bunk and waits a while (BUNK 2 · WAITING), then goes back to its spot.
+- Shorter, gentler lines: the long HOS notes are cut to ten words or fewer; the scorch mark is a warm spot on the
+  deck; the lower access reads NO FOOTFALL · DOOR CYCLED (she floats).
+
+RELEASE 37 · NIGHT WATCH, NOW AND 2291
+- ERA (Night Watch setup). NOW is the default: the ship as she is today, lit and humming, with only Driftnaut and K9
+  aboard. Driftnaut drifts between her favourite places on her own (the bridge window, the quarters table, the comms
+  chair, the warm spot by the reactor) and rests there a while. 2291 is the busy-town watch from release 33: HALCYON
+  remembers her crew, going about their day. TAKE CONTROL gives you Driftnaut in NOW and the commander in 2291.
+- SCENES. SCENE now picks a room, and the camera, its lights, its sound bed and its tape follow: QUIET DRIFT (bridge),
+  ENGINE ROOM, SLEEP STATION (quarters; K9 curls up), DEEP SIGNALS (comms), OUTER DARK (outside, stars, near silence),
+  or the WHOLE SHIP. In NOW, Driftnaut goes to that room to sit, rest or listen. RED ALERT is gone.
+- The watch bar: SCENE · TAPE · LIGHT · AMBIENCE · SLEEP · ⋯. TAPE changes the music in place (the new tape fades in, the
+  ship doesn't reload). LIGHT steps WARM / LOW / OFF over whatever the scene lit. AMBIENCE is one stepped key, LOW /
+  MID / HIGH, for the whole room bed. CONTROL and END moved into ⋯ with FOCUS, REC, FLOAT and FULLSCREEN.
+  The scene, tape, light and ambience you leave it on are remembered for next time.
+- The tapes have their identities: ORBITAL DRIFT, HOME FREQUENCY, NIGHT SIGNALS, ENGINE SLEEP, LAST TRANSMISSION, OUTER
+  DARK (and NEON YEARS / SPACEWAVE as the synthwave flavour at the end). Same names on the audio deck in the story.
+- REST in the story: press R (or the REST key on screen) anywhere. Driftnaut sits, the HUD withdraws, the camera holds
+  her room, the room's sound settles and the ship's little happenings pause. Any key, a tap or RETURN and she carries
+  on, no loading.
+- YouTube titles follow the scene and era, e.g. DRIFTNAUT // ENGINE ROOM · 1 HOUR · ENGINE SLEEP TAPE · SCI-FI
+  CHILLHOP ABOARD HALCYON, or ... · 2291 · HALCYON REMEMBERS HER CREW.
+- The about copy and controls card are rewritten for Driftnaut (drift, rest, the new watch keys).
+
+RELEASE 36 · DRIFTNAUT
+- The name: DeadScout is now DRIFTNAUT everywhere a player sees it (boot card, title, page title and description,
+  link previews, the installed app's name, the about copy, privacy page, the studio, YouTube titles and series names,
+  saved-take file names). Internal ids are unchanged, so saves, settings and the offline copy carry over.
+  Canon kept: HALCYON is the ship, DSV-0417 its hull number, 2291 the mission year, K9-4 the companion.
+- DRIFT. The astronaut hovers: about 5 pixels off the deck with a slow 2-pixel bob, a little higher at cruise, legs
+  still, and a soft shadow on the floor under her that breathes with the bob. In the shaft she drifts up and down
+  beside the ladder instead of climbing it. Sitting or crouching she settles lower but never touches down. No
+  footsteps and no rung clanks for her: a low, soft tone rises and falls with her speed. Everyone else keeps their
+  feet - the 2291 crew walk, K9 walks - so her floating is the clue nobody says out loud.
+- Gentler. Nothing hostile: the contamination growth, the anomaly pulses and the blackouts are gone from the story
+  (the service tunnel memory, the shaft and the EVA keep their beats with a rising signal instead); lights that used
+  to fail now dim and come back; hull knocks are a soft cooling tick. The ending reads SOURCE: HERE.
+- The STRANGE mood is now SIGNALS: faint transmissions, a console chirp, a far-off melody on the quarters monitor, a
+  ghost shift on the bridge. No dark decks, no growth.
+
+RELEASE 35
+- The loading screen keeps the composition (helmet, DEADSCOUT, HALCYON, the loading bar) but only the game's own art:
+  the invented planet and moon are gone; behind the card there are just chunky stars, a few twinkling.
+- The loading bar is chunkier, 16-bit style: a thick frame with a hard shadow, each block lit on top and shaded
+  below, the last one amber. LOADING is bigger. Short (landscape phone) screens keep the bar chunky.
+
+RELEASE 34 · THE LOADING SCREEN
+- The boot card is now the cabinet title screen from the mockup: a framed card over a pixel sky (stars that twinkle,
+  a moon, the curve of a gas giant in the corner), DSV-0417 / HOS 4.1 in the corners, the helmet, DEADSCOUT in big
+  cream letters, and HALCYON herself (boot-ship.png, cut from the exterior art and reduced to chunky pixels, with
+  two-frame flickering engine jets). While loading: LOADING and the sixteen-block bar. Then PRESS START in big orange
+  and a row of chunky keys: NIGHT WATCH (what a tap anywhere does), SCENE (the watch setup), SLEEP (a watch with the
+  30-minute sleep timer), ENTER HALCYON (the story), MENU (the title). Arrow keys move between the keys; any other key
+  starts the watch. Phones get the same card, re-flowed (portrait wraps the keys; landscape compacts everything).
+- tools/boot-ship-cut.py and tools/boot-ship-keep.py: how the ship sprite was cut out.
+
+RELEASE 33 · BUSY TOWN. HALCYON remembers her crew, and she keeps herself.
+- CREW ANIMATION (tools/crew.py, new). The pilot and the systems tech climb ladders properly now: four back-view climb
+  frames each (made from the commander's climb, with their own heads from behind: her brown hair and bun, his dark
+  curls, her orange shoulder patches), so nobody slides up a ladder like a paper doll. The pilot has a real seated pose
+  (two frames, so she types at the helm and at the comms desk) and sits at the quarters table.
+- THE SHIP'S DAY (watch.js). Crew routines follow your local clock. Breakfast, lunch and dinner bring people down to
+  the quarters; in the evening they play cards on the floor, read in the bunk, or look out the upper window; during
+  the day the pilot runs the comms desk and fetches coffee, the tech hauls crates up from the service tunnel, and the
+  commander walks rounds with a tablet. From 23:00 to 06:00 two of the crew sleep in the bunks (you can see them
+  under the blanket, breathing) while the commander keeps the watch. Storylets can now run lanes in parallel, so two
+  people really do things at the same time.
+- RESIDENTS (game/town.js, new). The ship's own small life, drawn in its own chunky pixels on a layer over the picture:
+  ceiling crawlers that service the light tubes; a floor scrubber in engineering that leaves a wet shine, steers
+  round K9, and stops to beep at it (K9 looks it over and chirps back); a welding arm over the engine; capsules in the
+  pneumatic tube up the shaft (a whoosh and a thunk); a cargo trolley in the service tunnel; coolant pulses in the
+  pipes; the recycler thumping under the floor; footsteps on the decking and the clink of ladder rungs. Every sound is
+  made in the page and panned to its source, quieter when the camera is far away. QUIET parks most of them, BUSY
+  runs them all, SLEEP settles them.
+- BUSY mood. A new SCENE mood between ROUTINE and STRANGE: everyone has somewhere to be, the drones and tubes run
+  often, never an alarm or a flicker, and night sleeps are shorter. Titled "BUSY TOWN ON A LIVING SPACESHIP".
+- REC · LONG TAKE in the watch's ⋯ menu: records the watch in 1080p at 4 Mbps (about 1.8 GB an hour, written to the
+  browser's own storage) until you tap it again; then the file saves.
+- Recordings and the float window now include the overlay layers (the day tint, the residents, the click effects).
+  Before this they recorded only the ship picture, so a take was missing what you saw.
+
+RELEASE 32
+- The engine beams outside the hull (the title screen, the HALCYON open, the bridge VIEWPORT look-out) were painted over
+  the engine barrels: the exterior used the cutaway's nozzle positions 14 px further in. cut.js now has the exterior
+  art's own nozzles (XNOZ, measured on world/exterior) and the beams leave each barrel at its lip; during the dissolve
+  they move between the two sets of positions.
+
+RELEASE 31
+- K9 ROUTES (game/k9nav.js, new). K9-4 is a ship resident with its own ways round, not a follower. One rule is
+  absolute: K9 never climbs a human ladder, and nothing teleports. K9's network is the deck it is on plus ONE
+  maintenance chute: a hatch low in engineering's west wall <-> a hatch at the east end of the service tunnel. The
+  upper deck (bridge, sensor, comms) has no K9 route.
+    When she changes deck, K9 goes to the foot of the ladder, looks up, chirps, and waits. If she stays on the other
+    deck and there is a route, after a while it takes the chute: hatch latch and seal, servo steps muffled behind the
+    wall (panned along the chute), the far hatch, and it trots up beside her. No route: it waits.
+    The old code jumped K9 to her deck when both were off-camera (k9.js) - removed. A second hidden jump in cut.js
+    (a move with no route snapped the actor to the target) now means 'stay where you are'. K9's watch errands are on
+    its own deck. Bedtime, end of shift and the double-tap summon all route through the chute or wait. Double-tap a
+    floor K9 can't reach and it looks up, chirps, and stays.
+    In a watch K9 sometimes goes down the chute to potter in the service tunnel for a few minutes, then comes back.
+    Both hatches are drawn on the wall (a small grille with a service light) and open as it passes.
+- Touches feel closer: every poke ducks the music ~15% and the room ~10% for a moment, then swells back. Effects are
+  drawn ~1.7x fatter; shakes and sways are bigger and longer; the big things (reactor, hatch, mug, lockers, plant,
+  desk, dish, valve) glow and breathe down for 2-3 s after you touch them.
+- Half as much happening: QUIET and ROUTINE watches space their events and micro-events about twice as far apart,
+  and the crew run errands half as often. Long stretches where a room just breathes. STRANGE keeps its pace.
+- The watch bar: four chunky keys - CONTROL, SCENE (with its value), SLEEP, END - and ⋯ for FOCUS, FLOAT and
+  FULLSCREEN. 2 px borders, a hard shadow, a press-down when clicked; the state is the colour (amber = on).
+- Dialogue no longer covers the watch bar.
+
+RELEASE 30
+- Boot art: the empty visor no longer shows the ship reflected, only the glass, its glare and a few stars. The skull
+  version (shown once you've finished the story) is now a ghost: two thirds glass, one third skull, dithered.
+- Toy reticles: no longer all shown when the ship loads (a 3.5 s showcase) or for the whole room under the cursor.
+  A reticle shows only when the pointer is near it, or near a recent tap on touch, and never during the opening.
+
+RELEASE 29 · COZY
+- Boot card art: the helmet, at the game's 64-pixel grain in the Halcyon palette (tools/helmet.py makes both from the
+  source art). The visor is empty, deep glass with stars and HALCYON reflected (boot-helmet.png). Once you have
+  finished the story, the visor shows what she is (boot-helmet-skull.png). DEADSCOUT is lettered under it.
+- Start of shift: as the opening dissolves into the ship the rooms are dark; the lights come on room by room with
+  their relays, the coffee pours on the comms shelf, a crew member says hello for the time of day, K9 chirps.
+- K9's bedtime: SLEEP sends K9 to the foot of the bunk with a goodnight chirp; it powers down and its eye-light
+  blinks slowly in the dark.
+- End of shift: END WATCH puts the lights out room by room, sends K9 to its dock, and HOS signs off ('SLEEP WELL'
+  late at night).
+- Little warmths: the mug on the comms shelf steams by itself now and then; the bridge glass mists at night; the
+  notes board on comms has a different note every day (click it), and older ones after that.
+
+RELEASE 28 · JOY (game/joy.js, new)
+- Everything answers back. 79 things to click, each with its own close-up sound (made in the page, all soft) and a
+  little pixel effect, and a ring pop so no click goes unanswered:
+    every monitor (flicker, new readout; every 5th reboots) and the keyboard under each wide one (typing);
+    every lamp (blinks); the plant (rustle, water; every 5th a flower); the bunks (curtain sway; snore and Zz on the 5th;
+    the lower one turns a page); the desk (cassette); the lockers (latch; on the 4th something falls out and K9 looks);
+    the quarters vent (dust); the bridge glass (a chime and a glint; every 7th a shooting star; HOLD it and it fogs);
+    chairs (creak); the comms notes (paper); the mug on the comms shelf (pour and steam; every 3rd a spill, and HOS
+    files a report); the reactor (hum and sparks; every 6th a steam burst and HOS asks you to stop); pipes (clank,
+    drip); the service crates (thud; on the 5th a rubber duck); the valve (ratchet); the airlock hatch (pressure seal);
+    the EVA suits (velcro); the dish (servo, ping); the shaft ladder plays a pentatonic scale by height; the stars
+    chime where you tap; the crew glance and say a line (night lines after 22:00).
+  Double-tap a floor in a watch and K9 trots over and sits. Hover shows four corner ticks and a faint tick sound.
+- SLEEP, designed. One button, 20 or 40 minutes: nothing strange is scheduled any more, the lights go down to the
+  quarters' lamp, a brown-noise bed comes up, the band drops to a drone and away, the picture dims to black and stays
+  black with the ship still breathing. A tap lifts the dark for eight seconds. The SLEEP DIM scene is gone (redundant).
+- Softer sound everywhere: a lowpass on the band and on every joy sound; ambience defaults lowered, the busy radio and
+  signal beds most. In a watch the ambience follows the room in the middle of the frame; the crew murmur when the
+  bridge is in view; rain-like ticks run on the hull in the whole-ship view.
+- The ship's day: a multiply tint follows your local clock (cool day, warm evening, a soft night). Weather outside,
+  every 10-20 minutes: an ice field drifting through open space, or an aurora off the gas giant. K9 sometimes chases a
+  floating bolt. Zz rises over a crew member who is staying put, at night or while you sleep. The plant in the crew
+  quarters grows a new leaf for every day you come back (sixteen at most; counted in this browser only).
+- Less friction. The boot card ends on PRESS START: one tap (or click, or any key) starts the watch with your last
+  settings; MENU goes to the title. NIGHT WATCH is first on the title and starts at once; SETUP is its own item. New
+  players get an endless watch. With the watch controls away, the quick keys and toy reticles fade off the glass.
+- A watch started from the title now hides the title (found while testing PRESS START).
+
+RELEASE 27
+- Night Watch bar: 11 buttons and 7 sound sliders -> 7 buttons. Removed the per-sound mixer, PHOTO (still P and
+  Options), CLOCK (tap the clock), and the dead SLEEP DIM / LABEL markup. MOOD in the bar is renamed SCENE (the setup
+  screen's MOOD is a different thing). FLOAT and FULLSCREEN only appear where the browser supports them. On small
+  screens the labels shorten (CONTROL SCENE FOCUS SLEEP FLOAT FULL END) and an active button turns amber.
+- FLOAT's mute: the floating window's video had no audio track, so its mute did nothing. While floating, the ship's
+  sound now plays through that window; its mute and its play/pause both switch SOUND, and SOUND switches it back.
+- Phones. The clock, quick keys and toy reticles were sized by the message text size (so large print inflated them);
+  they now scale with the picture (--ui). On small screens the clock shows digits only and the watch line shows time
+  left only. Held upright, the picture sits at the top and menus, setup, the watch bar, dialogue and on-screen keys
+  sit in the space below it. The NEXT and KEYS quick keys no longer show in a watch (a [hidden] override bug).
+- Boot screen: an arcade loading card (LOADING..., sixteen blocks) driven by the real download progress of the
+  world and crew bundles, then the title.
+- The walk, again: tools/walk.py rebuilt. The standing leg goes straight, the knee no longer balloons, legs are cut
+  at the belt (no seam), tapered and shaded in the suit's ramp, heel strike and toe-off, 2 px hip bob, timed so the
+  boots stay planted. Sneak redrawn the same way.
+- First-play tip no longer mentions K.
+
+RELEASE 26
+- The viewport. Using the bridge VIEWPORT (E, or the new VIEWPORT toy on the bridge in a watch) takes the camera out
+  to the hull in space for eight seconds, then dissolves back into the cutaway. (game/story.js viewport stage; the
+  toy calls the look() the toy API already had.)
+- Walking backwards. The pilot's 'walk-left' animation was the same right-facing frames as 'walk', and she was the
+  one actor the engine didn't mirror when walking left, so she moonwalked. Every sheet now walks facing right and is
+  mirrored to go left (cut.js drawActor).
+- The main lighting bus lights the EVA dock too (toys.js: LROOMS includes eva). The beacon stays its own switch.
+- Large print is the default text size for every message (Options still offers NORMAL / LARGE / TV).
+- The HALCYON open (the night watch and the Director's intro) ends on CURRENT STATUS · LOST: 7 s of text over the
+  hull instead of 12.6, then the 4.2 s dissolve. 'Last crew transmission' and 'source: internal' are gone.
+
+RELEASE 25
+- The walk. The commander sheet's eight walk frames barely moved the legs (a 10 px stride for a 64 px figure, both feet
+  planted), so she slid like a paper doll. tools/walk.py generates a new eight-pose cycle (contact, recoil, passing,
+  push-off, both sides) from the sheet's own upper body, two-bone legs in the suit ramp with its boots and outline, a
+  one-pixel bob; a sneak cycle the same way. Frames 39-54 appended to commander.png, the animation tables point at
+  them, timed so the feet lock to the floor at her measured 58 px/s (contacts on frames 0 and 4). The night watch's
+  commander and DeadScout both use it.
+- Lights off is not black. A room whose switch is off kept 7 % of its light (cut.js `L*=.1+.9*v`) and lost every
+  lamp. Now 28 %, and low grey-blue utility strips along the deck light the floor in switched-off rooms, fading as
+  the tubes come back.
+- CONTROLS card redrawn as an old console's instruction screen: keycaps with pixel bevels, a d-pad for MOVE, the
+  rest in two columns, the dim ship behind it. Same keys, same ESC/ENTER back.
+- The page scrolls: under the housing, THE SHIP / CONTROLS / TRANSMISSION NOTES in the console's lettering with
+  small pixel icons (CSS only, no new images); the grid background runs the length of the page. Hidden in broadcast,
+  photo and fullscreen modes. The privacy page is linked from the foot.
+
+SPRITES (release 24)
+- cut.js         DeadScout wears the commander's sheet, the one the night watch already uses (SHEET.deadscout='commander').
+                 The chibi production sheet is removed from assets-core.js (-220 KB on first load). Poses the sheet lacks
+                 play their nearest pose through the ALIAS table (run→walk, typing/terminal-idle→interact, kneel→crouch,
+                 wake→idle …), which now applies to any sheet, and an aliased pose is a legal script action.
+- game.js        Her footstep contact frames follow the commander's eight-frame walk.
+- assets-cast.js growth.png: two frames carried a checkerboard 'transparency' pattern and a square border baked in from
+                 the source image; removed, despeckled, re-outlined. growth, anomaly, crt-tiles reduced to 32 colours and
+                 tools to 24, no dither, hard alpha, so the props sit with the cast's locked palette instead of reading as
+                 painted. (-150 KB.)
+- The cast (commander, pilot, systems tech, K9) already shared one palette, one 1-px outline and one scale; the chibi was
+  the odd one out. If you want her told apart from the commander in the final EVA memory, a recolour of the commander's
+  sheet (orange patches, as the pilot's suit) is the next step; it needs a mask for which pixels are the patches.
+
+DeadScout · release 32 · changes from release 22 (releases 23-31, plus the exterior engine fix)
+(every item verified in the source; the build was run headless end to end: title, new game, play, pause, photo,
+ save/continue, night watch, take/release control, broadcast mode, Director, privacy page: no errors, no 404s)
+
+GAMEPLAY / STORY
+- game/story.js  A save made during a memory (last walk, final EVA, the pilot, K9, any memory) no longer strands the
+                 thread: the stage stays out of `done` until its lock releases, so the source can be tuned again and
+                 the stage replays with its after-effects. (`a.pending`, `a.stage`, `a.locked`)
+- game.js save() Rooms saved mid-event in 'memory' or 'blackout' come back as 'low-power' (the shaft blackout could
+                 stay dark for ever after CONTINUE).
+- game/story.js  state() no longer throws on a stage id from an older story (which silently stopped all saving);
+                 restore() ignores unknown ids.
+- game/story.js  any-memory ignores the 'you' source (second transmission) and sources without a memory;
+                 tune-weak needs the scanner; signal-layer passes a duration to music('memory'); eng-memory-hint only
+                 during the engineering memory; self-lock's jitter is rolled once per firing, not once per frame.
+- cut.js         A locked door stops her (click-to-move and scripted moves walked straight through and unlocked it):
+                 she walks to it, reaches, a locked use is recorded (the latch sound). Doors on one leg are handled in
+                 walking order; the door's state is read at arrival time.
+- cut.js         doorAt() takes the latest event in time, not the last in the list.
+- cut.js         snapshot() stores the commanded room state, not the derived 'present-dark' (which, replayed by trim()
+                 every 60 commands or by CONTINUE, silenced every later soft room state).
+- cut.js         travelTime() applies the actor's speed factor; a bad start ref no longer throws.
+- game.js        End card counts k9_memory_seen (it said n / 9 over 8 flags); CUT.drift(0) on a new game (UNCANNY
+                 leaked into the next game); playT counts seconds, not frames (2x fast on 120 Hz).
+- game.js        Timers from a finished session (K9, the memory music, toys) do nothing in the next one.
+- watch.js       SCREENS_CALM named two screens that don't exist (utility.diag, engineering.flow): beats were dropped
+                 with a console warning every watch. Now quarters.monitor and engineering.panel.
+- game/pad.js    Hiding the on-screen pad releases a held direction too.
+- game.js        The registry shows the best transmission score (it was saved and never shown).
+
+AUDIO / RECORDING (long sessions)
+- deep.js        The bed's LFO is stopped with the band (it kept every old band's graph and reverb IR alive after each
+                 pause, resume and tape change). A chord rescued late keeps a positive length.
+- amb.js         The five modulator oscillators are stopped on AMB.stop() (one set leaked per title→play).
+- music.js       Every voice disconnects from the tape wobble when it ends (7 of 8 pad voices leaked).
+- mix.js         Layer tickers skip the past without scheduling: a resume or skip no longer fires every missed pulse
+                 at once (tape 07 / the synthwave bands).
+- rec.js         captureStream tracks are stopped and the WebCodecs encoders closed after a take; the worklet blob URL
+                 is revoked.
+- director.js    LR.cleanup() on start, as the game does (recording parts no longer pile up in OPFS).
+- loud.js        The loudness history is capped to the last hour.
+
+SHELL / PWA
+- game.css       .row[hidden] hides (the OBJECTIVE row showed with FOCUS off); keyboard focus is visible on the
+                 watch bar, photo bar and inputs; blinking LEDs respect prefers-reduced-motion.
+- game/clock.js  More room between the ship clock and the quick keys.
+- sw.js          One cache per release (deadscout-v23) precached from a file list; old caches deleted on activate;
+                 no more ignoreSearch (two versions could mix offline); navigations fall back to index.html so an
+                 installed app opens offline. KEEP THE FILE LIST IN STEP WITH index.html.
+- privacy.html   Rewritten for DeadScout (it was another product's page and linked a stylesheet that doesn't exist).
+- index.html, director.html   ?v= bumped on every changed file.
+- Text: 'play.html' → 'index.html' in messages and comments; RECOGNIZED; story/slice.js → game/story.js.
+
+NOT CHANGED (your call)
+- og.png is 1.2 MB with 62k colours; quantising to 256 colours would make it ~490 KB but is lossy. og:image is a
+  relative URL; most scrapers want an absolute one (needs your domain).
+- Dead CSS blocks under .u-deck{display:none!important}, unused exports (LMX.ENVS etc.), write-only story flags.
+- The Director's hidden video-making controls and their code.

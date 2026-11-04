@@ -16,7 +16,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=45">
+<link rel="stylesheet" href="game.css?v=46">
 </head>
 <body>
 <div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><canvas class="bt-sky" id="bootSky" width="320" height="200" aria-hidden="true"></canvas><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><script>/* once you know what she is, the visor shows it (r29) */try{if(JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').second)document.getElementById('bootArt').src='boot-helmet-skull.png?v=2';}catch(e){}</script><p class="bt-kick">DSV-0417 // HALCYON</p><svg class="bt-orb" viewBox="0 0 40 20" aria-hidden="true"><ellipse cx="20" cy="11" rx="19" ry="4.5" fill="none" stroke="currentColor" stroke-width="1.6" transform="rotate(-12 20 11)"/><circle cx="20" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><p class="bt-name">DRIFTNAUT</p><p class="bt-tag">YOUR LITTLE PLACE IN SPACE</p><p class="bt-rule" aria-hidden="true">· · · · · · · ◆ · · · · · · ·</p><div class="bt-ship" role="img" aria-label="The survey vessel HALCYON, DSV-0417"></div></div><canvas class="bt-live" id="bootLive" aria-hidden="true"></canvas><div class="bt-mid"><p class="bt-load" id="bootLoad" hidden>LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill" hidden><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub" hidden>RECOVERING FEED</p><div class="bt-pick" id="bootStart"><button type="button" class="bt-card listen" data-b="listen"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9V7a5 5 0 0 1 10 0v2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="2" y="9" width="3" height="5" fill="currentColor"/><rect x="11" y="9" width="3" height="5" fill="currentColor"/></svg><b>LISTEN</b><span>RELAX · STUDY · DRIFT</span></button><button type="button" class="bt-card play" data-b="play"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="5" width="14" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="4" y="7" width="1" height="3" fill="currentColor"/><rect x="3" y="8" width="3" height="1" fill="currentColor"/><rect x="10" y="7" width="2" height="2" fill="currentColor"/><rect x="12" y="9" width="1" height="1" fill="currentColor"/></svg><b>GAME</b><span>EXPLORE · TOUCH · DISCOVER</span></button></div></div><p class="bt-foot" id="bootFoot"><span>NO SETUP · NO STORY REQUIRED · NO PRESSURE</span><button type="button" id="bootMenu" data-b="menu">MENU</button></p></div></div>
@@ -173,8 +173,8 @@
   <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>YOUR LITTLE PLACE IN SPACE</span></h2>
   <p><b>DRIFTNAUT</b> is a cozy pixel spaceship that plays warm space-chill music. Press <b>LISTEN</b> and leave it running while you work, read or wind down: the crew of HALCYON go about their day, the drones keep the ship tidy, K9 potters about. Press <b>GAME</b> to drift through the ship yourself.</p>
   <dl class="ab-keys">
-   <dt>LISTEN</dt><dd>SCENE changes the ship's lights and mood (the music carries on) · SKIP plays the next track · MUTE turns all sound off</dd>
-   <dt>GAME</dt><dd>Arrow keys or the on-screen pad to drift · E uses whatever you're next to · K calls K9 · ◂ LISTEN goes back</dd>
+   <dt>LISTEN</dt><dd>SCENE changes the ship's lights and mood (the music carries on) · SKIP plays the next track · MUTE turns all sound off · your keyboard's and phone's media keys work too</dd>
+   <dt>GAME</dt><dd>Click or tap anywhere to drift there (arrow keys work too) · tap a thing, or press E, to use it · the SHIP CHORES list gives you five cozy jobs · K calls K9 · ◂ LISTEN goes back · driftnaut.com/?game opens straight into the game</dd>
    <dt>TOUCH</dt><dd>The small lights on screens, lamps and machines: click them to play</dd>
   </dl>
  </div>
@@ -205,13 +205,13 @@
 <script src="game/events.js?v=3"></script>
 <script src="game/story.js?v=17"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=59"></script>
+<script src="game.js?v=60"></script>
 <script src="game/pad.js?v=13"></script>
 <script src="game/toys.js?v=19"></script>
 <script src="game/clock.js?v=6"></script>
 <script src="game/k9nav.js?v=1"></script>
 <script src="game/joy.js?v=7"></script>
-<script src="game/town.js?v=5"></script>
+<script src="game/town.js?v=6"></script>
 <script>if(/[?&]studio\b/.test(location.search))document.body.classList.add('studio');</script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
@@ -238,7 +238,7 @@
   function open(){if(/[?&]broadcast=1/.test(location.search))return;document.getElementById('bootLoad').hidden=true;document.querySelector('.bt-bar').hidden=true;if(SUB)SUB.hidden=true;
     PICK.hidden=false;FOOT.hidden=false;B.addEventListener('click',go);addEventListener('keydown',go,true);
     for(const el of [PICK,FOOT])el.addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(!b)return;e.stopPropagation();act(b.dataset.b);});}
-  function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}live=true;window.__bootLive=true;if(!pending&&window.__bootQ)pending=window.__bootQ;startScene();if(pending){const b=pending;pending=null;act(b);}}
+  function press(){if(/[?&]broadcast=1/.test(location.search)){shut();return;}live=true;window.__bootLive=true;if(!pending&&window.__bootQ)pending=window.__bootQ;if(!pending&&/[?&]game\b/.test(location.search))pending='play'; /* r54: driftnaut.com/?game drops straight into GAME (for the YouTube link) */startScene();if(pending){const b=pending;pending=null;act(b);}}
   /* r44 · the start screen is the game itself: a live crop of HALCYON's crew quarters drawn by the engine, warm lamps on,
      Driftnaut drifting by the desk and K9 beside her. It starts once the ship has loaded and stops when the card closes. */
   function startScene(){const c=document.getElementById('bootLive');if(!c||!window.CUT||!window.NW||!window.DSE||!CUT.render)return;let P,T;
