@@ -444,3 +444,19 @@ body:not(.studio) .wui .adv,body:not(.studio) #wMore{display:none!important}
 .np i{display:block;font-style:normal;font-size:.75em;color:#8fd6cf;letter-spacing:.3em}
 .np.on{opacity:.92;transform:none}
 #wNext{min-width:0;padding-left:14px;padding-right:14px}
+
+/* r53 · tester fixes */
+html:has(body.watching),body.watching{overflow:hidden!important;height:100dvh;overscroll-behavior:none}  /* the ship stays put; About lives on the start page */
+body.watching #about{display:none}
+body:not(.studio) #wName,body:not(.studio) #wTag2{visibility:hidden}  /* one label for the music: ♪ track (top right) and NOW PLAYING */
+#wMood s{text-decoration:none}
+.compact #wMood s,body.portrait #wMood s{display:none}                  /* narrow: the scene's name, not the word SCENE */
+#wNext{min-width:0}
+.toast{position:absolute;left:50%;bottom:calc(3.5% + 96px);transform:translate(-50%,6px);z-index:7;pointer-events:none;max-width:min(92%,640px);text-align:center;
+  font:400 clamp(11px,1.15vw,15px)/1.5 Silk,monospace;letter-spacing:.16em;color:#f3e6d2;background:rgba(11,14,17,.92);border:2px solid #d08a3a;padding:8px 14px;box-shadow:3px 3px 0 #000;opacity:0;transition:opacity .25s,transform .25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+body.portrait .toast{bottom:auto;top:calc(100% - 64px)}
+.toy{width:calc(44px*var(--ui,1))!important;height:calc(44px*var(--ui,1))!important;margin:calc(-22px*var(--ui,1)) 0 0 calc(-22px*var(--ui,1))!important;display:flex!important;align-items:center;justify-content:center}
+.toy img{width:calc(30px*var(--ui,1))!important;height:calc(30px*var(--ui,1))!important}
+.toy:focus-visible{outline:2px solid #ffb45a;outline-offset:2px}
+body.ui .np{opacity:0!important;transition:none}  /* r53: with the controls up, the ♪ track label sits in the same corner */

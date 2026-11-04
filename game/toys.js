@@ -62,12 +62,12 @@ body.photo .toys,body.bc .toys{display:none!important}`;
 document.head.appendChild(css);
 const layer=document.createElement('div');layer.className='toys';layer.setAttribute('aria-label','Things aboard');scr.appendChild(layer);
 const EL={};
-function el(T){let e=EL[T.id];if(e)return e;e=document.createElement('button');e.type='button';e.className='toy';e.innerHTML='<img alt=""><span></span>';
+function el(T){let e=EL[T.id];if(e)return e;e=document.createElement('button');e.type='button';e.className='toy';e.innerHTML='<img alt=""><span></span>';try{const lb=T.label();e.setAttribute('aria-label',lb);e.querySelector('span').textContent=lb;}catch(_){}
   e.addEventListener('pointerdown',ev=>{ev.stopPropagation();});
   e.addEventListener('click',ev=>{ev.stopPropagation();const r=T.act();if(r&&window.__padFlash)window.__padFlash(r);e.classList.remove('ping');void e.offsetWidth;e.classList.add('ping');paint(T,e);
     if(ev.pointerType!=='mouse'){e.classList.add('lbl');clearTimeout(e._l);e._l=setTimeout(()=>e.classList.remove('lbl'),1600);}tapUntil=Math.max(tapUntil,performance.now()+4000);});
   layer.appendChild(e);EL[T.id]=e;return e;}
-function paint(T,e){e.querySelector('span').textContent=T.label();const off=!!(T.off&&T.off());if(e._off!==off){e._off=off;e.querySelector('img').src=off?IMG.off:IMG.toy;}}
+function paint(T,e){const lb=T.label();e.querySelector('span').textContent=lb;e.setAttribute('aria-label',lb);const off=!!(T.off&&T.off());if(e._off!==off){e._off=off;e.querySelector('img').src=off?IMG.off:IMG.toy;}}
 /* ---------- which room: under the pointer, or the last one tapped ---------- */
 function inPoly(p,x,y){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const [xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
 function roomAtScreen(cx,cy){const V=G.view(),r=scr.getBoundingClientRect(),wx=V[0]+(cx-r.left)/r.width*V[2],wy=V[1]+(cy-r.top)/r.height*V[3];for(const [id,R] of Object.entries(M.rooms))if(inPoly(R.poly,wx,wy))return id;return null;}
@@ -115,7 +115,7 @@ function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({a
   if(A.watch()&&!quiet){const sc=SC[id]||{}; /* r51: a scene is lights and pace only; the music station plays on untouched */
     if(A.pace)A.pace(sc.pace||'routine');visit(id);if(A.nw){A.nw().scene=id;A.save();}}
   paintMood();}
-function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='SCENE<em> · '+(SC[S.mood]||SC.drift).name+'</em>';b.classList.toggle('on',S.mood!=='drift');}
+function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='<s>SCENE · </s>'+(SC[S.mood]||SC.drift).name;b.setAttribute('aria-label','Scene: '+(SC[S.mood]||SC.drift).name+' (tap for the next)');b.classList.toggle('on',S.mood!=='drift');}
   const l=document.getElementById('wLight');if(l){l.innerHTML='LIGHT<em> · '+S.light.toUpperCase()+'</em>';l.classList.toggle('on',S.light!=='warm');}}
 function light(){const L=['warm','low','off'];S.light=L[(L.indexOf(S.light)+1)%3];A.sfx('chunk',.6);applyLights();paintMood();}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood,#wLight');if(!b)return;e.stopPropagation();

@@ -176,7 +176,7 @@ function drawProps(t){if(!watching())return;const {carry,bunk}=propsNow(t);let r
 let lastT=0;
 function draw(){requestAnimationFrame(draw);const t=now(),dt=Math.max(0,Math.min(.1,t-lastT||0));lastT=t;
   V=view();K=cv.width/V[2];x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.imageSmoothingEnabled=false;
-  if(!live()||!watching())return;
+  if(!live())return;if(!watching()){drawMarks(t);return;} /* r53: in GAME only the markers are drawn here */
   let ext=0;try{ext=CUT.extAt(G.P,G.TIMES,t);}catch(e){}cv.style.opacity=String(1-ext);if(ext>.98){try{tick(dt);}catch(e){}return;} /* r41: outside the hull, the residents are behind the plating */
   try{tick(dt);}catch(e){}
   /* the pipes, first: they are behind everything */
@@ -208,7 +208,19 @@ function draw(){requestAnimationFrame(draw);const t=now(),dt=Math.max(0,Math.min
     else if(p.k==='dust')px(snap(X),snap(Y),'#8a7a6a',.6*(1-u));
     else if(p.k==='flash'){x.globalCompositeOperation='lighter';const XX=(p.x-V[0])*K,YY=(p.y-V[1])*K,R2=26*K,g=x.createRadialGradient(XX,YY,0,XX,YY,R2);g.addColorStop(0,`rgba(255,220,170,${.4*(1-u)})`);g.addColorStop(1,'rgba(255,220,170,0)');x.globalAlpha=1;x.fillStyle=g;x.fillRect(XX-R2,YY-R2,R2*2,R2*2);x.globalCompositeOperation='source-over';}
     else if(p.k==='z'){const A=Math.min(1,u*4)*(1-u);for(const [a,b] of [[0,0],[1,0],[2,0],[1,1],[0,2],[1,2],[2,2]])px(snap(X,U)+a*U,snap(Y,U)+b*U,'#e9d7c2',A,U);}}
-  x.globalAlpha=1;}
+  x.globalAlpha=1;drawMarks(t);}
+/* r53 · markers: a short "YOU" (or "K9") tag over an actor with a soft pulsing ring at their feet. PLAY shows YOU on entry so
+   the player finds themselves at once; CALL K9 marks K9 until it arrives. Drawn in screen pixels so it reads at any zoom */
+const MARKS={};
+function mark(a,label,secs,col){MARKS[a]={label,until:performance.now()+secs*1000,t0:performance.now(),col:col||'#ffb45a'};}
+function unmark(a){delete MARKS[a];}
+function drawMarks(t){const pn=performance.now(),D=cv.width/Math.max(1,cv.clientWidth);
+  for(const a in MARKS){const m=MARKS[a];if(pn>m.until){delete MARKS[a];continue;}let s=null;try{s=CUT.actorAt(G.P,G.TIMES,t,a);}catch(e){}if(!s)continue;
+    const fade=Math.min(1,(m.until-pn)/600,(pn-m.t0)/250),X=(s.x-V[0])*K,Y=(s.y-V[1])*K,H=(a==='k9'?40:80)*K,ph=((pn-m.t0)/900)%1;
+    x.save();x.globalAlpha=fade*(1-ph)*.9;x.strokeStyle=m.col;x.lineWidth=Math.max(1.5,2*D);x.beginPath();x.ellipse(X,Y,(14+ph*26)*K+6*D,(4+ph*8)*K+2*D,0,0,Math.PI*2);x.stroke();
+    const fs=Math.round(14*D),ty=Y-H-10*D-Math.sin(pn/260)*2*D;x.globalAlpha=fade;x.font=`${fs}px Silk, monospace`;x.textAlign='center';x.textBaseline='bottom';
+    const w=x.measureText(m.label).width+12*D;x.fillStyle='rgba(11,14,17,.88)';x.fillRect(Math.round(X-w/2),Math.round(ty-fs-6*D),Math.round(w),Math.round(fs+6*D));
+    x.fillStyle=m.col;x.fillText(m.label,Math.round(X),Math.round(ty-2*D));x.beginPath();x.moveTo(X-4*D,ty);x.lineTo(X+4*D,ty);x.lineTo(X,ty+5*D);x.closePath();x.fill();x.restore();}}
 requestAnimationFrame(draw);
-window.__town={R,ARM,TUBE,PIPES,props:propsNow,sleep(a,on){if(on)SLEEPERS[a]={kind:'sleep'};else delete SLEEPERS[a];},fire:{arm(){ARM.next=0;},tube(){TUBE.next=0;},recycler(){nextRecy=0;}}};
+window.__town={mark,unmark,R,ARM,TUBE,PIPES,props:propsNow,sleep(a,on){if(on)SLEEPERS[a]={kind:'sleep'};else delete SLEEPERS[a];},fire:{arm(){ARM.next=0;},tube(){TUBE.next=0;},recycler(){nextRecy=0;}}};
 })();
