@@ -83,13 +83,14 @@ window.__game={audio:()=>{ensureAudio();return {ctx:actx,out:master};},amb:room=
   watch:()=>!!watch,cfg:()=>watch&&watch.cfg,nw:()=>prefs.nw,save:()=>savePrefs(),tape:id=>watchTape(id),autoTape:()=>curTapeId(),pace:a=>setPace(a),ambience:v=>setAmbience(v),here:a=>CUT.hereRef(P,TIMES,now(),a),travel:(a,to)=>CUT.travelTime(a,CUT.hereRef(P,TIMES,now(),a),to)||0,steering:()=>state==='play',
   soundOn:()=>!!prefs.sound,dim:on=>setDim(!!on,true),k9rest:()=>{try{k9Rest(now(),true);}catch(e){}},me:()=>me,logs:()=>prefs.logs||[],chirp:()=>{sfx('chirp',null,1.6);},
   go:id=>{const O=CUT.MAP.objects[id];if(!O||state!=='play')return;cmd({move:me,to:O.spot,interrupt:true});const t0=now(),tt=CUT.travelTime(me,CUT.hereRef(P,TIMES,t0,me),O.spot)||0;setTimeout(()=>{if(state==='play'){cmd({actor:me,interact:id,interrupt:true});findLog(id);}},(tt+.4)*1000);},
-  look:secs=>{const t=now();runLines(['+0 camera exterior','+'+secs+' camera '+(watch?'cutaway':(prefs.camera==='follow'?'follow deadscout':'cutaway'))]);}}),padSet:m=>{prefs.pad=m;savePrefs();paintMenus();},say:(w,l,secs,o)=>say(w,l,secs,o),music:{on:()=>prefs.musicOn!==false,set:v=>{ensureAudio();setMusicOn(v);},prev(){if(watch)return null;setTape((prefs.tape||0)-1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},next(){if(watch)return null;setTape((prefs.tape||0)+1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},tape:()=>({n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0],watch:!!watch})},get state(){return state;},now:()=>now(),SP,eventsApi:()=>eventsApi(),events:()=>events,hint:()=>hintRef,endNow:()=>end(),run:l=>runLines(l),view:()=>CUT.view(P,TIMES,now()),story:()=>story,map(v){showMap=v;},shot(t,V){const c=document.createElement('canvas');c.width=V[2];c.height=V[3];CUT.force(V);CUT.render(c.getContext('2d'),P,TIMES,t,{x:0,y:0,w:V[2],h:V[3]},1);CUT.force(null);drawMap(t,c.getContext('2d'),V);return c.toDataURL('image/png');}};
+  look:secs=>{const t=now();runLines(['+0 camera exterior','+'+secs+' camera '+(watch?'cutaway':(prefs.camera==='follow'?'follow deadscout':'cutaway'))]);}}),padSet:m=>{prefs.pad=m;savePrefs();paintMenus();},say:(w,l,secs,o)=>say(w,l,secs,o),music:{on:()=>prefs.musicOn!==false,set:v=>{ensureAudio();setMusicOn(v);},prev(){if(watch)return null;setTape((prefs.tape||0)-1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},next(){if(watch)return null;setTape((prefs.tape||0)+1,true);return {n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0]};},tape:()=>({n:(prefs.tape||0)+1,name:TAPES[prefs.tape||0][0],watch:!!watch})},get state(){return state;},now:()=>now(),SP,eventsApi:()=>eventsApi(),events:()=>events,hint:()=>hintRef,endNow:()=>end(),run:l=>runLines(l),view:()=>vw(now()),story:()=>story,map(v){showMap=v;},shot(t,V){const c=document.createElement('canvas');c.width=V[2];c.height=V[3];CUT.force(V);CUT.render(c.getContext('2d'),P,TIMES,t,{x:0,y:0,w:V[2],h:V[3]},1);CUT.force(null);drawMap(t,c.getContext('2d'),V);return c.toDataURL('image/png');}};
 /* the display takes what the housing leaves: whole multiples of the 640 × 360 frame when that wastes little, otherwise the closest fit */
 /* a phone held upright: the picture at the top, menus and controls in the room below it (r27) */
 const portrait=()=>!BC&&window.innerHeight>window.innerWidth*1.15;
+const isPhone=()=>!BC&&!!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)&&Math.min(window.innerWidth,window.innerHeight)<=540; /* r55: a phone: touch, and a short side under ~540 px */
 function fit1(){const u=document.getElementById('unit');const cw0=stage.offsetWidth,ch0=stage.offsetHeight,cx=u.offsetWidth-cw0,cy=u.offsetHeight-ch0;
-  const P_=portrait();document.body.classList.toggle('portrait',P_);
-  const mg=BC?0:P_?8:20;let k=Math.min((window.innerWidth-cx-mg)/640,(P_?window.innerHeight*.5:window.innerHeight-cy-mg)/360);const ki=Math.floor(k);if(ki>=1&&ki>=(BC?.97:.86)*k)k=ki;k=Math.max(k,P_?.4:.6); /* an upright phone: as small as the width needs */
+  const P_=portrait();document.body.classList.toggle('portrait',P_);const PH=isPhone();document.body.classList.toggle('phone',PH);
+  const mg=BC||PH?0:P_?8:20;let k=Math.min((window.innerWidth-cx-mg)/640,(P_?window.innerHeight*.5:window.innerHeight-cy-mg)/360);const ki=Math.floor(k);if(ki>=1&&ki>=(BC?.97:.86)*k)k=ki;k=Math.max(k,P_?.4:.6); /* an upright phone: as small as the width needs */
   const cw=Math.round(640*k/2)*2,ch=Math.round(cw*9/16);if(cw!==stage.width||ch!==stage.height)LCV.setSize(cw,ch);stage.style.width=cw+'px';stage.style.height=ch+'px';}
 function fit(){if(recording)return;fit1();fit1();
   /* the scale for the instrument chrome (clock, quick keys, reticles), from the picture's width: not the text size */
@@ -265,7 +266,7 @@ document.addEventListener('keyup',e=>{const k=e.code;if(state!=='play')return;co
   if(d){keys[d]=false;const other=['left','right','up','down'].find(x=>keys[x]);if(other)moveDir(other);else stopHere();hinted();}
   if(k==='ShiftLeft'||k==='ShiftRight'){careful=false;const d2=['left','right','up','down'].find(x=>keys[x]);if(d2)moveDir(d2);}});
 window.addEventListener('blur',()=>{for(const d in keys)keys[d]=false;if(state==='play')stopHere();});
-stage.addEventListener('pointerdown',e=>{if(petK9(e))return;if(state!=='play')return;const r=stage.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width*LC.DW,dy=(e.clientY-r.top)/r.height*LC.DH,t=now(),V=CUT.view(P,TIMES,t),wx=V[0]+dx/LC.DW*V[2],wy=V[1]+dy/LC.DH*V[3];let hit=CUT.pick(P,TIMES,t,wx,wy);if(!hit||hit.type==='place'){const o=objAt(wx,wy);if(o)hit=o;}for(const d of [-30,30,-60,60]){if(hit)break;hit=CUT.pick(P,TIMES,t,wx,wy+d);}if(!hit)return;
+stage.addEventListener('pointerdown',e=>{if(petK9(e))return;if(state!=='play')return;const r=stage.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width*LC.DW,dy=(e.clientY-r.top)/r.height*LC.DH,t=now(),V=vw(t),wx=V[0]+dx/LC.DW*V[2],wy=V[1]+dy/LC.DH*V[3];let hit=CUT.pick(P,TIMES,t,wx,wy);if(!hit||hit.type==='place'){const o=objAt(wx,wy);if(o)hit=o;}for(const d of [-30,30,-60,60]){if(hit)break;hit=CUT.pick(P,TIMES,t,wx,wy+d);}if(!hit)return;
   if(hit.type==='place'){cmd({move:me,to:hit.ref,interrupt:true,sneak:careful});try{const pl=CUT.place(hit.ref);__town.ring(pl.x,pl.y,'#ffb45a',.8,24);}catch(_){}}else useObject(hit);hinted();});
 $('hPrompt').addEventListener('pointerdown',e=>{if(state!=='play')return;e.stopPropagation();e.preventDefault();use();});
 let hints=0;const hinted=()=>{if(++hints>=4)$('hHint').hidden=true;};
@@ -282,7 +283,7 @@ function say(who,line,secs,opt){sayQ.push({who,line,secs:secs||(2.2+line.length*
    offscreen or seen from the whole-ship camera goes in the dialogue panel at the bottom of the picture. The COMMS deck below
    the screen only echoes the last line, as the console that received it. */
 const TALK_ACT={PILOT:'pilot',SYSTEMS:'systems',COMMANDER:'commander'};let talkWho=null,mirrorT=null;
-function actorOnScreen(a){if(!P||!TIMES)return null;const t=now(),rep=CUT.report(P,TIMES,t)[a];if(!rep||rep==='GONE'||rep==='—')return null;const p=CUT.actorAt(P,TIMES,t,a),V=CUT.view(P,TIMES,t);if(!p||!V)return null;
+function actorOnScreen(a){if(!P||!TIMES)return null;const t=now(),rep=CUT.report(P,TIMES,t)[a];if(!rep||rep==='GONE'||rep==='—')return null;const p=CUT.actorAt(P,TIMES,t,a),V=vw(t);if(!p||!V)return null;
   const x=(p.x-V[0])/V[2],y=(p.y-136-V[1])/V[3],zoom=V[2]<CUT.W*.72;return {x,y,zoom,on:x>.03&&x<.97&&y>.02&&y<.98};}
 function talkMode(q){if(q.opt.panel)return 'panel';if(q.who==='HOS')return q.line.length<=46&&!q.opt.panel?'strip':'panel';
   const a=TALK_ACT[q.who];if(a&&q.line.length<=70){const o=actorOnScreen(a);if(o&&o.on&&o.zoom)return 'bubble';}return 'panel';}
@@ -408,7 +409,7 @@ function enterPlay(){if(!watch){beginWatch({play:true});return;}if(state==='play
   P.script.push({at:t,move:'deadscout',to:p.ref,teleport:true,interrupt:true},{at:t+.05,show:'deadscout'},...CREW3.map(c=>({at:t,hide:c})));P.rev++;if(CUT.solid)CUT.solid(true); /* r43: in PLAY the ship is yours: just you and K9 (the crew are LISTEN's) */
   extT0=0;if(P.brand)P.brand.intro=false;CUT.exterior(null);me='deadscout';lit=false;crouched=false;careful=false;state='play';show('hud',false);document.body.classList.add('playing');paintWatch();wake();setTimeout(()=>{try{__town.mark('deadscout','YOU',5);}catch(e){}},250);
   if((prefs.playHints||0)<3){prefs.playHints=(prefs.playHints||0)+1;savePrefs();const touch=window.matchMedia&&matchMedia('(pointer: coarse)').matches;setTimeout(()=>toast(touch?'TAP ANYWHERE TO DRIFT THERE · TAP THINGS TO USE THEM':'CLICK TO DRIFT THERE · ARROWS WORK TOO · E USES THINGS',6),900);}
-  choresPaint();}
+  choresPaint();rotateHint();CAM.wide=false;}
 function exitPlay(){if(!watch||state!=='play')return;for(const d in keys)keys[d]=false;const t=now();P.script.push({at:t+.4,hide:'deadscout'},...CREW3.map(c=>({at:t+.4,show:c})));P.rev++;if(CUT.solid)setTimeout(()=>CUT.solid(false),500);
   if(prefs.camera==='follow')setCam('ship');state='watch';me='commander';$('hPrompt').hidden=true;document.body.classList.remove('playing');paintWatch();wake();}
 /* CALL K9: it comes by its own routes; it never climbs a ladder, so from another deck it says so and waits */
@@ -456,11 +457,11 @@ const ROOM_MIX={bridge:{engine:.35,ventilation:.4,machinery:.08,radio:.25,signal
   engineering:{engine:.85,ventilation:.3,machinery:.7,radio:.05,signal:.05,hull:.3},service:{engine:.45,ventilation:.2,machinery:.25,radio:.12,signal:.2,hull:.6},airlock:{engine:.4,ventilation:.7,machinery:.4,radio:.1,signal:.05,hull:.3},eva:{engine:.05,ventilation:0,machinery:0,radio:.35,signal:.3,hull:.05}};
 const SX={room:null,climb:0,walk:0,doors:null,uses:0,knock:0,was:null,wi:-1,k9i:-1};const CONTACTS={deadscout:[0,4],crew:[0,4],k9:[0,1]}; /* her walk is the commander's eight frames now */
 function roomMix(room){const m=Object.assign({},AMB?AMB.MIX0:{},ROOM_MIX[room]||{});m.music=prefs.mix.music!=null?prefs.mix.music:.65;return m;}
-function sfx(name,x,gain){if(!SFX||!prefs.sound)return;const V=CUT.view(P,TIMES,now()),pan=x==null?0:((x-(V[0]+V[2]/2))/(V[2]/2))*.8;SFX.play(name,{pan,gain});}
+function sfx(name,x,gain){if(!SFX||!prefs.sound)return;const V=vw(now()),pan=x==null?0:((x-(V[0]+V[2]/2))/(V[2]/2))*.8;SFX.play(name,{pan,gain});}
 let DT=null;function driftTone(v,x){if(!actx||!master)return;if(!DT){const o=actx.createOscillator(),o2=actx.createOscillator(),lp=actx.createBiquadFilter(),g=actx.createGain(),pn=actx.createStereoPanner();
     o.type='sine';o.frequency.value=78;o2.type='triangle';o2.frequency.value=156.6;lp.type='lowpass';lp.frequency.value=520;g.gain.value=0;o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(pn);pn.connect(master);o.start();o2.start();DT={o,o2,lp,g,pn};}
   const T=actx.currentTime,on=prefs.sound&&(state==='play'||state==='opening'||state==='route'||state==='deck');DT.g.gain.setTargetAtTime(on?v*.032:0,T,v>0?.12:.22);DT.o.frequency.setTargetAtTime(74+v*10,T,.3);DT.o2.frequency.setTargetAtTime(148+v*21,T,.3);DT.lp.frequency.setTargetAtTime(380+v*420,T,.3);
-  try{const V=CUT.view(P,TIMES,now());DT.pn.pan.setTargetAtTime(Math.max(-.7,Math.min(.7,((x-(V[0]+V[2]/2))/(V[2]/2))*.6)),T,.2);}catch(e){}}
+  try{const V=vw(now());DT.pn.pan.setTargetAtTime(Math.max(-.7,Math.min(.7,((x-(V[0]+V[2]/2))/(V[2]/2))*.6)),T,.2);}catch(e){}}
 function sfxTick(t){if(!SFX||!actx||state!=='play'&&state!=='opening'&&state!=='route'&&state!=='deck')return;const s=CUT.actorAt(P,TIMES,t,me),room=CUT.roomAt(P,TIMES,t,me);
   if(room!==SX.room){SX.room=room;if(AMB)AMB.set(roomMix(room),2.5);}
   /* footsteps come from the gait's contact frames, not a timer; the floor picks the sound */
@@ -494,7 +495,7 @@ function paintDeck(){const l=story?DRIFT.level(story.flags,playT):0;$('kMenu').i
 $('kMenu').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;const k=b.dataset.t;if(k==='close'){closeRoute();return;}const was=sel;if(k==='x'){sfx('latch',null,.8);note('TAPE '+String(TAPES.length+1).padStart(2,'0')+' · SPOOL EMPTY · LABEL IN HER HAND',6);if(story)story.flags.tape7=true;sel=was;paintSel('kMenu');return;}setTape(+k,true);sfx('click',null,.8);note('AUDIO DECK · '+TAPES[+k][0],4);if(story)story.flags.tape_changed=true;paintDeck();sel=was;paintSel('kMenu');save();});
 /* ---------- K9-4's senses and legs: the same commands she uses, pushed by its controller ---------- */
 function k9Api(){const pushCmd=c=>{if(watch||(state!=='play'&&state!=='route'&&state!=='deck'&&state!=='chart'&&state!=='console'))return;c.at=now();SP.cmds.push(c);SP.rev=(SP.rev||0)+1;};
-  return {map:()=>CUT.MAP,on:()=>state==='play'&&!watch&&story&&story.flags.awakened,pos:a=>CUT.actorAt(P,TIMES,now(),a),view:()=>CUT.view(P,TIMES,now()),ss:()=>CUT.SS,tuning:()=>!!SCAN.tuning,
+  return {map:()=>CUT.MAP,on:()=>state==='play'&&!watch&&story&&story.flags.awakened,pos:a=>CUT.actorAt(P,TIMES,now(),a),view:()=>vw(now()),ss:()=>CUT.SS,tuning:()=>!!SCAN.tuning,
     nearestSource:(x,y)=>{const R=SCAN.read(x,y);return R.src?{id:R.src.id,s:R.s,x:R.src.x,y:R.src.y}:null;},
     act:(a,anim,secs,face)=>pushCmd({actor:a,do:anim,for:secs,face}),move:(a,ref,fast)=>pushCmd({move:a,to:ref,interrupt:true,fast:!!fast}),stop:a=>pushCmd({move:a,to:CUT.hereRef(P,TIMES,now(),a),interrupt:true}),
     teleport:(a,ref)=>pushCmd({move:a,to:ref,teleport:true,interrupt:true}),placeNear:(x,y)=>{const h=CUT.pick(P,TIMES,now(),x,y-4);return h&&h.type==='place'?h.ref:null;},place:ref=>CUT.place(ref),
@@ -526,7 +527,7 @@ let conQ=[],conBusy=false;function conStep(){if(!conQ.length){conBusy=false;retu
 /* ---------- K9 (Nov 2026): click it and it chirps back; during a long focus session it goes and curls up by the bunk ---------- */
 let petT=0;
 function petK9(e){if(state!=='play'&&state!=='watch')return false;const t=now(),k=CUT.actorAt(P,TIMES,t,'k9');if(!k)return false;const rep=CUT.report(P,TIMES,t).k9;if(!rep||rep==='GONE')return false;
-  const r=stage.getBoundingClientRect(),V=CUT.view(P,TIMES,t),sx=r.left+(k.x-V[0])/V[2]*r.width,sy=r.top+(k.y-V[1])/V[3]*r.height,s=r.width/V[2]*CUT.W/1184/2;
+  const r=stage.getBoundingClientRect(),V=vw(t),sx=r.left+(k.x-V[0])/V[2]*r.width,sy=r.top+(k.y-V[1])/V[3]*r.height,s=r.width/V[2]*CUT.W/1184/2;
   if(Math.abs(e.clientX-sx)>Math.max(18,34*s)||e.clientY>sy+6||e.clientY<sy-Math.max(26,46*s))return false;
   if(performance.now()-petT<700)return true;petT=performance.now();sfx('chirp',null,1.6);
   const m=document.createElement('span');m.className='k9mark';m.textContent=Math.random()<.5?'♪':'!';const tr=$('talk').getBoundingClientRect();m.style.left=(sx-tr.left)+'px';m.style.top=(sy-tr.top-Math.max(30,52*s))+'px';$('talk').appendChild(m);setTimeout(()=>m.remove(),1400);return true;}
@@ -570,7 +571,7 @@ async function toggleRecord(o){o=o||{};if(recording){const R=recording;recording
   recording.t0=now();recording.start();$('takeLink').hidden=true;$('hRec').hidden=false;$('tRec').hidden=false;paintMenus();resume();}
 /* ---------- SHOW WORLD MAP: a developer overlay (index.html?dev, then V) for mapping the master art ---------- */
 const DEV=/[?&]dev/.test(location.search);let showMap=false;
-function drawMap(t,c0,V0){const M=CUT.MAP;if(!M)return;const c=c0||stage.getContext('2d'),V=V0||CUT.view(P,TIMES,t),k=c.canvas.width/V[2];c.save();c.setTransform(k,0,0,k,-V[0]*k,-V[1]*k);c.lineWidth=2/k;c.font=(14/k)+'px monospace';c.textBaseline='top';
+function drawMap(t,c0,V0){const M=CUT.MAP;if(!M)return;const c=c0||stage.getContext('2d'),V=V0||vw(t),k=c.canvas.width/V[2];c.save();c.setTransform(k,0,0,k,-V[0]*k,-V[1]*k);c.lineWidth=2/k;c.font=(14/k)+'px monospace';c.textBaseline='top';
   for(const [id,r] of Object.entries(M.rooms)){c.strokeStyle='rgba(255,0,255,.8)';c.beginPath();r.poly.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.stroke();c.fillStyle='rgba(255,0,255,.9)';c.fillText(id,r.poly[0][0]+4,r.poly[0][1]+4);}
   c.strokeStyle='rgba(0,255,120,.9)';for(const [a,b] of M.walk){c.beginPath();c.moveTo(...M.nodes[a]);c.lineTo(...M.nodes[b]);c.stroke();}
   c.strokeStyle='rgba(255,220,0,.9)';for(const [a,b] of M.ladders.concat(M.hoist||[])){c.beginPath();c.moveTo(...M.nodes[a]);c.lineTo(...M.nodes[b]);c.stroke();}
@@ -599,9 +600,33 @@ let lastTrack=-1,hudN=0,saveN=0,playPn=0;
    after the camera that can't see her (drift.js level 0 / 1 / 2). It eases over about half a minute, so nobody sees it change */
 let DRV=0,drvT=0;function driftTick(){const pn=performance.now(),dt=Math.min(1,(pn-(drvT||pn))/1000);drvT=pn;
   const tgt=watch||(story&&story.flags&&story.flags.second)?1:story?[0,.35,1][Math.min(2,DRIFT.level(story.flags,playT))]:0;DRV+=(tgt-DRV)*Math.min(1,dt/12);if(Math.abs(tgt-DRV)<.002)DRV=tgt;if(CUT.float)CUT.float(DRV);}
+/* r55 · THE PHONE CAMERA. Tablets and computers keep the whole ship. On a phone the camera glides, never cuts:
+   GAME follows Driftnaut about 2x closer (pinch out or double-tap for the whole ship, and back);
+   LISTEN on an upright phone pans slowly along the whole ship, bow to stern and back, about two minutes a pass */
+let CAMV=null,camT=0;const CAM={wide:false,tip:false};window.__cam=CAM;
+const vw=t=>CAMV||CUT.view(P,TIMES,t);
+function camTarget(t){if(!document.body.classList.contains('phone')||!watch||BC||recording)return null;const W=CUT.W,H=CUT.H,por=document.body.classList.contains('portrait'),asp=stage.height/stage.width||9/16;
+  if(state==='play'&&!CAM.wide){let s=null;try{s=CUT.actorAt(P,TIMES,t,me);}catch(e){}if(!s)return null;const w=W/(por?2.3:1.8),h=w*asp;
+    return [Math.max(0,Math.min(W-w,s.x-w/2)),Math.max(0,Math.min(H-h,s.y-40-h/2)),w,h];}
+  if(state==='watch'&&por){const w=W/1.7,h=w*asp,u=.5-.5*Math.cos(performance.now()/1000*2*Math.PI/240);return [(W-w)*u,Math.max(0,Math.min(H-h,H*.5-h/2)),w,h];}
+  return null;}
+function camTick(t){const pn=performance.now(),dt=Math.min(.1,(pn-(camT||pn))/1000);camT=pn;const tg=camTarget(t);
+  if(!tg){if(!CAMV)return;const B=CUT.view(P,TIMES,t);CAMV=CAMV.map((v,i)=>v+(B[i]-v)*Math.min(1,dt*3));if(CAMV.every((v,i)=>Math.abs(v-B[i])<1))CAMV=null;return;}
+  if(!CAMV)CAMV=CUT.view(P,TIMES,t).slice();const k=Math.min(1,dt*(state==='play'?3:1.2));CAMV=CAMV.map((v,i)=>v+(tg[i]-v)*k);
+  if(state==='play'&&!CAM.tip&&!(prefs.camTip>1)){CAM.tip=true;prefs.camTip=(prefs.camTip||0)+1;savePrefs();setTimeout(()=>{if(state==='play')toast('PINCH OR DOUBLE-TAP TO SEE THE WHOLE SHIP',5);},7500);}}
+/* pinch and double-tap */
+{const pts=new Map();let d0=0,lastTap=0;
+  stage.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===2){const [a,b]=[...pts.values()];d0=Math.hypot(a[0]-b[0],a[1]-b[1]);}
+    const pn=e.timeStamp;if(pts.size===1&&pn-lastTap<380&&state==='play'&&document.body.classList.contains('phone')){CAM.wide=!CAM.wide;lastTap=0;}else lastTap=pn;},true);
+  stage.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===2&&d0){const [a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    if(d<d0*.72){CAM.wide=true;d0=d;}else if(d>d0*1.35){CAM.wide=false;d0=d;}}},true);
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)d0=0;};stage.addEventListener('pointerup',up,true);stage.addEventListener('pointercancel',up,true);
+  stage.style.touchAction='none';}
+/* turn the phone: a one-time hint when GAME starts on an upright phone */
+function rotateHint(){if(!document.body.classList.contains('phone')||!document.body.classList.contains('portrait')||prefs.rotTip)return;prefs.rotTip=1;savePrefs();setTimeout(()=>{if(state==='play'&&document.body.classList.contains('portrait'))toast('⟲ TURN YOUR PHONE SIDEWAYS FOR A BIGGER SHIP',5);},1200);}
 function frame(){requestAnimationFrame(frame);driftTick();if(DT&&state!=='play'&&state!=='opening'&&state!=='route'&&state!=='deck')driftTone(0,0);pollPad();tickExterior();if(state==='opening')openingTick(now());const t=state==='title'||state==='registry'||(state==='controls'||state==='options')&&menuFrom==='title'||state==='setup'?(TIMES[1]?TIMES[1].start:0)+5+((performance.now()/1000-idle0)%24):now();
   if(state==='title'||state==='registry'||state==='setup'||(state==='controls'||state==='options')&&menuFrom==='title'){CUT.force('drift');LCV.render(t,{});CUT.force(null);if(DEV&&showMap)drawMap(t);return;}
-  LCV.render(t,{});if(DEV&&showMap)drawMap(t);
+  camTick(t);if(CAMV)CUT.force(CAMV);LCV.render(t,{});if(CAMV)CUT.force(null);if(DEV&&showMap)drawMap(t);
   if(story&&!watch&&(state==='play'||state==='opening'||state==='route'||state==='deck')){sfxTick(t);story.update();if(k9&&state==='play'){k9.update(t);if(events&&!resting)events.update(t);idleGlance(t);const r=CUT.roomAt(P,TIMES,t,me);if(r!==lastRoom){lastRoom=r;lastProgress=t;}}if(!(hudN%6))paintNotes();if(SCAN.found&&state==='play'){const p=CUT.actorAt(P,TIMES,t,me),k=Math.max(2,Math.round(stage.width/384)),R=SCAN.read(p.x,p.y);if(SCAN.tick(t,R)==='lock'){tuneReq=true;ping();}scanSound(R);if(scanVisible(t,R)){const c2=stage.getContext('2d');c2.save();c2.globalAlpha=scanA;SCAN.draw(c2,t,R,k,1);c2.restore();}}else scanSound(null);}else{tuneReq=false;scanSound(null);}
   if(recording&&(state==='play'||state==='watch')){layersOnto();recording.frame(Math.max(0,t-recording.t0));}
   else if(document.pictureInPictureElement&&watch)layersOnto();

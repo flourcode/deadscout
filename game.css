@@ -479,3 +479,10 @@ body.portrait .chores{top:calc(3% + 4px);right:calc(3% + 6px);left:auto;min-widt
 @media (max-height:500px){.toast{font-size:10px;padding:5px 10px;bottom:calc(3.5% + 70px);max-width:70%}
   body.watching:not(.portrait) .talk .tbot{bottom:calc(3.5% + 56px)!important}}
 .toast{width:max-content}
+
+/* r55 · phones: edge to edge, no instrument bezel around the picture */
+body.phone .unit{padding:0!important;background:none!important;box-shadow:none!important}
+body.phone .screen{border:0!important;box-shadow:none!important}
+body.phone .u-top,body.phone .u-deck,body.phone .u-plate{display:none!important}
+body.phone .g{padding:env(safe-area-inset-top) 0 0;align-items:start}
+body.phone:not(.portrait) .g{place-items:center;padding:0}

@@ -120,7 +120,7 @@ document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')touchSeen
 const gamepad=()=>{try{return [...(navigator.getGamepads?navigator.getGamepads():[])].some(g=>g);}catch(e){return false;}};
 const mode=()=>{try{const p=JSON.parse(localStorage.getItem('deadScoutGamePrefs')||'{}').pad;return p===true||p==='on'?'on':p===false||p==='off'?'off':'auto';}catch(e){return 'auto';}};
 let wasOn=false;
-setInterval(()=>{const st=G.state,m=mode(),want=m==='on'||(m==='auto'&&touchSeen&&!gamepad());const on=want&&st==='play'&&!document.body.classList.contains('photo');
+setInterval(()=>{const st=G.state,m=mode(),want=m==='on'; /* r55: touch drives by tapping the ship now; the pad is opt-in (KEYS / K) */const on=want&&st==='play'&&!document.body.classList.contains('photo');
   if(wasOn&&!on){if(dPressed){const c={up:'ArrowUp',left:'ArrowLeft',down:'ArrowDown',right:'ArrowRight',use:'KeyE'}[dPressed];dPressed=null;paintCross();if(c)send('keyup',c);} /* a held direction is released too, or she keeps walking */for(const K of KEYS)if(K.down){K.down=false;K.img.src=cap(K.w,K.h,K.legend,false,K.seed);send('keyup',K.code);}}
   pad.hidden=!on;wasOn=on;
   /* the rear deck stays visible: if the EVA platform is on screen under the keys, the keys step up above it */
