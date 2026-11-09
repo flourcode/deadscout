@@ -44,7 +44,7 @@ function roomIR(ctx){const sr=ctx.sampleRate,n=Math.floor(sr*1.5),b=ctx.createBu
   for(let i=0;i<n;i++){const w=Math.random()*2-1;lp+=.25*(w-lp);d[i]=lp*Math.pow(1-i/n,3.2)*(i<sr*.012?i/(sr*.012):1);}}return b;}
 
 /* each tape measured with loud.js (BS.1770, 4 minutes, seed 22910001) and trimmed to about -19.5 LUFS */
-const TRIM={"soft-orbit": 0.513, "space-wave": 0.543, "warm-transit": 0.513, "night-cruise": 0.507};
+const TRIM={"soft-orbit": 0.484, "space-wave": 0.507, "warm-transit": 0.49, "night-cruise": 0.479};
 
 function make(ctx,dest,o){
   o=o||{};const TK=tapeOf(o.tape),T=TAPES[TK],seed=(o.seed>>>0)||22910001,SLEEP=!!o.sleep;
@@ -55,7 +55,7 @@ function make(ctx,dest,o){
   const out=G(0);out.connect(dest);
   const comp=ctx.createDynamicsCompressor();comp.threshold.value=-20;comp.ratio.value=2.5;comp.attack.value=.015;comp.release.value=.3;comp.knee.value=12;comp.connect(out);
   const sat=ctx.createWaveShaper();{const c=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;c[i]=Math.tanh(x*1.4)/Math.tanh(1.4);}sat.curve=c;}sat.connect(comp);
-  const warm=F('lowpass',7200,.5);warm.connect(sat);const hp=F('highpass',32,.6);hp.connect(warm);const sum=G(1);sum.connect(hp);
+  const warm=F('lowpass',7200,.5);warm.connect(sat);const hp=F('highpass',48,.6);hp.connect(warm);const sum=G(1);sum.connect(hp);
   const room=ctx.createConvolver();room.buffer=roomIR(ctx);const roomLP=F('lowpass',3800);const roomG=G(.55);room.connect(roomLP);roomLP.connect(roomG);roomG.connect(sum);
   /* tape wobble on the tonal parts: a slowly modulated short delay (a few cents of wow) */
   const wowD=ctx.createDelay(.05);wowD.delayTime.value=.014;const wowL=ctx.createOscillator(),wowA=G(.0011);wowL.frequency.value=.42;wowL.connect(wowA);wowA.connect(wowD.delayTime);
@@ -68,7 +68,8 @@ function make(ctx,dest,o){
   melLP.connect(echo);echo.connect(eLP);eLP.connect(fb);fb.connect(echo);eLP.connect(eG);eG.connect(sum);const melSend=G(.35);melLP.connect(melSend);melSend.connect(room);
   const bassB=G(1),bassLP=F('lowpass',480,.5);bassB.connect(bassLP);bassLP.connect(sum);
   const drumB=G(1),drumLP=F('lowpass',6200,.4);drumB.connect(drumLP);drumLP.connect(sum);const drumSend=G(.12);drumLP.connect(drumSend);drumSend.connect(room);
-  const vin=ctx.createBufferSource();vin.buffer=vinylBuf(ctx,RNG(seed^77));vin.loop=true;const vinHP=F('highpass',700),vinG=G(SLEEP?.35:.55);vin.connect(vinHP);vinHP.connect(vinG);vinG.connect(sum);vin.start();
+  /* r59: the vinyl crackle is off. It was about fifteen clicks a second in each ear over a bed of hiss: not a cosy record, a constant static crackle. (The buffer stays so the stem still exists for tests.) */
+  const vin=ctx.createBufferSource();vin.buffer=vinylBuf(ctx,RNG(seed^77));vin.loop=true;const vinHP=F('highpass',700),vinG=G(0);vin.connect(vinHP);vinHP.connect(vinG);vinG.connect(sum);vin.start();
   const L=[wowL,flut,panL,vin];
   if(o.solo){const S={keys:keysB,pad:padB,mel:melB,bass:bassB,drums:drumB,vin:vinG};for(const k in S)if(k!==o.solo)S[k].gain.value=0;if(o.solo!=='mel'){eG.gain.value=0;}} /* test hook: one stem at a time */
   /* ---- voices ---- */
@@ -87,7 +88,7 @@ function make(ctx,dest,o){
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.07*vel,t+.018);g.gain.setTargetAtTime(.045*vel,t+.04,.4);g.gain.setTargetAtTime(0,t+dur,.09);g.connect(bassB);}
   function pad(ms,t,dur){for(const m of ms){for(const dt of [-5,5]){const x=osc('triangle',mhz(m),t,t+dur+2.5);x.detune.value=dt;const g=G(0);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+.9);g.gain.setValueAtTime(.03,t+Math.max(.95,dur-.1));g.gain.linearRampToValueAtTime(0,t+dur+1.6);x.connect(g);g.connect(padB);}}}
-  function kick(t,v){const x=osc('sine',110,t,t+.6),g=G(0);x.frequency.setValueAtTime(118,t);x.frequency.exponentialRampToValueAtTime(46,t+.09);
+  function kick(t,v){const x=osc('sine',110,t,t+.6),g=G(0);x.frequency.setValueAtTime(118,t);x.frequency.exponentialRampToValueAtTime(55,t+.09);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.62*v,t+.004);g.gain.setTargetAtTime(0,t+.02,.11);x.connect(g);g.connect(drumB);
     duck.gain.setValueAtTime(1,t);duck.gain.linearRampToValueAtTime(.8,t+.02);duck.gain.setTargetAtTime(1,t+.04,.13);}
   function snare(t,v){const s=nz(t,.3),bp=F('bandpass',1800,.7),g=G(0);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2*v,t+.003);g.gain.setTargetAtTime(0,t+.01,.07);s.connect(bp);bp.connect(g);g.connect(drumB);
@@ -104,7 +105,7 @@ function make(ctx,dest,o){
   const VOX=BARS.map(b=>{if(!b.first)return null;const root=T.key+b.deg,pcs=Q[b.shape].map(s=>(root+s)%12);
     /* place each tone in F3..A4 nearest the last chord's centre, so the hands barely move */
     const ms=pcs.map(pc=>{let best=null;for(let m=53;m<=70;m++)if(m%12===pc&&(best==null||Math.abs(m-prevC)<Math.abs(best-prevC)))best=m;return best;}).sort((a,b)=>a-b);
-    const uniq=[...new Set(ms)];prevC=uniq.reduce((a,b)=>a+b,0)/uniq.length*.5+61*.5;let bm=36+((root%12)+12)%12;if(bm>44)bm-=12;return {keys:uniq,bass:bm,root};});
+    const uniq=[...new Set(ms)];prevC=uniq.reduce((a,b)=>a+b,0)/uniq.length*.5+61*.5;let bm=36+((root%12)+12)%12; /* r58: the bass stays between 65 and 123 Hz, where small speakers can still play it */return {keys:uniq,bass:bm,root};});
   for(let i=0;i<BARS.length;i++)if(!VOX[i])VOX[i]=VOX[i-1];
   const R0=RNG(seed^hashStr(T.name)^Math.imul((o.pass|0)+1,40503)); /* each pass of the station gets its own hook */
   /* the hook: two bars of a pentatonic line, 5-7 notes, C5-C6 */
@@ -153,6 +154,6 @@ function make(ctx,dest,o){
     setTimeout(()=>{for(const x of L){try{x.stop();}catch(e){}}try{out.disconnect();}catch(e){}},((f||.5)+.8)*1000);}
   const LV=TRIM[TK]||1;out.gain.setValueAtTime(0,ctx.currentTime);out.gain.linearRampToValueAtTime(LV,ctx.currentTime+Math.max(.3,Math.min(o.fadeIn||1.5,15)));
   return {tick,ahead:2,skip(){},setState,setIntensity,hero,stop,get state(){return state;},tape:T.name,plan:{ev:[]},bpm:T.bpm};}
-const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.7, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -22.9, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4, "warm-transit": -19.5, "warm-transit:sleep": -23.2, "night-cruise": -19.5, "night-cruise:sleep": -22.9};
+const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.7, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -23.1, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4, "warm-transit": -19.5, "warm-transit:sleep": -23.1, "night-cruise": -19.5, "night-cruise:sleep": -22.8};
 window.DEEP={make,TAPES,ALIAS,tapeOf,PENT,nearest,LUFS,TRIM};
 })();

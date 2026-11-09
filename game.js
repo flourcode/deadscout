@@ -26,7 +26,7 @@ function beds(){if(BED||!actx||!ambBus)return BED;const sr=actx.sampleRate,n=sr*
   for(const b of [brown,pink])for(let c=0;c<2;c++){const d=b.getChannelData(c),f=Math.floor(sr*.5);for(let i=0;i<f;i++){const u=i/f;d[i]=d[i]*u+d[d.length-f+i]*(1-u);}}
   const mkBed=(buf,lp,hp)=>{const s=actx.createBufferSource();s.buffer=buf;s.loop=true;s.loopStart=0;s.loopEnd=buf.duration-.5;const l=actx.createBiquadFilter();l.type='lowpass';l.frequency.value=lp;const h=actx.createBiquadFilter();h.type='highpass';h.frequency.value=hp;
     const g=actx.createGain();g.gain.value=0;const m=actx.createOscillator(),mg=actx.createGain();m.frequency.value=.031+Math.random()*.01;mg.gain.value=0;m.connect(mg);mg.connect(g.gain);s.connect(l);l.connect(h);h.connect(g);g.connect(ambBus);s.start();m.start();return {g,mg};};
-  BED={brown:mkBed(brown,520,30),pink:mkBed(pink,2600,180)};paintBeds();return BED;}
+  BED={brown:mkBed(brown,520,70),pink:mkBed(pink,2600,180)}; /* r58: brown noise from 70 Hz up (it was 30): no rumble small speakers can't play */paintBeds();return BED;}
 function paintBeds(){const B=beds();if(!B)return;const T=actx.currentTime;for(const k of ['brown','pink']){const v=BEDV[k][prefs.nw[k]||'low']||0;B[k].g.gain.setTargetAtTime(v,T,2);B[k].mg.gain.setTargetAtTime(v*.1,T,2);}} /* ±10%, over half a minute */
 /* r40 · INTENSITY: REST · FOCUS · CHILL, live on the band (the mood never changes, only how much is playing) */
 const INTS=['rest','focus','chill'],INTN={rest:'DEEP REST',focus:'FOCUS',chill:'SPACE CHILL'};const INT_N=()=>Math.max(0,INTS.indexOf(prefs.nw.intensity||'focus'));

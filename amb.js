@@ -14,14 +14,18 @@ let lfos=[]; /* every modulator, so stop() can stop them: r22 left five oscillat
 const lfo=(hz,amt,target)=>{const o=ctx.createOscillator(),k=ctx.createGain();o.frequency.value=hz;k.gain.value=amt;o.connect(k);k.connect(target);o.start();lfos.push(o);return o;};
 function layer(name,build){const fader=g(0);fader.connect(out);const nodes=build(fader);L[name]={fader,nodes,level:0};}
 function start(c,dest,mix,opts){stop();ctx=c;out=g(1);out.connect(dest);alive=true;mood=(opts&&opts.mood)||'routine';
-  layer('engine',f=>{const s=src(),lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=90;lp.Q.value=.7;const o=ctx.createOscillator();o.type='sine';o.frequency.value=48;const o2=ctx.createOscillator();o2.type='triangle';o2.frequency.value=96.4;
-    const og=g(.5),o2g=g(.12),ng=g(.9);lfo(.05,6,o.frequency);lfo(.031,.18,og.gain);s.connect(lp);lp.connect(ng);ng.connect(f);o.connect(og);og.connect(f);o2.connect(o2g);o2g.connect(f);o.start();o2.start();return [s,o,o2];});
+  /* r58: the engine was a 48 Hz sine under noise cut off at 90 Hz: almost all of it below what laptop, phone and small desktop speakers can play.
+     They don't stay silent down there, they rattle and crackle (heard as static). The hum now sits where speakers work (96 and 144 Hz), the rumble is a
+     band around 170 Hz, and nothing under 60 Hz gets out of this layer */
+  layer('engine',f=>{const s=src(),lp=ctx.createBiquadFilter();lp.type='bandpass';lp.frequency.value=170;lp.Q.value=.6;const cut=ctx.createBiquadFilter();cut.type='highpass';cut.frequency.value=60;cut.Q.value=.7;cut.connect(f);
+    const o=ctx.createOscillator();o.type='sine';o.frequency.value=96;const o2=ctx.createOscillator();o2.type='triangle';o2.frequency.value=144.6;
+    const og=g(.16),o2g=g(.05),ng=g(.4);lfo(.05,3,o.frequency);lfo(.031,.06,og.gain);s.connect(lp);lp.connect(ng);ng.connect(cut);o.connect(og);og.connect(cut);o2.connect(o2g);o2g.connect(cut);o.start();o2.start();return [s,o,o2];});
   layer('ventilation',f=>{const s=src(),bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=420;bp.Q.value=.5;const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=180;const k=g(.5);lfo(.023,.22,k.gain);lfo(.011,120,bp.frequency);s.connect(hp);hp.connect(bp);bp.connect(k);k.connect(f);return [s];});
   layer('machinery',f=>{const s=src(),lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=160;const k=g(0);s.connect(lp);lp.connect(k);k.connect(f);
     /* the pump: 40-70 s on, 60-120 s off, eased both ways; relays and a motor as the world turns */
     const pump=()=>{if(!alive)return;const n=ctx.currentTime,on=40+Math.random()*30;k.gain.setTargetAtTime(.7,n,6);k.gain.setTargetAtTime(0,n+on,8);
       const next=on+(mood==='quiet'?120:60)+Math.random()*80;timers.push(setTimeout(pump,next*1000));};timers.push(setTimeout(pump,8000+Math.random()*20000));
-    const relay=()=>{if(!alive)return;click(f,.18+Math.random()*.1);const next=(mood==='quiet'?45:18)+Math.random()*40;timers.push(setTimeout(relay,next*1000));};timers.push(setTimeout(relay,6000));
+    const relay=()=>{if(!alive)return;click(f,.045+Math.random()*.025); /* r59: relays tick quietly (they could be the loudest thing in the mix) */const next=(mood==='quiet'?45:18)+Math.random()*40;timers.push(setTimeout(relay,next*1000));};timers.push(setTimeout(relay,6000));
     const motor=()=>{if(!alive)return;const o=ctx.createOscillator(),og=g(0),bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=70+Math.random()*40;bp.Q.value=8;o.type='sawtooth';o.frequency.value=23+Math.random()*9;o.connect(bp);bp.connect(og);og.connect(f);const n=ctx.currentTime,d=10+Math.random()*16;og.gain.setTargetAtTime(.22,n,3);og.gain.setTargetAtTime(0,n+d,4);o.start(n);o.stop(n+d+16);
       timers.push(setTimeout(motor,(90+Math.random()*180)*1000));};timers.push(setTimeout(motor,30000+Math.random()*60000));return [s];});
   layer('radio',f=>{const s=src(),bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800;bp.Q.value=1.2;const k=g(.25);lfo(.17,.1,k.gain);s.connect(bp);bp.connect(k);k.connect(f);
@@ -37,7 +41,7 @@ function start(c,dest,mix,opts){stop();ctx=c;out=g(1);out.connect(dest);alive=tr
   set(mix||MIX0,2);}
 function click(f,v){const s=src(),hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=1200;const k=g(0),n=ctx.currentTime;s.connect(hp);hp.connect(k);k.connect(f);k.gain.setValueAtTime(0,n);k.gain.linearRampToValueAtTime(v,n+.004);k.gain.setTargetAtTime(0,n+.01,.02);s.stop(n+.3);}
 /* faders: 0..1 each, eased, with a curve so the lower half is usable */
-function set(mix,secs){if(!ctx)return;for(const k in L){const v=Math.pow(Math.max(0,Math.min(1,mix[k]!=null?mix[k]:MIX0[k])),1.6)*({engine:.4,ventilation:.45,machinery:.4,radio:0,signal:0,hull:.2}[k]||.5);L[k].level=v;L[k].fader.gain.setTargetAtTime(v,ctx.currentTime,secs!=null?secs/3:.4);}}
+function set(mix,secs){if(!ctx)return;for(const k in L){const v=Math.pow(Math.max(0,Math.min(1,mix[k]!=null?mix[k]:MIX0[k])),1.6)*({engine:.4,ventilation:.3,machinery:.4,radio:0,signal:0,hull:.2}[k]||.5);L[k].level=v;L[k].fader.gain.setTargetAtTime(v,ctx.currentTime,secs!=null?secs/3:.4);}}
 function duck(amount,secs){if(!out)return;out.gain.setTargetAtTime(Math.max(0,1-amount),ctx.currentTime,(secs||10)/3);}
 function stop(){alive=false;timers.forEach(clearTimeout);timers=[];for(const k in L){try{L[k].fader.gain.setTargetAtTime(0,ctx.currentTime,.3);const F=L[k];setTimeout(()=>{try{F.fader.disconnect();F.nodes.forEach(n=>{try{n.stop();}catch(e){}});}catch(e){}},1500);}catch(e){}}L={};
   {const old=lfos;lfos=[];setTimeout(()=>{for(const o of old){try{o.stop();o.disconnect();}catch(e){}}},1500);}}
