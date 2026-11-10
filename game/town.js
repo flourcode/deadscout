@@ -146,7 +146,7 @@ function crewSounds(t,dt){if(asleep())return;for(const a of ['pilot','systems','
   else if(s.climb){st.d+=dy;if(st.d>18){st.d=0;play('rung',s.x,s.y);}}else st.d=0;}}
 
 /* ============================== crew props from the schedule ============================== */
-const SLOT={top:{hx:575,y:705},low:{hx:575,y:788}},PREF={commander:['low','top'],systems:['low','top'],pilot:['top','low']},HEAD={pilot:['#7b3f1c','#e39754'],systems:['#292a31','#99623b'],commander:['#e9d7c2','#14181c']}; /* r41: the commander sleeps in the bottom bunk, helmet and all */
+const SLOT={top:{hx:575,y:705},low:{hx:575,y:788}},PREF={commander:['low','top'],systems:['low','top'],pilot:['top','low']},HEAD={deadscout:['#f6efe4','#14181c'],pilot:['#7b3f1c','#e39754'],systems:['#292a31','#99623b'],commander:['#e9d7c2','#14181c']}; /* r41: the commander sleeps in the bottom bunk, helmet and all */
 const SLEEPERS={};
 function propsNow(t){const w=W(),L=(w&&w.man&&w.man.props)||[];const carry={},bunk={};for(const p of L){if(p.at>t)break;if(p.carry)carry[p.carry]=p.prop;if(p.bunk){if(t<p.until)bunk[p.bunk]=p;else delete bunk[p.bunk];}}for(const a in SLEEPERS)bunk[a]=SLEEPERS[a];return {carry,bunk};}
 let lastBunkSnd=0;

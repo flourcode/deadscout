@@ -167,7 +167,11 @@ function make(ctx,dest,o){
   function tick(h){if(stopped)return;while(t0+bN*barDur<h){bar(bN,t0+bN*barDur);bN++;}}
   function setState(s){state=s;} /* r51: the ship's mood never changes the music */
   function setIntensity(n){M.int=SLEEP?0:Math.max(0,Math.min(2,n|0));}
-  function hero(kind){if(stopped||!/^(relay|scanner|chime)$/.test(kind))return;const t=ctx.currentTime+.05,V=VOX[bN%BARS.length]||VOX[0];rhodes(V.keys[V.keys.length-1]+12,t,1.2,.35);rhodes(V.keys[V.keys.length-2]+12,t+.18,1.2,.28);}
+  /* r66: touch notes. The major pentatonic of the track's key: any of them sits on any chord in the song, so nothing she touches can sound wrong.
+     o.i = a step on that scale (0 = the tonic, 5 = the octave) or a list of steps played one after another; bell or rhodes */
+  const TPENT=[0,2,4,7,9];function touch(o){o=o||{};const k=((T.key%12)+12)%12,base=60+(k>6?k-12:k),L=Array.isArray(o.i)?o.i:[o.i|0],t=ctx.currentTime+.03,gap=o.gap||.16;
+    L.forEach((i,n)=>{const m=base+TPENT[((i%5)+5)%5]+12*Math.floor(i/5),at=t+n*gap,v=(o.v||.5)*(1-n*.08);if(o.voice==='rhodes')rhodes(m,at,1.1,v*.7);else bell(m+12,at,v);});}
+  function hero(kind,o){if(stopped)return;if(kind==='touch'){try{touch(o);}catch(e){}return;}if(!/^(relay|scanner|chime)$/.test(kind))return;const t=ctx.currentTime+.05,V=VOX[bN%BARS.length]||VOX[0];rhodes(V.keys[V.keys.length-1]+12,t,1.2,.35);rhodes(V.keys[V.keys.length-2]+12,t+.18,1.2,.28);}
   function stop(f){if(stopped)return;stopped=true;const t=ctx.currentTime;out.gain.cancelScheduledValues(t);out.gain.setTargetAtTime(0,t,Math.max(.05,(f||.5)/3));
     setTimeout(()=>{for(const x of L){try{x.stop();}catch(e){}}try{out.disconnect();}catch(e){}},((f||.5)+.8)*1000);}
   const LV=TRIM[TK]||1;out.gain.setValueAtTime(0,ctx.currentTime);out.gain.linearRampToValueAtTime(LV,ctx.currentTime+Math.max(.3,Math.min(o.fadeIn||1.5,15)));

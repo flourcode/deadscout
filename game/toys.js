@@ -43,11 +43,11 @@ const TOYS=ROOMS.map(r=>({id:'light-'+r,room:r,light:1,at:()=>lamp(r),label:()=>
  {id:'eterm',room:'engineering',at:up('e-term',74),label:()=>'ENGINEERING PANEL',act:()=>comp('eterm','typing',['+0 screen engineering.panel signal-bars for 4s','+0 screen engineering.load waveform for 4s'],null)},
  {id:'pumps',room:'service',at:up('sv-mid',70),label:()=>'SERVICE PUMPS',act(){if(S.busy.p)return null;S.busy.p=1;A.sfx('pumps',1);later(5500,()=>{S.busy.p=0;});return 'PUMPS CYCLING';}},
  {id:'beacon',room:'eva',at:()=>{const n=M.navlights&&M.navlights[M.navlights.length-1];return n?[n[0],n[1]+14]:up('eva-antenna',120)();},label:()=>'BEACON · '+(S.beacon?'ON':'OFF'),off:()=>!S.beacon,act(){S.beacon=!S.beacon;A.sfx(S.beacon?'switchon':'switchoff',1.6);if(S.beacon)later(200,()=>A.sfx('ping',.4));CUT.toy({beacon:S.beacon?1:0});return null;}},
- {id:'k9',room:'*',at:()=>{const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');return k?[k.x,k.y-50]:null;},label:()=>'K9-4',hide:()=>{const r=CUT.report(G.P,G.TIMES,G.now()).k9;return !r||r==='GONE';},act(){A.chirp();return null;}}]);
+ {id:'k9',room:'*',at:()=>{const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');return k?[k.x,k.y-50]:null;},label:()=>'SCOUT',hide:()=>{const r=CUT.report(G.P,G.TIMES,G.now()).k9;return !r||r==='GONE';},act(){A.chirp();return null;}}]);
 /* ---------- the reticle: four corner brackets and a dot, drawn in pixels ---------- */
 function ret(col){const c=document.createElement('canvas');c.width=15;c.height=15;const x=c.getContext('2d');x.fillStyle=col;const p=(X,Y)=>x.fillRect(X,Y,1,1);
   for(let i=0;i<4;i++){p(1+i,1);p(1,1+i);p(13-i,1);p(13,1+i);p(1+i,13);p(1,13-i);p(13-i,13);p(13,13-i);}p(7,7);p(6,7);p(8,7);p(7,6);p(7,8);return c.toDataURL();}
-const IMG={toy:ret('#7ee3e5'),off:ret('#8a6f58')};
+const IMG={toy:ret('#e9d7c2'),off:ret('#8a6f58')};
 const css=document.createElement('style');css.textContent=`
 .toys{position:absolute;inset:0;pointer-events:none;z-index:3}
 .toys[hidden]{display:none}

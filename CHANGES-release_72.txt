@@ -1,0 +1,18 @@
+DRIFTNAUT — RELEASE 72
+=======================
+Story: home
+- HALCYON is a research vessel, drifting peacefully a long way out. It is
+  home to an astronaut and a robodog called Scout. That is the whole
+  story; nothing says how they came to be there.
+- The dog is Scout everywhere a visitor reads (was K9 / K9-4): the About
+  text, its label, its messages.
+- About and page descriptions rewritten to the line above. No pronouns.
+
+Puffs
+- Outside the hull the astronaut's pack lets out a small puff of cold gas
+  whenever speed or heading changes (setting off, turning, stopping),
+  pushed the opposite way. None while coasting, none indoors.
+  Cream-white, no flame, silent: a real suit's jet pack is cold nitrogen.
+- Cache bumped (driftnaut-v72).
+
+

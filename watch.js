@@ -77,8 +77,9 @@ const BAND=h=>h>=23||h<6?'night':(h>=6.5&&h<8.5)||(h>=12&&h<13.5)||(h>=18&&h<19.
 const WHEN={meal:{meal:5,day:.25,off:.5,night:.1},off:{off:2.6,day:.55,meal:.4,night:.3},day:{day:1.2,meal:.5,off:.5,night:.35},night:{night:14,day:0,meal:0,off:.08}};
 /* ---------- the schedule ---------- */
 function schedule(cfg,opts){cfg=Object.assign({},DEFAULTS,cfg||{});opts=opts||{};const A=ACTIVITY[cfg.activity]||ACTIVITY.routine,total=cfg.duration_minutes*60,from=opts.from||0,r=rng((cfg.seed|0)+(opts.from?Math.floor(opts.from)*7919:0)+(opts.only?13:0));
-  const NOW=cfg.era!=='2291',actors=opts.only?[opts.only]:NOW?[]:['pilot','systems','commander'],ev=[],at={},free={},last={};
-  if(NOW&&!opts.from){for(const a of ['pilot','systems','commander'])ev.push({at:0,hide:a});ev.push({at:0,show:'deadscout'});} /* r37 NOW: the ship as it is; only Driftnaut and K9 aboard (toys.js moves her) */
+  const NOW=cfg.era!=='2291',actors=opts.only?[opts.only]:(NOW||cfg.solo)?[]:['pilot','systems','commander'],ev=[],at={},free={},last={};
+  if(NOW&&!opts.from){for(const a of ['pilot','systems','commander'])ev.push({at:0,hide:a});ev.push({at:0,show:'deadscout'});}
+  if(cfg.solo&&!NOW&&!opts.from)for(const a of ['pilot','systems','commander','deadscout'])ev.push({at:0,hide:a}); /* she is drawn by game/naut.js in her own suit */ /* r66: one keeper and a dog. The ship was built for more; nobody else is aboard */ /* r37 NOW: the ship as it is; only Driftnaut and K9 aboard (toys.js moves her) */
   for(const a of actors){at[a]=(opts.at&&opts.at[a])||HOME[a];free[a]=from+(opts.only?2:20+r()*60);}
   const travel=(a,to)=>window.CUT?CUT.travelTime(a,at[a],to):20;
   const clock0=cfg.clock0||Date.now(),hourAt=t=>{const d=new Date(clock0+t*1000);return d.getHours()+d.getMinutes()/60;},props=[],busyM=!!A.busy,MODE=busyM?'routine':cfg.activity;

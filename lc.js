@@ -21,7 +21,7 @@ function create(canvas){
   const chapterAt=t=>{for(let k=times.length-1;k>=0;k--)if(t>=times[k].start)return k;return 0;};
   function cfgOf(ch,sd){const role=String(ch.role||ch.title||'').toUpperCase(),mk=ch.motion&&ch.motion!=='auto'?ch.motion:(ROLE_SET[role]||P.motion||'synthwave'),S=SETS[mk]||SETS.synthwave,e=FX_ENERGY[ch.fxEnergy||P.fxEnergy||'mid']||1;
     return {dark:!!S.dark,e,sd,scan:Math.min(S.scan,.6),bump:Math.min(S.bump,.6),vsync:Math.min(S.vsync,.4),tear:Math.min(S.tear,.4),chroma:Math.min(S.chroma,.4),expo:Math.min(S.expo,1.2),calm:/ESCALATION|REALIZATION/.test(role)?.8:1,stars:false};}
-  const HAL_BLOCKS=[['2291 // DSV HALCYON',0,2.4],['OUTER HELIOSPHERE','150 AU FROM SOL',2.4,4.5],['CURRENT STATUS','LOST',4.5,7]];
+  const HAL_BLOCKS=[['2291 // DSV HALCYON',0,2.4],['DRIFTING PEACEFULLY','150 AU FROM SOL',2.4,7]];
   function halcyonOpen(c,t){c.save();c.setTransform(scale,0,0,scale,0,0);c.fillStyle='rgba(2,3,8,.38)';c.fillRect(0,0,DW,DH);c.globalAlpha=sm(t/.8);
     for(const b of HAL_BLOCKS){const two=b.length===4,t0=b[two?2:1],t1=b[two?3:2];if(t<t0||t>=t1)continue;const u=t-t0,a=Math.min(sm(u/.45),1-sm((u-(t1-t0-.5))/.5));c.globalAlpha=sm(t/.8)*a;c.textAlign='left';
       c.font='400 30px Silk,"LR Clean",monospace';try{c.letterSpacing='9px';}catch(e){}c.fillStyle='#8fd8c0';c.fillText(b[0],150,DH-250);

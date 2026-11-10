@@ -382,10 +382,10 @@ body.aonly .wui,body.aonly .tag{opacity:0!important}
 .bt-card{all:unset;cursor:pointer;box-sizing:border-box;width:min(270px,42vw);padding:clamp(12px,2.4vh,22px) 12px;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.2vh,10px);border-radius:6px;text-align:center;box-shadow:4px 4px 0 #000;transition:transform .08s}
 .bt-card svg{width:clamp(18px,3vw,26px);height:auto;shape-rendering:crispEdges}
 .bt-card b{font:400 clamp(20px,3.6vw,32px)/1 Silk;letter-spacing:.12em}.bt-card span{font:400 clamp(7px,1.2vw,10px)/1.4 Silk;letter-spacing:.14em}
-.bt-card.listen{background:#d8e7a4;color:#12322f;box-shadow:inset 0 0 0 2px #eef6cf,4px 4px 0 #000}
+.bt-card.listen{background:#e9d7c2;color:#14181c;box-shadow:inset 0 0 0 2px #f6efe4,4px 4px 0 #000}
 .bt-card.play{background:#1e4a47;color:#e6efd6;box-shadow:inset 0 0 0 2px #5f9187,4px 4px 0 #000}
 .bt-card:hover,.bt-card:focus-visible{transform:translate(-1px,-1px)}.bt-card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
-.bt-card.listen:focus-visible{box-shadow:inset 0 0 0 3px #12322f,4px 4px 0 #000}.bt-card.play:focus-visible{box-shadow:inset 0 0 0 3px #d8e7a4,4px 4px 0 #000}
+.bt-card.listen:focus-visible{box-shadow:inset 0 0 0 3px #14181c,4px 4px 0 #000}.bt-card.play:focus-visible{box-shadow:inset 0 0 0 3px #d8e7a4,4px 4px 0 #000}
 .bt-foot{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;color:#8fbfa0}
 .bt-foot button{all:unset;cursor:pointer;padding:5px 10px;font:400 9px/1 Silk;letter-spacing:.2em;color:#efe2cf;box-shadow:inset 0 0 0 2px #3c3a40}
 .bt-pick[hidden]{display:none}
@@ -400,7 +400,7 @@ body.aonly .wui,body.aonly .tag{opacity:0!important}
 .bt-box>.bt-art,.bt-box>.bt-mid,.bt-box>.bt-foot{grid-column:2}
 .bt-sky,.bt-top,.bt-art img,.bt-ship{display:none!important}
 .bt-art{margin:0;gap:clamp(6px,1.4vw,14px)}
-.bt-kick{margin:0 0 clamp(4px,1vw,10px);padding:clamp(6px,1vw,10px) clamp(12px,2vw,22px);font:400 clamp(8px,1.2vw,13px)/1 Silk;letter-spacing:.32em;color:#cfe3d0;box-shadow:inset 0 0 0 2px #3f6a63;border-radius:4px;background:rgba(8,20,22,.6)}
+.bt-kick{margin:0 0 clamp(4px,1vw,10px);padding:clamp(6px,1vw,10px) clamp(12px,2vw,22px);font:400 clamp(8px,1.2vw,13px)/1 Silk;letter-spacing:.32em;color:#e9d7c2;box-shadow:inset 0 0 0 2px #907763;border-radius:4px;background:rgba(8,20,22,.6)}
 .bt-orb{width:clamp(44px,6vw,86px);height:auto;color:#efe2cf}
 .bt-name{font-size:clamp(30px,5.4vw,74px)!important;letter-spacing:.24em;margin-right:-.24em;color:#f2e6d2;text-shadow:4px 4px 0 #0b1214}
 .bt-tag{color:#e6efd6!important;letter-spacing:.34em;font-size:clamp(8px,1.2vw,14px)!important}
@@ -415,7 +415,7 @@ body.aonly .wui,body.aonly .tag{opacity:0!important}
   .bt-pick{flex-direction:column;align-items:center;gap:12px}.bt-card{width:min(360px,92%);min-width:0;flex-direction:row;justify-content:center;gap:18px;padding:10px 16px}
   .bt-card b{font-size:clamp(20px,7vw,28px)}.bt-card svg{width:30px}.bt-card>b,.bt-card>span{grid-column:2}
   .bt-card{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:16px;row-gap:6px;align-items:center}.bt-card svg{grid-row:1/3}
-  .bt-foot{flex-direction:column;gap:8px}.bt-foot span{box-shadow:inset 0 0 0 1px #3f6a63;padding:7px 10px;border-radius:4px;font-size:8px;letter-spacing:.18em}}
+  .bt-foot{flex-direction:column;gap:8px}.bt-foot span{box-shadow:inset 0 0 0 1px #907763;padding:7px 10px;border-radius:4px;font-size:8px;letter-spacing:.18em}}
 @media (max-height:520px) and (min-aspect-ratio:4/5){.bt-kick,.bt-rule,.bt-orb{display:none}.bt-card{padding:10px 8px}}
 
 /* ===================== r44 · the start screen is a live window into the ship ===================== */
