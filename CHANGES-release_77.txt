@@ -1,0 +1,45 @@
+DRIFTNAUT — RELEASE 77
+=======================
+One layout aboard, from the UI review.
+
+The picture fills the window (desktop and phones held sideways)
+- No frame, no margin, no whole-number scaling steps. 1440 x 900 was
+  1280 x 720 with a gap all round; it is now 1440 x 810. An ultrawide
+  2200 x 900 window was 1280 x 720; it is now 1600 x 900.
+- Where the window is not 16:9, the leftover strip is the same dark sky
+  with a few stars (not the grid), and the picture's edge fades into it.
+- The picture is drawn at the next whole multiple up and scaled down, so
+  every picture pixel is the same size (very slightly softer than before
+  at in-between sizes).
+
+One bar
+- SCENE, SKIP, SOUND, then three quieter ones: MINI (the floating window,
+  was FLOAT, was parked under the clock), FULL (full screen, new) and ?
+  (About, new).
+- MINI and FULL are hidden where the browser cannot do them (phones).
+- ? opens the About text as a panel over the ship; CLOSE, Esc or a click
+  outside closes it. It used to sit below the picture, out of reach once
+  aboard.
+
+Phones and tablets
+- Button text is 12 px (was 8). Every control is at least 44 px tall
+  (48 on phones, 52 on tablets; was 36).
+- Buttons keep their words: SCENE and SOUND sit as a small caption above
+  the value.
+- The FLOAT button no longer overlaps SKIP on tablets (it is gone there).
+
+Removed
+- The clock.
+- The room markers (brackets on hover). Everything is clickable anyway.
+
+Moved
+- The hint sits just above the bar on desktop, just below it on upright
+  phones and tablets.
+
+Not in this release
+- Upright phones and tablets still show the 16:9 picture at the top with
+  empty sky below. Filling the height needs the renderer to draw a tall
+  picture; see the note in the hand-off.
+- Cache bumped (driftnaut-v77).
+
+

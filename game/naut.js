@@ -15,7 +15,7 @@ const stage=document.getElementById('stage'),rnd=(a,b)=>a+Math.random()*(b-a),cl
 const M=CUT.MAP,NODES=M.nodes,HULL=[110,250,2080,1200],HOV=6;
 const QN=(location.search.match(/[?&]night=(\d)/)||[])[1];
 const G={x:736,y:846-HOV,vx:0,vy:0,path:[],face:1,last:0,wanderAt:0,slow:false,ext:0,on:false,t0:0,space:false,act:null,mug:0,k9At:0,night:null,asleep:false,acts:0,roll:0};
-window.__naut=window.__ghost=G;try{CUT.hideHer(true);}catch(e){}G.isNight=()=>{if(G.forceNight!=null)return !!G.forceNight;if(QN!=null)return QN==='1';const h=new Date().getHours();return h>=22||h<6;};
+window.__naut=window.__ghost=G;try{CUT.hideHer(true);}catch(e){}G.isNight=()=>{if(G.forceNight!=null)return !!G.forceNight;return QN==='1';}; /* r74: the visitor's clock no longer changes anything; a nap is one of the routines */
 /* strictly inside a room's outline, or nowhere (the engine's own roomOf answers with the nearest room even from open space) */
 const roomAt=(x,y)=>{for(const r in M.rooms){const P=M.rooms[r].poly;let in_=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)in_=!in_;}if(in_)return r;}return null;};
 /* the ship's ways: the same nodes the crew walk, and the two ladders */
@@ -27,31 +27,42 @@ function nearestNode(x,y,room){let best=null,bd=1e9;for(const k in NODES){if(roo
 function route(a,b){const D={[a]:0},prev={},Q=[a],done={};while(Q.length){Q.sort((p,q)=>D[p]-D[q]);const u=Q.shift();if(done[u])continue;done[u]=1;if(u===b)break;for(const v of ADJ[u]){const w=D[u]+Math.hypot(NODES[u][0]-NODES[v][0],NODES[u][1]-NODES[v][1]);if(D[v]==null||w<D[v]){D[v]=w;prev[v]=u;Q.push(v);}}}
   if(D[b]==null)return [a];const L=[b];while(L[0]!==a)L.unshift(prev[L[0]]);return L;}
 function nearRoom(x,y){let best=null,bd=1e9;for(const r in RINFO){const R=RINFO[r],d=Math.hypot(Math.max(R.x0-x,0,x-R.x1),Math.max(R.top-y,0,y-R.floor));if(d<bd){bd=d;best=r;}}return [best,bd];}
+/* r73: THE ENGINE WASH. Astern of the nozzles the exhaust runs to the edge of the picture. Nobody drifts through that.
+   A place picked inside it is moved to its nearest edge, and a path that would cross it goes round instead: in front of the stern,
+   just forward of the nozzles (the wash reaches the right-hand edge, so there is no way round behind it) */
+const WASH={x0:2100,y0:280,y1:880},STERNX=2034,MID=60; /* y0..y1 are for the middle of the suit; her feet are MID lower */
+const inWash=(x,y)=>x>WASH.x0-24&&y-MID>WASH.y0-24&&y-MID<WASH.y1+24;
+function clearOfWash(x,y){if(!inWash(x,y))return [x,y];const up=(y-MID)-(WASH.y0-40),dn=(WASH.y1+40)-(y-MID),lf=x-(WASH.x0-60),m=Math.min(up,dn,lf);return m===lf?[WASH.x0-60,y]:m===up?[x,WASH.y0-40+MID]:[x,WASH.y1+40+MID];}
+function aroundStern(ax,ay,bx,by){let hit=false;for(let i=1;i<28;i++){const u=i/28;if(inWash(ax+(bx-ax)*u,ay+(by-ay)*u)){hit=true;break;}}if(!hit)return [];
+  const side=y=>(y-MID)<(WASH.y0+WASH.y1)/2?WASH.y0-46+MID:WASH.y1+46+MID,V=[];
+  if(ax>STERNX+40)V.push([STERNX,side(ay)]);if(bx>STERNX+40)V.push([STERNX,side(by)]);return V;}
 /* where to, and how: (tx,ty) is where her feet should end up */
 function plan(tx,ty,slow){const cur=G.space?null:roomAt(G.x,G.y-34);let room=roomAt(tx,ty-34);if(!room){const [r,d]=nearRoom(tx,ty-34);if(d<70)room=r;}
   const P=[];let N=[];G.slow=!!slow;
   if(!room){ /* out in the open */
-    tx=clamp(tx,50,CUT.W-50);ty=clamp(ty,110,CUT.H-30);
-    if(!G.space){N=route(nearestNode(G.x,G.y,cur),'eva-center');while(cur&&N.length>=2&&NROOM[N[1]]===cur)N.shift();for(const k of N)P.push(pt(k));}
+    tx=clamp(tx,50,CUT.W-50);ty=clamp(ty,110,CUT.H-30);[tx,ty]=clearOfWash(tx,ty);
+    let fx=G.x,fy=G.y;if(!G.space){N=route(nearestNode(G.x,G.y,cur),'eva-center');while(cur&&N.length>=2&&NROOM[N[1]]===cur)N.shift();for(const k of N)P.push(pt(k));fx=NODES['eva-center'][0];fy=NODES['eva-center'][1]-HOV;}
+    for(const v of aroundStern(fx,fy,tx,ty))P.push({x:v[0],y:v[1],space:1});
     P.push({x:tx,y:ty,space:1});}
   else{const R=RINFO[room];tx=clamp(tx,R.x0+30,R.x1-30);ty=clamp(ty,R.top+122,R.floor-HOV);
     if(!G.space&&room===cur){G.path=[{x:tx,y:ty}];return;}
     const end=nearestNode(tx,ty,room);
     if(G.space){N=route('eva-center',end);}else{N=route(nearestNode(G.x,G.y,cur),end);while(cur&&N.length>=2&&NROOM[N[1]]===cur)N.shift();}
     while(N.length>=2&&NROOM[N[N.length-2]]===room)N.pop();
-    for(const k of N)P.push(pt(k));if(G.space&&P[0])P[0].dock=1;P.push({x:tx,y:ty});}
+    if(G.space){const e=NODES['eva-center'];for(const v of aroundStern(G.x,G.y,e[0],e[1]-HOV))P.push({x:v[0],y:v[1],space:1});}
+    const n0=P.length;for(const k of N)P.push(pt(k));if(G.space&&P[n0])P[n0].dock=1;P.push({x:tx,y:ty});}
   /* the airlock is crossed properly: one door at a time, with a pause between */
   const ids=P.map(p=>p.n);if(ids.includes('a-inner')&&ids.includes('a-outer')){const c=P.find(p=>p.n==='a-center');if(c)c.wait=2.4;}
   /* ease into the sharp turns (the shaft, a door at a height) so she never clips a corner */
   let px=G.x,py=G.y;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],d1=Math.hypot(a.x-px,a.y-py)||1,d2=Math.hypot(b.x-a.x,b.y-a.y)||1;a.turn=((a.x-px)*(b.x-a.x)+(a.y-py)*(b.y-a.y))/(d1*d2)<.6;px=a.x;py=a.y;}
   G.path=P;}
-G.go=(x,y,slow)=>plan(x,y,slow);
+G.go=(x,y,slow)=>plan(x,y,slow);G.api={NODES,NROOM,RINFO,route,roomAt,rnd,clamp,pick,active:()=>active(),pois:()=>pois(),mark:(a,kind)=>PR.marks.push({a,t:performance.now(),kind}),hold:ms=>{PR.at=performance.now()+ms;}};G.under=[];
 let POI=null;function pois(){if(POI)return POI;POI=[];try{const O=M.objects;for(const k in O){const o=O[k];if(!o.spot)continue;let p=null;try{p=CUT.place(o.spot);}catch(e){}if(p&&p.x!=null&&!POI.some(q=>q.x===p.x&&q.y===p.y))POI.push({id:k,x:p.x,y:p.y});}}catch(e){}return POI;}
 function active(){const g=GP();return !!(g&&g.state==='watch'&&g.watch);}
 /* HALCYON speaks seldom: never twice in five minutes */
 const HAL={at:-1e9,said:{}};function halcyon(text,key,pn){pn=pn||performance.now();if(pn-G.t0<40000||pn-HAL.at<600000||(key&&HAL.said[key]))return false;HAL.at=pn;if(key)HAL.said[key]=1;try{GP().toast('HALCYON · '+text,7);}catch(e){}return true;}
 /* her own watch, when nobody is steering */
-function wander(pn,g){const acts=[['poi',3],['window',4],['k9',2],['table',1],['out',G.space?0:1.2]];if(pn>(G.plantAt||0))acts.push(['plant',2.2]);if(pn>G.mug)acts.push(['cocoa',2.4]);if(G.night&&G.acts>=2)acts.push(['bed',9]);G.acts++;let tot=acts.reduce((s,a)=>s+a[1],0),u=Math.random()*tot,kind='poi';for(const [k,w] of acts){u-=w;if(u<=0){kind=k;break;}}
+function wander(pn,g){const acts=[['poi',3],['window',4],['k9',2],['table',1],['out',G.space?0:1.2]];if(pn>(G.plantAt||0))acts.push(['plant',2.2]);if(pn>G.mug)acts.push(['cocoa',2.4]);if(G.acts>=3&&!G.night)acts.push(['bed',.9]);if(G.night&&G.acts>=2)acts.push(['bed',9]);G.acts++;let tot=acts.reduce((s,a)=>s+a[1],0),u=Math.random()*tot,kind='poi';for(const [k,w] of acts){u-=w;if(u<=0){kind=k;break;}}
   if(G.act&&G.act.next){kind=G.act.next;}
   let tx,ty,stay=rnd(14,30),face=0;
   if(kind==='window'){const w=pick([[227,552,-1],[1168,552,-1]]);tx=w[0]+18;ty=w[1]-rnd(6,40);face=w[2];stay=rnd(90,180);} /* a long look: nothing has to happen */
@@ -67,14 +78,14 @@ function arrived(pn,g){const a=G.act;
   if(a){G.wanderAt=pn+a.stay*1000;G.last=pn-30000;if(a.face)G.face=a.face;
     if(a.kind==='cocoa'){PR.steam={x:G.x-34,y:G.y-54,t:pn};PR.steamAt=pn;try{g.sfx('valve',G.x,.4);}catch(e){}G.mugFrom=pn+7000;G.mug=pn+170000;setTimeout(()=>{if(G.on&&!G.path.length)PR.steam={x:G.x-34,y:G.y-54,t:performance.now()};},5200);G.act={next:'window'};return;}
     if(a.kind==='plant'){G.plantAt=pn+420000;PR.water=pn;try{g.hero('touch',{i:[4,2],v:.3,gap:.3});}catch(e){}}
-    if(a.kind==='bed'){G.asleep=true;try{__town.sleep('deadscout',true);}catch(e){}halcyon('SLEEP WELL · I HAVE THE SHIP','bed',pn);}
+    if(a.kind==='bed'){G.asleep=true;G.wakeAt=G.night?Infinity:pn+rnd(45,80)*1000;G.acts=0;try{__town.sleep('deadscout',true);}catch(e){}if(G.night)halcyon('SLEEP WELL · I HAVE THE SHIP','bed',pn);}
     if(a.kind==='k9')try{g.hero('touch',{i:[7,9],v:.4,gap:.12});}catch(e){}
     G.act=null;return;}
   /* where you sent her: the thing she stops at answers with a short phrase of its own, three notes from the same scale */
   for(const p of pois()){if(Math.hypot(p.x-G.x,(p.y-40)-(G.y-36))<56){let h=0;for(const c of p.id)h=(h*31+c.charCodeAt(0))>>>0;const b=h%5,sh=[[0,2,4],[4,2,3],[0,3,2],[2,4,5],[1,3,5],[4,5,2]][(h>>3)%6];
       try{g.hero('touch',{i:sh.map(v=>b+v),v:.42,voice:'rhodes',gap:.17});}catch(e){}try{window.__town&&__town.ring(p.x,p.y-36,'#ff9a3c',1.2,30);}catch(e){}break;}}}
 function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exterior(null);}catch(e){}}return;}
-  if(!G.on){G.on=true;G.t0=pn;G.wanderAt=pn+26000;G.last=pn;hint();WK={t0:pn,st:0};try{CUT.toy({drive:.06,dv:.06});}catch(e){} /* r68: asleep from the very first frame, so the running engines never flash before the spool */try{g.P.script.push({at:g.now(),hide:'deadscout'});g.P.rev++;}catch(e){}}
+  if(!G.on){G.on=true;G.t0=pn;G.wanderAt=pn+26000;G.last=pn;hint();WK={t0:pn,st:0};PR.k9=pn-45000+17000;G.act={next:'cocoa'};G.star=pn+72000;try{CUT.toy({drive:.06,dv:.06});}catch(e){} /* r68: asleep from the very first frame, so the running engines never flash before the spool */try{g.P.script.push({at:g.now(),hide:'deadscout'});g.P.rev++;}catch(e){}}
   if(!G.path.length&&pn-G.last>24000&&pn>G.wanderAt){G.wanderAt=pn+20000;try{wander(pn,g);}catch(e){}}
   const wp=G.path[0];
   if(wp){if(wp.space&&!G.space){G.space=true;}
@@ -121,7 +132,7 @@ function waking(pn,g){const el=pn-WK.t0,T=CUT.toy({}),sc=window.__toys&&__toys.S
   if(WK.st===3&&pn>=WK.next){const r=WK.order[WK.i++];if(r){CUT.toy({room:{[r]:WK.lv[r]}});WK.next=pn+380;if(WK.i===2)try{const k=CUT.actorAt(g.P,g.TIMES,g.now(),'k9');if(k&&!k.walk){g.P.script.push({at:g.now(),actor:'k9',do:'signal-detect',for:2.4});g.P.rev++;}g.sfx('chirp',k?k.x:null,.5);}catch(e){}}
     else if(WK.up){WK=null;PR.at=0;PR.scene=sc;}}}
 const PR={room:null,prev:{},left:{},scene:null,doors:{},crew:{},k9:-1e9,marks:[],steamAt:-1e9,at:0,asleep:{},bedAt:0};G.pr=PR;
-function presence(pn,g){if(pn<PR.at)return;PR.at=pn+350;const aboard=!G.space,t=g.now(),night=G.night;
+function presence(pn,g){if(pn<PR.at)return;PR.at=pn+350;const aboard=!G.space,t=g.now(),night=G.night||G.asleep;if(G.asleep&&pn>(G.wakeAt||Infinity)){wake();G.wanderAt=pn+3000;G.last=pn-30000;}
   try{const sc=window.__toys&&__toys.S&&__toys.S.mood;if(sc!==PR.scene){PR.scene=sc;PR.prev={};PR.left={};PR.room=null;PR.qPrev=undefined;} /* a new scene sets its own lights: forget what was borrowed */
     const T=CUT.toy({}),r=aboard?roomAt(G.x,G.y-40):null,lvl=k=>T.room[k]==null?1:T.room[k];
     if(night&&PR.qPrev===undefined&&lvl('crew-quarters')>.5){PR.qPrev=lvl('crew-quarters');CUT.toy({room:{'crew-quarters':.42}});}
@@ -129,14 +140,14 @@ function presence(pn,g){if(pn<PR.at)return;PR.at=pn+350;const aboard=!G.space,t=
     if(r&&r!==PR.room&&!(night&&r==='crew-quarters')){const lv=lvl(r);if(lv<.98&&PR.prev[r]==null){PR.prev[r]=lv;CUT.toy({room:{[r]:Math.min(1,lv+.5)}});}}
     if(PR.room&&PR.room!==r)PR.left[PR.room]=pn;PR.room=r;
     for(const k in PR.prev){if(k!==r&&pn-(PR.left[k]||0)>6000){CUT.toy({room:{[k]:PR.prev[k]}});delete PR.prev[k];}}}catch(e){}
-  try{for(const id in M.doors){if(/maint/.test(id))continue;const d=M.doors[id],near=aboard&&!G.asleep&&Math.abs(G.x-d.x)<(d.big?96:76)&&G.y-36>d.y-d.h-30&&G.y-36<d.y+30;
+  try{for(const id in M.doors){if(/maint/.test(id))continue;const d=M.doors[id],near=(aboard&&!G.asleep&&Math.abs(G.x-d.x)<(d.big?96:76)&&G.y-36>d.y-d.h-30&&G.y-36<d.y+30)||(!d.big&&G.movers&&G.movers().some(m=>Math.abs(m.x-d.x)<54&&Math.abs(m.y-d.y)<26));
       if(near){if(!PR.doors[id]){CUT.toy({door:{[id]:1}});g.sfx('airopen',d.x,d.big?.45:.3);}PR.doors[id]=pn+(d.big?1500:2600);}else if(PR.doors[id]&&pn>PR.doors[id]){CUT.toy({door:{[id]:0}});delete PR.doors[id];}}}catch(e){}
   try{    const k=CUT.actorAt(g.P,g.TIMES,t,'k9');if(k&&aboard&&Math.hypot(k.x-G.x,(k.y-20)-(G.y-36))<95&&pn-PR.k9>45000){PR.k9=pn;PR.marks.push({a:'k9',t:pn,kind:'heart'});g.sfx('chirp',k.x,.6);try{g.hero('touch',{i:[7,9],v:.35,gap:.12});}catch(e){}
       if(!k.walk){g.P.script.push({at:t,actor:'k9',do:'signal-detect',for:2.2});g.P.rev++;}}}catch(e){}
   try{const p=CUT.place('comms.shelf');if(p&&aboard&&Math.hypot(p.x-G.x,(p.y-40)-(G.y-36))<60&&pn-PR.steamAt>60000){PR.steamAt=pn;PR.steam={x:p.x,y:p.y-60,t:pn};g.sfx('valve',p.x,.3);}}catch(e){}}
 const BUNK=[623,846],PLANT=[915,650]; /* the plant on the quarters locker: the one living thing aboard besides the two of them */
 function wake(){if(!G.asleep)return;G.asleep=false;try{__town.sleep('deadscout',false);}catch(e){}G.act=null;}
-const GLYPH={heart:['01010','11111','11111','01110','00100']};
+const GLYPH={z:['111','001','010','100','111'],heart:['01010','11111','11111','01110','00100']};
 function glyph(x,rows,cx,cy,u,col){const w=rows[0].length;x.fillStyle='#0b0e11';x.fillRect(cx-(w>>1)*u-u,cy-u,(w+2)*u,(rows.length+2)*u);x.fillStyle=col;rows.forEach((r,j)=>{for(let i=0;i<w;i++)if(r[i]==='1')x.fillRect(cx-(w>>1)*u+i*u,cy+j*u,u,u);});}
 /* drawn in the ship's own pixels */
 const DRIFT=[16,17,18,17];const PUFF=[];G.puff=PUFF;
@@ -165,10 +176,12 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
   if(!G.on){ /* the start screen: she is already aboard, in her own suit, drifting a little by the bunks */
     const g=GP();if(!g||g.state!=='title')return;const im=suit(DRIFT[Math.floor(pn/900)%4]);if(!im)return;let ea=0;try{ea=clamp(CUT.extAt(),0,1);}catch(e){}if(ea>.97)return;
     const X=Math.round((822+Math.sin(pn/5200)*18)/u)*u,Y=Math.round((826+Math.sin(pn/1700)*7)/u)*u;x.save();x.globalAlpha=1-ea;x.imageSmoothingEnabled=false;x.drawImage(im,X-AX,Y-AY);x.restore();return;}
-  try{const g=GP();for(let i=PR.marks.length-1;i>=0;i--){const m=PR.marks[i],age=(pn-m.t)/1000;if(age>2.8){PR.marks.splice(i,1);continue;}const c=CUT.actorAt(g.P,g.TIMES,t,m.a);if(!c)continue;const X=Math.round(c.x/u)*u;
+  let vin=1;try{vin=1-clamp(CUT.extAt(),0,1);}catch(e){}
+  if(vin>.5)for(const f of G.under)try{f(x,t,u,pn,vin);}catch(e){}
+  if(vin>.5)try{const g=GP();for(let i=PR.marks.length-1;i>=0;i--){const m=PR.marks[i],age=(pn-m.t)/1000;if(age>2.8){PR.marks.splice(i,1);continue;}const c=CUT.actorAt(g.P,g.TIMES,t,m.a);if(!c)continue;const X=Math.round(c.x/u)*u;
       const U=u*3; /* the whole ship is drawn at about half size, so a mark needs blocks of three art pixels to read */
       glyph(x,GLYPH.heart,X,Math.round((c.y-72-age*8)/U)*U,U,'#ff9a3c');}}catch(e){}
-  if(PR.steam){const sa=(pn-PR.steam.t)/1000;if(sa>3.4)PR.steam=null;else for(let i=0;i<6;i++){const w=sa-i*.32;if(w<0||w>1.8)continue;x.globalAlpha=.95*(1-w/1.8);x.fillStyle='#f6efe4';const q=u*4;x.fillRect(Math.round((PR.steam.x+Math.sin(w*3+i*2)*8+(i%3-1)*8)/q)*q,Math.round((PR.steam.y-w*34)/q)*q,q,q);}x.globalAlpha=1;}
+  if(PR.steam&&vin>.5){const sa=(pn-PR.steam.t)/1000;if(sa>3.4)PR.steam=null;else for(let i=0;i<6;i++){const w=sa-i*.32;if(w<0||w>1.8)continue;x.globalAlpha=.95*(1-w/1.8);x.fillStyle='#f6efe4';const q=u*4;x.fillRect(Math.round((PR.steam.x+Math.sin(w*3+i*2)*8+(i%3-1)*8)/q)*q,Math.round((PR.steam.y-w*34)/q)*q,q,q);}x.globalAlpha=1;}
   const amp=G.space?1.6:1,bob=(Math.sin(pn/900)*4+Math.sin(pn/2300)*3)*amp,Y=G.y+bob;
   for(let i=PUFF.length-1;i>=0;i--){const p=PUFF[i],age=pn-p.t;if(age>p.life){PUFF.splice(i,1);continue;}const k=age/p.life,q=k<.45?u*4:u*2,e=age/1000;x.globalAlpha=k<.35?1:1-(k-.35)/.65;x.fillStyle=k<.4?'#f6efe4':'#e9d7c2';x.fillRect(Math.round((p.x+p.vx*e*(1-k*.4))/q)*q,Math.round((p.y+p.vy*e*(1-k*.4))/q)*q,q,q);}x.globalAlpha=1;
   let vis=1;try{if(!G.space&&G.ext<.5)vis=1-clamp(CUT.extAt(),0,1);}catch(e){} /* while the ship is shown closed (the opening), she is inside it and out of sight */
@@ -183,9 +196,11 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
     const s=(pn/1000)%2.6;if(s<1.6){x.globalAlpha=.8*(1-s/1.6);x.fillStyle='#f6efe4';x.fillRect(mx+(s>.8?u:0),Math.round((my-6-s*14)/u)*u,2*u,2*u);x.globalAlpha=1;}}});
 /* the sky keeps to itself: stars, the planet, the comet and the far beacon the ship already had. Added here: a shooting star now and then,
    quick and small, behind the hull */
-CUT.behind&&CUT.behind((x,t,SS)=>{if(!active())return;const q=(SS||2)*2,per=47,n=Math.floor(t/per),ph=t-n*per,h=k=>CUT._hash(n,7200+k);if(h(0)>.62||ph>1.1)return;
-  const sx=CUT.W*(.08+.84*h(1)),sy=CUT.H*(h(2)<.5?.02+.1*h(3):.86+.1*h(3)),dx=h(4)<.5?-1:1,len=220+260*h(5),u=ph/1.1,hx=sx+dx*len*u,hy=sy+len*.34*u;
-  for(let k=0;k<9;k++){const a=(1-k/9)*(u<.8?1:(1-u)/.2);if(a<=.05)continue;x.globalAlpha=a;x.fillStyle=k<2?'#f6efe4':k<5?'#7ee3e5':'#1fb4ce';x.fillRect(Math.round((hx-dx*k*q*1.6)/q)*q,Math.round((hy-k*q*.55)/q)*q,q,q);}x.globalAlpha=1;});
+function streak(x,q,sx,sy,dx,len,u){const hx=sx+dx*len*u,hy=sy+len*.34*u;for(let k=0;k<9;k++){const a=(1-k/9)*(u<.8?1:(1-u)/.2);if(a<=.05)continue;x.globalAlpha=a;x.fillStyle=k<2?'#f6efe4':k<5?'#7ee3e5':'#1fb4ce';x.fillRect(Math.round((hx-dx*k*q*1.6)/q)*q,Math.round((hy-k*q*.55)/q)*q,q,q);}x.globalAlpha=1;}
+CUT.behind&&CUT.behind((x,t,SS)=>{if(!active())return;const q=(SS||2)*2,pn=performance.now(),per=47,n=Math.floor(t/per),ph=t-n*per,h=k=>CUT._hash(n,7200+k);
+  if(!(h(0)>.62||ph>1.1))streak(x,q,CUT.W*(.08+.84*h(1)),CUT.H*(h(2)<.5?.02+.1*h(3):.86+.1*h(3)),h(4)<.5?-1:1,220+260*h(5),ph/1.1);
+  if(G.star&&pn>G.star){const u=(pn-G.star)/1400;if(u>1)G.star=0;else streak(x,q,CUT.W*.2,CUT.H*.03,1,520,u);} /* the one every visit gets, a little over a minute in */
+  if(G.shower){const e=(pn-G.shower)/1000;if(e>9)G.shower=0;else for(let i=0;i<11;i++){const u=(e-i*.62-CUT._hash(i,7301)*.4)/1.2;if(u<0||u>1)continue;streak(x,q,CUT.W*(.05+.9*CUT._hash(i,7302)),CUT.H*(CUT._hash(i,7303)<.6?.01+.11*CUT._hash(i,7304):.87+.08*CUT._hash(i,7304)),-1,260+200*CUT._hash(i,7305),u);}}});
 /* input: one verb. The arrow keys are the same verb in steps */
 let noteAt=0;function send(tx,ty){const pn=performance.now();wake();G.act=null;G.last=pn;
   if(pn-noteAt>110){noteAt=pn;const i=Math.round(clamp(1-((ty-34)-230)/(1180-230),0,1)*9);try{GP().hero('touch',{i,v:.5});}catch(e){}} /* higher up the ship, higher in pitch */

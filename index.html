@@ -16,7 +16,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/silkscreen-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plexmono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="game.css?v=54">
+<link rel="stylesheet" href="game.css?v=55">
 </head>
 <body>
 <div class="boot" id="boot" role="status" aria-live="polite"><div class="bt-box"><canvas class="bt-sky" id="bootSky" width="320" height="200" aria-hidden="true"></canvas><p class="bt-top"><span>DSV-0417</span><span>HOS 4.1</span></p><div class="bt-art"><img id="bootArt" src="boot-helmet.png?v=2" alt="" width="64" height="64"><p class="bt-kick">DSV-0417 // HALCYON</p><svg class="bt-orb" viewBox="0 0 26 13" aria-hidden="true" shape-rendering="crispEdges" fill="currentColor"><rect x="10" y="2" width="1" height="1"/><rect x="11" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="13" y="2" width="1" height="1"/><rect x="14" y="2" width="1" height="1"/><rect x="15" y="2" width="1" height="1"/><rect x="9" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="15" y="3" width="1" height="1"/><rect x="16" y="3" width="1" height="1"/><rect x="17" y="3" width="1" height="1"/><rect x="18" y="3" width="1" height="1"/><rect x="19" y="3" width="1" height="1"/><rect x="20" y="3" width="1" height="1"/><rect x="21" y="3" width="1" height="1"/><rect x="22" y="3" width="1" height="1"/><rect x="23" y="3" width="1" height="1"/><rect x="24" y="3" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="16" y="4" width="1" height="1"/><rect x="24" y="4" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/><rect x="8" y="5" width="1" height="1"/><rect x="17" y="5" width="1" height="1"/><rect x="23" y="5" width="1" height="1"/><rect x="24" y="5" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="17" y="6" width="1" height="1"/><rect x="21" y="6" width="1" height="1"/><rect x="22" y="6" width="1" height="1"/><rect x="23" y="6" width="1" height="1"/><rect x="2" y="7" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="8" y="7" width="1" height="1"/><rect x="17" y="7" width="1" height="1"/><rect x="18" y="7" width="1" height="1"/><rect x="19" y="7" width="1" height="1"/><rect x="20" y="7" width="1" height="1"/><rect x="21" y="7" width="1" height="1"/><rect x="1" y="8" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/><rect x="15" y="8" width="1" height="1"/><rect x="16" y="8" width="1" height="1"/><rect x="17" y="8" width="1" height="1"/><rect x="18" y="8" width="1" height="1"/><rect x="1" y="9" width="1" height="1"/><rect x="9" y="9" width="1" height="1"/><rect x="10" y="9" width="1" height="1"/><rect x="11" y="9" width="1" height="1"/><rect x="12" y="9" width="1" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="14" y="9" width="1" height="1"/><rect x="15" y="9" width="1" height="1"/><rect x="16" y="9" width="1" height="1"/><rect x="1" y="10" width="1" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="3" y="10" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="5" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="7" y="10" width="1" height="1"/><rect x="8" y="10" width="1" height="1"/><rect x="9" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="11" y="10" width="1" height="1"/><rect x="12" y="10" width="1" height="1"/><rect x="13" y="10" width="1" height="1"/><rect x="14" y="10" width="1" height="1"/><rect x="15" y="10" width="1" height="1"/></svg><p class="bt-name">DRIFTNAUT</p><p class="bt-tag">A LOFI RADIO, A LONG WAY OUT</p><p class="bt-rule" aria-hidden="true">· · · · · · · ◆ · · · · · · ·</p><div class="bt-ship" role="img" aria-label="The survey vessel HALCYON, DSV-0417"></div></div><canvas class="bt-live" id="bootLive" aria-hidden="true"></canvas><div class="bt-mid"><p class="bt-load" id="bootLoad" hidden>LOADING<span class="bt-dots"></span></p><div class="bt-bar" id="bootFill" hidden><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><p class="bt-sub" id="bootSub" hidden>RECOVERING FEED</p><div class="bt-pick" id="bootStart"><button type="button" class="bt-card listen" data-b="listen"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9V7a5 5 0 0 1 10 0v2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="2" y="9" width="3" height="5" fill="currentColor"/><rect x="11" y="9" width="3" height="5" fill="currentColor"/></svg><b>COME ABOARD</b><span>LISTEN · DRIFT · EXPLORE</span></button></div></div><p class="bt-foot" id="bootFoot"><span>NO GOALS · NO SCORES · NOTHING YOU HAVE TO DO</span></p></div></div>
@@ -94,7 +94,7 @@
     <div class="wui-tools"><button type="button" data-w="focus25" id="wFocus25">FOCUS · 25 MIN</button><button type="button" data-w="float2" id="wFloat2" title="A small ship window that stays on top of your other windows">FLOAT</button></div><div class="wui-top"><span class="wui-name" id="wName">NIGHT WATCH // DSV HALCYON</span><span class="wui-time"><b id="wTime"></b><span class="wt-track" id="wTrack"></span></span></div>
     <div class="wui-bar">
       <div class="wui-more" id="wMore" hidden><button type="button" data-w="int" id="wInt">INTENSITY<em> · FOCUS</em></button><button type="button" data-w="brown" id="wbrown">BROWN NOISE<em> · LOW</em></button><button type="button" data-w="pink" id="wpink">PINK NOISE<em> · LOW</em></button><button type="button" data-w="fade" id="wFade">FADE OUT<em> · OFF</em></button><button type="button" data-w="focus" id="wFocusBtn">FOCUS · OFF</button><input type="text" id="wObj" maxlength="40" hidden aria-hidden="true"><button type="button" data-w="full">FULL<em>SCREEN</em></button><button type="button" data-w="float" id="wFloat">FLOAT</button><button type="button" data-w="rec" id="wRec">REC<em> · LONG TAKE</em></button><button type="button" data-w="menu">MENU</button></div>
-      <div class="wui-btns main"><button type="button" data-w="mood" id="wMood" class="m-listen">SCENE<em> · QUIET DRIFT</em></button><button type="button" data-w="listen" id="wListen" class="m-play on">◂ LISTEN</button><button type="button" data-w="next" id="wNext" title="Next track (N)">SKIP</button><button type="button" data-w="sound" id="wSound"><s>SOUND · </s>MUSIC + SHIP</button><button type="button" data-w="k9" id="wK9" class="m-play">CALL SCOUT</button><button type="button" data-w="play" id="wPlay" class="m-listen on">GAME ▸</button><button type="button" data-w="tape" id="wTape" class="adv">TAPE<em> · SPACE WAVE</em></button><button type="button" data-w="aud" id="wAud" class="m-listen adv">AUDIO ONLY</button><button type="button" data-w="more" id="wMoreBtn" class="adv" aria-expanded="false" aria-label="More">⋯</button><button type="button" id="wControl" hidden></button><button type="button" id="wSleep" hidden></button><button type="button" id="wTape2" hidden></button><button type="button" id="wLight" hidden></button><button type="button" id="wAmb" hidden></button></div>
+      <div class="wui-btns main"><button type="button" data-w="mood" id="wMood" class="m-listen">SCENE<em> · QUIET DRIFT</em></button><button type="button" data-w="listen" id="wListen" class="m-play on">◂ LISTEN</button><button type="button" data-w="next" id="wNext" title="Next track (N)">SKIP</button><button type="button" data-w="sound" id="wSound"><s>SOUND<u> · </u></s>MUSIC + SHIP</button><span class="wui-gap" aria-hidden="true"></span><button type="button" data-w="float2" id="wMini" class="aux" title="A small ship window that stays on top of your other windows">MINI</button><button type="button" data-w="full" id="wFull" class="aux" title="Full screen">FULL</button><button type="button" data-w="about" id="wAbout" class="aux" title="About Driftnaut" aria-label="About Driftnaut">?</button><button type="button" data-w="k9" id="wK9" class="m-play">CALL SCOUT</button><button type="button" data-w="play" id="wPlay" class="m-listen on">GAME ▸</button><button type="button" data-w="tape" id="wTape" class="adv">TAPE<em> · SPACE WAVE</em></button><button type="button" data-w="aud" id="wAud" class="m-listen adv">AUDIO ONLY</button><button type="button" data-w="more" id="wMoreBtn" class="adv" aria-expanded="false" aria-label="More">⋯</button><button type="button" id="wControl" hidden></button><button type="button" id="wSleep" hidden></button><button type="button" id="wTape2" hidden></button><button type="button" id="wLight" hidden></button><button type="button" id="wAmb" hidden></button></div>
   </section>
   <div class="dim" id="dim" hidden></div>
   <div class="aonly" id="aonly" hidden><span>AUDIO ONLY · TAP TO RETURN</span></div>
@@ -168,7 +168,7 @@
   </footer>
  </div>
 </div>
-<section class="ab" id="about" aria-label="About Driftnaut">
+<section class="ab" id="about" aria-label="About Driftnaut"><button type="button" class="ab-x" id="abX" aria-label="Close">CLOSE</button>
  <div class="ab-col">
   <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>YOUR LITTLE PLACE IN SPACE</span></h2>
   <p><b>DRIFTNAUT</b> is a cozy pixel spaceship that plays warm space-chill music. Come aboard and leave it running while you work, read or wind down. HALCYON is a research vessel, drifting peacefully a long way out. It is home to an astronaut and a robodog called Scout. The ship picks the music.</p>
@@ -190,7 +190,7 @@
 <script src="deep.js?v=15"></script>
 <script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=64"></script>
+<script src="cut.js?v=65"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=13"></script>
 <script src="watch.js?v=20"></script>
@@ -205,14 +205,15 @@
 <script src="game/events.js?v=3"></script>
 <script src="game/story.js?v=17"></script>
 <script src="game/console.js?v=2"></script>
-<script src="game.js?v=74"></script>
+<script src="game.js?v=75"></script>
 <script src="game/pad.js?v=14"></script>
-<script src="game/toys.js?v=22"></script>
+<script src="game/toys.js?v=23"></script>
 <script src="game/clock.js?v=8"></script>
 <script src="game/k9nav.js?v=1"></script>
 <script src="game/joy.js?v=7"></script>
 <script src="game/town.js?v=9"></script>
-<script src="game/naut.js?v=6"></script>
+<script src="game/naut.js?v=8"></script>
+<script src="game/life.js?v=1"></script>
 <script>if(/[?&]studio\b/.test(location.search))document.body.classList.add('studio');</script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
    progress shown as an arcade loading bar, sixteen blocks, then the title. Falls back to plain script tags if fetch fails. */
@@ -228,7 +229,11 @@
      else, or any key, is LISTEN; P is PLAY; arrows move between the two; MENU is the title (the story, options) */
   const PICK=document.getElementById('bootStart'),FOOT=document.getElementById('bootFoot');
   let live=false,pending=null;
-  const act=b=>{if(!live){pending=b;PICK.classList.add('wait');return;}shut();const G=window.__game;try{if(b==='play')G.quickPlay();else if(b==='menu'){}else G.quickWatch();}catch(err){}};
+  const act=b=>{if(!live){pending=b;PICK.classList.add('wait');return;}const G=window.__game;
+    /* r75: the start screen stays up, opaque, until the ship it is handing over to is actually loaded. It used to fade at once, which showed
+       the picture underneath at a different size for a moment, darkening, before the real opening began: a false start */
+    if(b==='listen'||!b){if(act.going)return;act.going=true;removeEventListener('keydown',go,true);try{G.quickWatch();}catch(err){}const t0=Date.now(),iv=setInterval(()=>{const ok=window.__gp&&__gp.state==='watch';if(ok||Date.now()-t0>4000){clearInterval(iv);setTimeout(shut,ok?120:0);}},40);return;}
+    shut();try{if(b==='play')G.quickPlay();}catch(err){}};
   const go=e=>{if(e&&e.target&&e.target.closest&&e.target.closest('[data-b]'))return;
     if(e&&e.type==='keydown'){if(e.metaKey||e.ctrlKey||e.altKey)return;const f=document.activeElement,on=f&&f.dataset&&f.dataset.b;
       if(/^Arrow(Left|Right|Up|Down)$/.test(e.code)){e.preventDefault();const L=[...PICK.querySelectorAll('button')],k=on?L.indexOf(f):-1,d=/Left|Up/.test(e.code)?-1:1;L[(k+d+L.length)%L.length].focus();return;}

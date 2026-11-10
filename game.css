@@ -539,3 +539,49 @@ body.ui #wFocus{opacity:1!important}
 #wPlay,#wFocus25,#wFocus,.chores,#hPrompt{display:none!important}
 .bt-pick .bt-card.listen{grid-column:1/-1}
 #stage{cursor:pointer}
+
+/* ===== r77 · ONE LAYOUT ABOARD =====
+   The picture fills the window. Where the window is not 16:9 the leftover strip is the same dark sky with a few stars, and the
+   picture's edge fades into it. One bar: SCENE, SKIP, SOUND, and three quiet ones (MINI, FULL, ?). No clock, no room markers.
+   The hint sits just above the bar. On phones the text is 12 px and every control is at least 44 px tall */
+body.watching:not(.studio){background-color:#161719;background-image:radial-gradient(#e9d7c2 1px,transparent 1.6px),radial-gradient(#907763 1px,transparent 1.6px),radial-gradient(#5c544c 1px,transparent 1.6px);background-size:311px 277px,193px 239px,127px 151px;background-position:40px 60px,120px 10px,70px 100px}
+body.watching:not(.studio):not(.portrait){overflow:hidden}
+body.watching:not(.studio):not(.portrait) .unit{clip-path:none!important;margin:0 auto}
+body.watching:not(.studio):not(.portrait) #screen{margin:0 auto}
+body.watching:not(.studio):not(.portrait) main,body.watching:not(.studio):not(.portrait) #wrap{padding:0!important;margin:0!important}
+body.watching.lb-v:not(.studio) #stage{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 26px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,transparent,#000 26px,#000 calc(100% - 26px),transparent);background:transparent}
+body.watching.lb-h:not(.studio) #stage{-webkit-mask-image:linear-gradient(to right,transparent,#000 26px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to right,transparent,#000 26px,#000 calc(100% - 26px),transparent);background:transparent}
+body.watching:not(.studio) .shiptime,body.watching:not(.studio) .toy,body.watching:not(.studio) .wui-tools{display:none!important}
+/* the bar */
+body.watching:not(.studio) .wui-btns.main{align-items:stretch;gap:8px;flex-wrap:nowrap}
+body.watching:not(.studio) .wui-btns.main button{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+body.watching:not(.studio) .wui-btns.main button[hidden]{display:none!important}
+.wui-btns button s{text-decoration:none}.wui-btns button u{text-decoration:none}
+.wui-gap{width:10px;flex:none}
+body.watching:not(.studio) .wui-btns.main button.aux{min-width:44px;padding-left:.8em;padding-right:.8em;color:#c6ab92;box-shadow:inset 0 0 0 2px rgba(231,219,192,.2),0 3px 0 #0b0e11}
+body.watching:not(.studio) .wui-btns.main button.aux.on{color:#ff9a3c;box-shadow:inset 0 0 0 2px #ff9a3c,0 3px 0 #0b0e11}
+body.watching:not(.studio) .wui-btns.main button.aux:hover{color:#f6efe4}
+/* the hint: just above the bar */
+body.watching:not(.studio):not(.portrait) .toast{bottom:92px!important;top:auto!important}
+/* upright phones and tablets: the bar hangs below the picture. Two-line buttons keep the words SCENE and SOUND */
+body.watching.portrait:not(.studio) #wMood s,body.watching.portrait:not(.studio) #wSound s,body.watching.compact:not(.studio) #wMood s,body.watching.compact:not(.studio) #wSound s,.compact #wMood s,.compact #wSound s{display:block!important;font-size:8px;letter-spacing:.24em;color:#907763;margin-bottom:5px}
+body.watching.portrait:not(.studio) .wui-btns.main button u,.compact .wui-btns.main button u{display:none}
+body.watching.portrait:not(.studio) #wMood,body.watching.portrait:not(.studio) #wSound,.compact #wMood,.compact #wSound{flex-direction:column;align-items:flex-start!important;padding-top:7px;padding-bottom:7px}
+body.watching.portrait:not(.studio) .wui-btns.main{gap:6px;justify-content:center;flex-wrap:wrap}
+body.watching.portrait:not(.studio) .wui-gap{display:none}
+body.watching.portrait:not(.studio) .toast{top:calc(100% + 104px)!important;bottom:auto!important}
+/* About, as a panel over the ship */
+.ab-x{display:none}
+.ab.open{position:fixed;inset:0;z-index:90;overflow:auto;margin:0;max-width:none;background:rgba(11,14,17,.95);padding:64px clamp(18px,6vw,120px) 64px;align-content:start;display:grid!important}
+.ab.open .ab-x{all:unset;display:block;position:fixed;right:18px;top:14px;z-index:91;cursor:pointer;font:400 12px/1 Silk,monospace;letter-spacing:.2em;color:#e9d7c2;padding:14px 16px;min-height:16px;background:#0b0e11;box-shadow:inset 0 0 0 2px rgba(231,219,192,.38),0 3px 0 #000}
+.ab.open .ab-x:focus-visible{outline:2px solid #ff9a3c;outline-offset:2px}
+body.watching:not(.about) .ab:not(.open){display:none}
+/* r77: two-line buttons are a fixed 48 px (52 on tablets), and on a phone the row is tightened so all four fit on one line */
+body.watching.portrait:not(.studio) .wui-btns.main button,.compact .wui-btns.main button{height:52px;min-height:0;padding-top:0!important;padding-bottom:0!important;line-height:1;justify-content:center}
+body.watching.portrait:not(.studio) #wMood,body.watching.portrait:not(.studio) #wSound,.compact #wMood,.compact #wSound{justify-content:center}
+body.watching.portrait:not(.studio) #wMood s,body.watching.portrait:not(.studio) #wSound s,.compact #wMood s,.compact #wSound s{margin-bottom:6px;line-height:1}
+body.phone.watching:not(.studio) .wui-btns.main button{height:48px;letter-spacing:.08em!important;padding-left:10px!important;padding-right:10px!important}
+body.phone.watching.portrait:not(.studio) .wui-btns.main{flex-wrap:nowrap;gap:5px}
+body.phone.watching.portrait:not(.studio) .wui-bar{padding-left:6px;padding-right:6px}
+.wui-btns button u{margin:0 .45em}
+.ab.open{padding-top:92px}
