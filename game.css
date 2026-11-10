@@ -534,3 +534,8 @@ body.portrait .wui-tools{top:calc(100% + 64px);right:auto;left:50%;transform:tra
 body.portrait #wFocus{top:calc(3% + 20px)}
 .wui-tools,.wui-tools button{pointer-events:auto}
 body.ui #wFocus{opacity:1!important}
+
+/* ===== r63 · one thing: a lofi radio you can haunt. No GAME mode, no focus timer, no lists ===== */
+#wPlay,#wFocus25,#wFocus,.chores,#hPrompt{display:none!important}
+.bt-pick .bt-card.listen{grid-column:1/-1}
+#stage{cursor:pointer}

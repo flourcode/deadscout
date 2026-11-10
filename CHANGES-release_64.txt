@@ -1,0 +1,27 @@
+DRIFTNAUT — RELEASE 64
+=======================
+The ship notices her. Nothing to do, nothing to win — it just answers.
+
+Presence
+- Rooms warm as she enters. In the dimmer scenes the room she is in lifts
+  by half and settles back about six seconds after she leaves. (Quiet Drift
+  is already fully lit, so there is nothing to see there.)
+- She carries a faint amber glow of her own, indoors only.
+- Inner doors slide open as she comes near and close a moment after.
+- Crew sense something: pass close to one and a small "…" then "?" appears
+  over their head. At most once every 45 seconds each.
+- K9 knows it is her: a small heart and a chirp when she comes close, at
+  most once every 30 seconds.
+- A curl of steam rises off the meal unit when she drifts past it.
+
+Fixed
+- Touch notes and the reactions above could not fire in the first seconds
+  after the page loaded.
+
+Not in this release
+- Crew do not change what they are doing; the mark is the whole reaction.
+- No leaning plant (there is no plant aboard) and screens do not flicker
+  awake; they still answer with the note and the ring.
+- Cache bumped (driftnaut-v64).
+
+

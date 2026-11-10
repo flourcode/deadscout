@@ -130,7 +130,8 @@ let wasWatch=false;setInterval(()=>{const w=document.body.classList.contains('wa
    off by one, and then she isn't there. First after 8-20 minutes, then every 25-60. */
 const HAUNT=['upper-access.window','quarters.locker','airlock.prep','engineering.end','lower-access.east','sensor.rack','comms.right','quarters.terminal'];
 let nextHaunt=0,haunting=false;
-function haunt(){const t=G.now();if(!A.watch()||G.state!=='watch'||haunting||(window.__joy&&__joy.sleeping&&__joy.sleeping()))return;
+function haunt(){if(window.__ghost)return; /* r63: she is always aboard now, not an apparition */
+  const t=G.now();if(!A.watch()||G.state!=='watch'||haunting||(window.__joy&&__joy.sleeping&&__joy.sleeping()))return;
   try{const busy=new Set(['pilot','systems','commander'].map(a=>CUT.roomAt(G.P,G.TIMES,t,a)));const ok=HAUNT.filter(sp=>{const p=CUT.place(sp);return p&&!busy.has(CUT.roomOf(p.x,p.y-20));});
     const sp=ok.length?ok[Math.floor(Math.random()*ok.length)]:null,P=sp&&CUT.place(sp);if(!P)return;haunting=true;const D=14+Math.random()*12;
     G.beat({move:'deadscout',to:P.ref,teleport:true,interrupt:true});G.beat({at:.4,show:'deadscout'});G.beat({at:.6,actor:'deadscout',action:Math.random()<.5?'look-around':'observe',for:D});
