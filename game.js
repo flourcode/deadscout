@@ -234,7 +234,7 @@ function choresFinish(){if(state!=='play')return;toast('ALL CHORES DONE · HALCY
 window.__glowFn=()=>{if(state!=='play'||window.__eva)return [];const L=[];CHORES.forEach((c,i)=>{if(CHR.done.has(i))return;const O=CUT.MAP.objects[c.ids[0]];if(O&&O.spot)L.push({ref:O.spot,kind:'chore'});});
   if(CHR.near){const O=CUT.MAP.objects[CHR.near];if(O&&O.spot)L.push({ref:O.spot,kind:'near'});}try{if(window.__play)L.push(...__play.glows());}catch(_){}return L;};
 window.__gp={toast:(a,b)=>toast(a,b),sfx:(a,b,c)=>sfx(a,b,c),cmd:b=>cmd(b),now:()=>now(),vw:t=>vw(t==null?now():t),get state(){return state;},get me(){return me;},get P(){return P;},get TIMES(){return TIMES;},get actx(){return actx;},get bus(){return ambBus;},get watch(){return watch;},
-  enterPlay:()=>enterPlay(),exitPlay:()=>exitPlay(),tape:()=>watch&&(watch.tape||curTapeId())||'soft-orbit',stage,breakLen:()=>breakOf(FOC.len||25),foc:()=>FOC.phase,wake:()=>wake(),hero:(k,a)=>{try{band&&band.hero&&band.hero(k,a);}catch(e){}}};
+  enterPlay:()=>enterPlay(),exitPlay:()=>exitPlay(),tape:()=>watch&&(watch.tape||curTapeId())||'soft-orbit',stage,breakLen:()=>breakOf(FOC.len||25),foc:()=>FOC.phase,wake:()=>wake(),tapeKey:()=>{try{return band&&band.key!=null?band.key:0;}catch(e){return 0;}},hero:(k,a)=>{try{band&&band.hero&&band.hero(k,a);}catch(e){}}};
 let toastEl=null,toastT=0;function toast(text,secs){if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';toastEl.setAttribute('role','status');(stage.parentElement||document.body).appendChild(toastEl);}
   toastEl.textContent=text;toastEl.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('on'),(secs||3.4)*1000);}
 /* r37 · REST. From anywhere in the story: SIT / LISTEN. Driftnaut settles, the HUD withdraws, the camera holds her room,
@@ -719,7 +719,7 @@ async function floatWindow(){try{if(document.pictureInPictureElement){await docu
     pipV.addEventListener('pause',()=>{if(!inPip())return;setSound(!prefs.sound);pipV.muted=!prefs.sound;pipV.play().catch(()=>{});}); /* the window's play/pause toggles the sound; the picture keeps running */
     if(navigator.mediaSession){try{navigator.mediaSession.metadata=new MediaMetadata({title:'NIGHT WATCH',artist:'DSV HALCYON'});}catch(e){}}}
   pipV.muted=!prefs.sound;await pipV.play();await pipV.requestPictureInPicture();}catch(e){note('FLOATING WINDOW · NOT AVAILABLE IN THIS BROWSER',4);}}
-window.addEventListener('dblclick',e=>{if(state==='watch'&&e.target===stage)toggleFull();});
+/* r79: a double-click no longer goes full screen. Clicking twice on something is an ordinary thing to do aboard now; FULL in the bar is the way in */
 if(BC)broadcast();else{enter('title');}idle0=performance.now()/1000;requestAnimationFrame(frame);
 if(LR&&LR.cleanup)LR.cleanup();
 })();

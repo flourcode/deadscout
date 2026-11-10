@@ -68,7 +68,7 @@ function wander(pn,g){const acts=[['poi',3],['window',4],['k9',2],['table',1],['
   if(kind==='window'){const w=pick([[227,552,-1],[1168,552,-1]]);tx=w[0]+18;ty=w[1]-rnd(6,40);face=w[2];stay=rnd(90,180);} /* a long look: nothing has to happen */
   else if(kind==='cocoa'){const p=CUT.place('comms.shelf');tx=p.x+34;ty=p.y-HOV;face=-1;stay=13;} /* made with care: steam, a wait, more steam, then the cup */
   else if(kind==='plant'){tx=PLANT[0]-46;ty=PLANT[1]+78;face=1;stay=11;}
-  else if(kind==='k9'){let k=null;try{k=CUT.actorAt(g.P,g.TIMES,g.now(),'k9');}catch(e){}if(!k){kind='poi';}else{tx=k.x-54;ty=k.y-HOV;face=1;stay=rnd(10,18);}}
+  else if(kind==='k9'){let k=null;try{k=CUT.actorAt(g.P,g.TIMES,g.now(),'k9');}catch(e){}if(!k){kind='poi';}else{tx=k.x-54;ty=k.y-HOV;face=1;stay=rnd(30,50);}}
   else if(kind==='table'){tx=736+rnd(-20,40);ty=846-rnd(6,30);stay=rnd(30,60);}
   else if(kind==='bed'){tx=BUNK[0]+24;ty=BUNK[1]-HOV;face=-1;stay=1e7;}
   else if(kind==='out'){tx=2131;ty=1116-HOV;face=1;stay=rnd(40,75);}
@@ -79,7 +79,7 @@ function arrived(pn,g){const a=G.act;
     if(a.kind==='cocoa'){PR.steam={x:G.x-34,y:G.y-54,t:pn};PR.steamAt=pn;try{g.sfx('valve',G.x,.4);}catch(e){}G.mugFrom=pn+7000;G.mug=pn+170000;setTimeout(()=>{if(G.on&&!G.path.length)PR.steam={x:G.x-34,y:G.y-54,t:performance.now()};},5200);G.act={next:'window'};return;}
     if(a.kind==='plant'){G.plantAt=pn+420000;PR.water=pn;try{g.hero('touch',{i:[4,2],v:.3,gap:.3});}catch(e){}}
     if(a.kind==='bed'){G.asleep=true;G.wakeAt=G.night?Infinity:pn+rnd(45,80)*1000;G.acts=0;try{__town.sleep('deadscout',true);}catch(e){}if(G.night)halcyon('SLEEP WELL · I HAVE THE SHIP','bed',pn);}
-    if(a.kind==='k9')try{g.hero('touch',{i:[7,9],v:.4,gap:.12});}catch(e){}
+    if(a.kind==='k9'){PR.k9=pn;PR.marks.push({a:'k9',t:pn,kind:'heart'});G.heartAt=pn;} /* time together: the astronaut settles beside Scout for a while */
     G.act=null;return;}
   /* where you sent her: the thing she stops at answers with a short phrase of its own, three notes from the same scale */
   for(const p of pois()){if(Math.hypot(p.x-G.x,(p.y-40)-(G.y-36))<56){let h=0;for(const c of p.id)h=(h*31+c.charCodeAt(0))>>>0;const b=h%5,sh=[[0,2,4],[4,2,3],[0,3,2],[2,4,5],[1,3,5],[4,5,2]][(h>>3)%6];
@@ -102,7 +102,7 @@ function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exte
   G.pvx=G.vx;G.pvy=G.vy;
   G.x=clamp(G.x+G.vx*dt,40,CUT.W-40);G.y=clamp(G.y+G.vy*dt,90,CUT.H-20);if(Math.abs(G.vx)>6)G.face=G.vx>0?1:-1;
   /* out on the deck or beyond it, the ship is seen from outside; aboard, it opens */
-  const want=G.space||(G.x>1975&&G.y>880)?1:0;G.ext+=(want-G.ext)*Math.min(1,dt*1.6);if(Math.abs(want-G.ext)<.004)G.ext=want;
+  const want=G.space||(G.x>1945&&G.y>880)?1:0; /* r80: the outside view starts as the astronaut clears the door, not a step later */G.ext+=(want-G.ext)*Math.min(1,dt*1.6);if(Math.abs(want-G.ext)<.004)G.ext=want;
   try{if(G.ext>.004){CUT.exterior(G.ext);G.extOn=true;}else if(G.extOn){G.extOn=false;CUT.exterior(null);}}catch(e){}
   if(WK)try{waking(pn,g);}catch(e){WK=null;}
   presence(pn,g);
@@ -142,7 +142,7 @@ function presence(pn,g){if(pn<PR.at)return;PR.at=pn+350;const aboard=!G.space,t=
     for(const k in PR.prev){if(k!==r&&pn-(PR.left[k]||0)>6000){CUT.toy({room:{[k]:PR.prev[k]}});delete PR.prev[k];}}}catch(e){}
   try{for(const id in M.doors){if(/maint/.test(id))continue;const d=M.doors[id],near=(aboard&&!G.asleep&&Math.abs(G.x-d.x)<(d.big?96:76)&&G.y-36>d.y-d.h-30&&G.y-36<d.y+30)||(!d.big&&G.movers&&G.movers().some(m=>Math.abs(m.x-d.x)<54&&Math.abs(m.y-d.y)<26));
       if(near){if(!PR.doors[id]){CUT.toy({door:{[id]:1}});g.sfx('airopen',d.x,d.big?.45:.3);}PR.doors[id]=pn+(d.big?1500:2600);}else if(PR.doors[id]&&pn>PR.doors[id]){CUT.toy({door:{[id]:0}});delete PR.doors[id];}}}catch(e){}
-  try{    const k=CUT.actorAt(g.P,g.TIMES,t,'k9');if(k&&aboard&&Math.hypot(k.x-G.x,(k.y-20)-(G.y-36))<95&&pn-PR.k9>45000){PR.k9=pn;PR.marks.push({a:'k9',t:pn,kind:'heart'});g.sfx('chirp',k.x,.6);try{g.hero('touch',{i:[7,9],v:.35,gap:.12});}catch(e){}
+  try{    const k=CUT.actorAt(g.P,g.TIMES,t,'k9');if(k&&aboard&&Math.hypot(k.x-G.x,(k.y-20)-(G.y-36))<95&&pn-PR.k9>45000){PR.k9=pn;PR.marks.push({a:'k9',t:pn,kind:'heart'});G.heartAt=pn;
       if(!k.walk){g.P.script.push({at:t,actor:'k9',do:'signal-detect',for:2.2});g.P.rev++;}}}catch(e){}
   try{const p=CUT.place('comms.shelf');if(p&&aboard&&Math.hypot(p.x-G.x,(p.y-40)-(G.y-36))<60&&pn-PR.steamAt>60000){PR.steamAt=pn;PR.steam={x:p.x,y:p.y-60,t:pn};g.sfx('valve',p.x,.3);}}catch(e){}}
 const BUNK=[623,846],PLANT=[915,650]; /* the plant on the quarters locker: the one living thing aboard besides the two of them */
@@ -150,7 +150,13 @@ function wake(){if(!G.asleep)return;G.asleep=false;try{__town.sleep('deadscout',
 const GLYPH={z:['111','001','010','100','111'],heart:['01010','11111','11111','01110','00100']};
 function glyph(x,rows,cx,cy,u,col){const w=rows[0].length;x.fillStyle='#0b0e11';x.fillRect(cx-(w>>1)*u-u,cy-u,(w+2)*u,(rows.length+2)*u);x.fillStyle=col;rows.forEach((r,j)=>{for(let i=0;i<w;i++)if(r[i]==='1')x.fillRect(cx-(w>>1)*u+i*u,cy+j*u,u,u);});}
 /* drawn in the ship's own pixels */
-const DRIFT=[16,17,18,17];const PUFF=[];G.puff=PUFF;
+const DRIFT=[16,17,18,17];
+/* the near railings of the back deck, lifted out of the outside art by their colour (rail orange), once */
+const RAILS={x:1944,y:1036,w:392,h:96,c:null,tried:0};
+function rails(){if(RAILS.c)return RAILS.c;if(RAILS.tried>40)return null;RAILS.tried++;const c=document.createElement('canvas');c.width=RAILS.w;c.height=RAILS.h;const g=c.getContext('2d');g.translate(-RAILS.x,-RAILS.y);
+  let ok=false;try{ok=CUT.layer('exterior',g,RAILS.x,RAILS.y,RAILS.w,RAILS.h,1);}catch(e){}if(!ok)return null;let d;try{d=g.getImageData(0,0,RAILS.w,RAILS.h);}catch(e){return null;}const p=d.data;
+  for(let y=0;y<RAILS.h;y++)for(let X=0;X<RAILS.w;X++){const i=(y*RAILS.w+X)*4,r=p[i],gg=p[i+1],b=p[i+2],wx=RAILS.x+X,near=(wx<2012)||(wx>2196&&wx<2326);if(!(near&&r>135&&r-b>64&&gg>55&&gg<r*.82))p[i+3]=0;}
+  g.setTransform(1,0,0,1,0,0);g.putImageData(d,0,0);return RAILS.c=c;}const PUFF=[];G.puff=PUFF;
 /* HER SUIT (r66). Orange, cream bands and pack, charcoal gloves and boots, a white helmet, a dark visor.
    The sheet she shares has one palette for the whole figure, so each of the four frames she uses is painted once by region
    (boxes in the frame's own art pixels, from its top-left corner) and kept */
@@ -192,6 +198,14 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
     if(G.face<0){x.translate(X,0);x.scale(-1,1);x.translate(-X,0);}x.drawImage(im,X-AX,Yr-AY);x.restore();}
   else try{CUT.sprite('deadscout','idle',G.x,Y,G.face<0,t,x,vis,[[fr,1]]);}catch(e){}
   if(PR.water){const wa=(pn-PR.water)/1000;if(wa>6)PR.water=0;else for(let i=0;i<5;i++){const w=(wa*1.3+i*.37)%1.6;if(w>1||wa<.8)continue;x.globalAlpha=.9*(1-w);x.fillStyle='#f6efe4';const q=u*2;x.fillRect(Math.round((G.x+G.face*30+w*10)/q)*q,Math.round((G.y-70+w*w*44)/q)*q,q,q);}x.globalAlpha=1;}
+  /* r79: THE BACK DECK. Seen from outside, the door to the deck is in the stern wall, edge-on. Standing on the deck the astronaut is behind
+     the deck's near railings, and coming through the door is behind the door housing until clear of it. So, while on the deck (not out in
+     open space), the housing and the near railings are drawn again over the astronaut from the outside art */
+  /* r80: the railings are there whether the hull is shown open or closed, so they are drawn at full strength either way. (They used to
+     fade in with the outside view, which is still on its way in when the astronaut steps out: so going out passed in front of the rail,
+     and coming back, with the outside view already up, passed behind it.) Only the door housing waits for the outside view */
+  if(!G.space&&G.x>1880&&G.y>900){let ea=0;try{ea=clamp(CUT.extAt(),0,1);}catch(e){}if(ea>.02)try{CUT.layer('exterior',x,1880,880,104,264,ea);}catch(e){}
+    if(G.x>1925){const R=rails();if(R){x.save();x.imageSmoothingEnabled=false;x.drawImage(R,RAILS.x,RAILS.y);x.restore();}}}
   if(pn<G.mug&&pn>(G.mugFrom||0)&&!G.space&&vis>.9){const q=u*3,mx=Math.round((G.x+G.face*30-q/2)/u)*u,my=Math.round((Y-62)/u)*u;x.fillStyle='#0b0e11';x.fillRect(mx-u,my-u,q+2*u,q+2*u);x.fillStyle='#ff9a3c';x.fillRect(mx,my,q,q);
     const s=(pn/1000)%2.6;if(s<1.6){x.globalAlpha=.8*(1-s/1.6);x.fillStyle='#f6efe4';x.fillRect(mx+(s>.8?u:0),Math.round((my-6-s*14)/u)*u,2*u,2*u);x.globalAlpha=1;}}});
 /* the sky keeps to itself: stars, the planet, the comet and the far beacon the ship already had. Added here: a shooting star now and then,
@@ -202,16 +216,21 @@ CUT.behind&&CUT.behind((x,t,SS)=>{if(!active())return;const q=(SS||2)*2,pn=perfo
   if(G.star&&pn>G.star){const u=(pn-G.star)/1400;if(u>1)G.star=0;else streak(x,q,CUT.W*.2,CUT.H*.03,1,520,u);} /* the one every visit gets, a little over a minute in */
   if(G.shower){const e=(pn-G.shower)/1000;if(e>9)G.shower=0;else for(let i=0;i<11;i++){const u=(e-i*.62-CUT._hash(i,7301)*.4)/1.2;if(u<0||u>1)continue;streak(x,q,CUT.W*(.05+.9*CUT._hash(i,7302)),CUT.H*(CUT._hash(i,7303)<.6?.01+.11*CUT._hash(i,7304):.87+.08*CUT._hash(i,7304)),-1,260+200*CUT._hash(i,7305),u);}}});
 /* input: one verb. The arrow keys are the same verb in steps */
-let noteAt=0;function send(tx,ty){const pn=performance.now();wake();G.act=null;G.last=pn;
+let noteAt=0;function send(tx,ty){const pn=performance.now();wake();G.act=null;G.last=pn;if(!G.found){G.found=true;try{localStorage.setItem('driftnaut.found','1');}catch(e){}}
   if(pn-noteAt>110){noteAt=pn;const i=Math.round(clamp(1-((ty-34)-230)/(1180-230),0,1)*9);try{GP().hero('touch',{i,v:.5});}catch(e){}} /* higher up the ship, higher in pitch */
   plan(tx,ty,false);const f=G.path[G.path.length-1];try{window.__town&&f&&__town.ring(f.x,f.y-34,'#e9d7c2',.8,22);}catch(_){}}
 const DIR={ArrowLeft:[-230,0],ArrowRight:[230,0],ArrowUp:[0,-290],ArrowDown:[0,290]};
 addEventListener('keydown',e=>{if(!active()||!DIR[e.code]||e.metaKey||e.ctrlKey||e.altKey)return;e.preventDefault();if(e.repeat)return;const f=G.path[G.path.length-1]||G,d=DIR[e.code];send(f.x+d[0],f.y+d[1]);},true);
 addEventListener('pointerdown',e=>{if(!active())return;const t=e.target;if(t!==stage&&!(t.closest&&t.closest('.toy')))return;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw();
-  send(V[0]+(e.clientX-r.left)/r.width*V[2],V[1]+(e.clientY-r.top)/r.height*V[3]+34);},true);
-/* said once or twice, then never again */
-function hint(){let n=0;try{n=+localStorage.getItem('driftnaut.watchhint')||0;}catch(e){}if(n>=2)return;setTimeout(()=>{if(!active())return;try{localStorage.setItem('driftnaut.watchhint',String(n+1));}catch(e){}
-  GP().toast((window.matchMedia&&matchMedia('(pointer: coarse)').matches?'TAP ANYWHERE TO EXPLORE':'CLICK ANYWHERE TO EXPLORE'),8);},16000);}
+  send(V[0]+(e.clientX-r.left)/r.width*V[2],V[1]+(e.clientY-r.top)/r.height*V[3]+34);G.lead=e.pointerType!=='touch'?performance.now():0;},true);
+/* r78: hold and move. With the button held, the astronaut follows the pointer; let go and the astronaut stays. (Not following a pointer
+   that is merely moving: this is a window left open on a desk, and the mouse has other places to be. Touch keeps to taps, because a
+   finger dragged on a phone moves the camera) */
+addEventListener('pointermove',e=>{if(!G.lead||!(e.buttons&1)||!active())return;const pn=performance.now();if(pn-G.lead<150)return;G.lead=pn;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw();G.act=null;G.last=pn;plan(V[0]+(e.clientX-r.left)/r.width*V[2],V[1]+(e.clientY-r.top)/r.height*V[3]+34,false);},true);
+addEventListener('pointerup',()=>{G.lead=0;},true);addEventListener('pointercancel',()=>{G.lead=0;},true);
+/* r78: discovery first. The line is shown once, 24 seconds in, only to a visitor who has never clicked the ship */
+function hint(){let done=false;try{done=!!localStorage.getItem('driftnaut.found');}catch(e){}if(done)return;setTimeout(()=>{if(!active()||G.found)return;
+  GP().toast((window.matchMedia&&matchMedia('(pointer: coarse)').matches?'TAP ANYWHERE TO EXPLORE':'CLICK ANYWHERE TO EXPLORE'),8);},24000);}
 let last=0;function loop(now){requestAnimationFrame(loop);const dt=Math.min(.12,(now-(last||now))/1000);last=now;if(document.hidden)return;try{tick(dt,now);}catch(e){}}
 requestAnimationFrame(loop);
 })();

@@ -1,0 +1,13 @@
+DRIFTNAUT — RELEASE 80
+=======================
+Fixed
+- Going out to the back deck, the astronaut still passed in front of the
+  railing (coming back in was right). The railings were being drawn over
+  the astronaut only as strongly as the outside view was showing, and
+  that view is still fading in during the first steps out. They are now
+  drawn at full strength whenever the astronaut is on the deck, in both
+  directions, and the outside view starts as the astronaut clears the
+  door rather than a step later.
+- Cache bumped (driftnaut-v80).
+
+
