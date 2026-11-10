@@ -1,0 +1,12 @@
+DRIFTNAUT — RELEASE 81
+=======================
+Fixed
+- Going out to the back deck, the astronaut was still drawn on the outside
+  of the stern wall beside the door (coming in was right). On the way
+  out the hull now starts closing as the astronaut crosses the airlock, so
+  the wall is whole by the time the door is reached, and whatever part of
+  the astronaut is still inside that wall is drawn behind it. The
+  astronaut comes out from behind the door housing, the same as going in.
+- Cache bumped (driftnaut-v81).
+
+

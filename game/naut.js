@@ -102,7 +102,8 @@ function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exte
   G.pvx=G.vx;G.pvy=G.vy;
   G.x=clamp(G.x+G.vx*dt,40,CUT.W-40);G.y=clamp(G.y+G.vy*dt,90,CUT.H-20);if(Math.abs(G.vx)>6)G.face=G.vx>0?1:-1;
   /* out on the deck or beyond it, the ship is seen from outside; aboard, it opens */
-  const want=G.space||(G.x>1945&&G.y>880)?1:0; /* r80: the outside view starts as the astronaut clears the door, not a step later */G.ext+=(want-G.ext)*Math.min(1,dt*1.6);if(Math.abs(want-G.ext)<.004)G.ext=want;
+  const out=G.y>880&&G.x>1640&&G.path.some(p=>p.space||p.x>1945); /* r81: on the way out, the hull is already closing as the astronaut crosses the airlock, so the wall is whole by the time the door is reached */
+  const want=G.space||(G.x>1945&&G.y>880)||out?1:0;G.ext+=(want-G.ext)*Math.min(1,dt*1.6);if(Math.abs(want-G.ext)<.004)G.ext=want;
   try{if(G.ext>.004){CUT.exterior(G.ext);G.extOn=true;}else if(G.extOn){G.extOn=false;CUT.exterior(null);}}catch(e){}
   if(WK)try{waking(pn,g);}catch(e){WK=null;}
   presence(pn,g);
@@ -204,7 +205,9 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
   /* r80: the railings are there whether the hull is shown open or closed, so they are drawn at full strength either way. (They used to
      fade in with the outside view, which is still on its way in when the astronaut steps out: so going out passed in front of the rail,
      and coming back, with the outside view already up, passed behind it.) Only the door housing waits for the outside view */
-  if(!G.space&&G.x>1880&&G.y>900){let ea=0;try{ea=clamp(CUT.extAt(),0,1);}catch(e){}if(ea>.02)try{CUT.layer('exterior',x,1880,880,104,264,ea);}catch(e){}
+  /* r81: everything of the astronaut that is still inside the stern wall (left of the door housing's outer edge) is behind that wall
+     as far as the outside view is showing, going out as well as coming in */
+  if(!G.space&&G.x>1540&&G.y>900){let ea=0;try{ea=clamp(CUT.extAt(),0,1);}catch(e){}if(ea>.02)try{CUT.layer('exterior',x,1500,860,484,290,ea);}catch(e){}
     if(G.x>1925){const R=rails();if(R){x.save();x.imageSmoothingEnabled=false;x.drawImage(R,RAILS.x,RAILS.y);x.restore();}}}
   if(pn<G.mug&&pn>(G.mugFrom||0)&&!G.space&&vis>.9){const q=u*3,mx=Math.round((G.x+G.face*30-q/2)/u)*u,my=Math.round((Y-62)/u)*u;x.fillStyle='#0b0e11';x.fillRect(mx-u,my-u,q+2*u,q+2*u);x.fillStyle='#ff9a3c';x.fillRect(mx,my,q,q);
     const s=(pn/1000)%2.6;if(s<1.6){x.globalAlpha=.8*(1-s/1.6);x.fillStyle='#f6efe4';x.fillRect(mx+(s>.8?u:0),Math.round((my-6-s*14)/u)*u,2*u,2*u);x.globalAlpha=1;}}});
