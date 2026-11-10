@@ -15,13 +15,20 @@
 const PENT=[0,2,4,7,9];
 /* chord shapes in semitones above the chord root (the bass plays the root, so the keys can leave it out) */
 const Q={maj7:[0,4,7,11],maj9:[4,7,11,14],six9:[4,9,14,7],m7:[3,7,10,12],m9:[3,7,10,14],d13:[4,10,14,21],d9:[4,10,14,7],sus9:[5,10,14,7]};
-/* the six tapes. key = semitones above C; prog = [degree above the key, shape, bars] */
+/* r61: ten tracks, each a little song. key = semitones above C; prog = the main loop, progB = the middle section; [degree above the key, shape, bars].
+   lead = who plays over the last section: a nylon guitar picking the chord, or a soft flute holding long notes */
 const TAPES={
-  'soft-orbit':   {name:'SOFT ORBIT',   key:0,bpm:82,swing:.6, prog:[[5,'maj9'],[4,'m7'],[2,'m9'],[0,'maj9']],                 kit:'full', comp:'push',bass:'walk', mel:.8, pad:.22,bright:3200},
-  'warm-transit': {name:'WARM TRANSIT', key:9,bpm:80,swing:.6, prog:[[0,'maj9'],[4,'m7'],[9,'m9'],[5,'maj9']],                 kit:'full', comp:'push',bass:'walk', mel:.75,pad:.24,bright:3100},
-  'night-cruise': {name:'NIGHT CRUISE', key:7,bpm:84,swing:.6, prog:[[2,'m9'],[7,'d13'],[0,'maj9',2]],                         kit:'full', comp:'push',bass:'walk', mel:.8, pad:.22,bright:3200},
-  'space-wave':   {name:'SPACE WAVE',   key:2,bpm:78,swing:.58,prog:[[0,'maj9'],[9,'m9'],[2,'m9'],[7,'sus9']],                 kit:'full', comp:'hold',bass:'soft', mel:.75,pad:.3, bright:3000},};
-/* r51: one station of two tapes. Every older tape id (saves, the studio, episodes) plays one of the two */
+  'soft-orbit':   {name:'SOFT ORBIT',   key:0, bpm:82,swing:.6, prog:[[5,'maj9'],[4,'m7'],[2,'m9'],[0,'maj9']],  progB:[[2,'m9'],[7,'d13'],[0,'maj9'],[9,'m9']],  kit:'full',comp:'push',bass:'walk',mel:.8, pad:.22,bright:3200,lead:'guitar'},
+  'space-wave':   {name:'SPACE WAVE',   key:2, bpm:78,swing:.58,prog:[[0,'maj9'],[9,'m9'],[2,'m9'],[7,'sus9']],  progB:[[5,'maj9',2],[0,'maj9',2]],               kit:'full',comp:'hold',bass:'soft',mel:.75,pad:.3, bright:3000,lead:'flute'},
+  'warm-transit': {name:'WARM TRANSIT', key:9, bpm:80,swing:.6, prog:[[0,'maj9'],[4,'m7'],[9,'m9'],[5,'maj9']],  progB:[[2,'m9'],[7,'sus9'],[0,'maj9',2]],        kit:'full',comp:'push',bass:'walk',mel:.75,pad:.24,bright:3100,lead:'flute'},
+  'night-cruise': {name:'NIGHT CRUISE', key:7, bpm:84,swing:.6, prog:[[2,'m9'],[7,'d13'],[0,'maj9',2]],          progB:[[5,'maj9'],[4,'m7'],[2,'m9'],[7,'d13']],  kit:'full',comp:'push',bass:'walk',mel:.8, pad:.22,bright:3200,lead:'guitar'},
+  'paper-moons':  {name:'PAPER MOONS',  key:3, bpm:76,swing:.6, prog:[[0,'maj9'],[9,'m9'],[5,'maj9'],[7,'sus9']],  progB:[[5,'maj9'],[4,'m7'],[2,'m9'],[7,'d13']],  kit:'warm',comp:'push',bass:'walk',mel:.7, pad:.24,bright:2900,lead:'guitar'},
+  'slow-dock':    {name:'SLOW DOCK',    key:10,bpm:72,swing:.62,prog:[[2,'m9'],[7,'d13'],[4,'m7'],[9,'m9']],     progB:[[5,'maj9',2],[0,'maj9',2]],               kit:'soft',comp:'hold',bass:'soft',mel:.6, pad:.3, bright:2800,lead:'flute'},
+  'window-seat':  {name:'WINDOW SEAT',  key:7, bpm:80,swing:.6, prog:[[5,'maj9'],[7,'d9'],[4,'m7'],[9,'m9']],    progB:[[2,'m9'],[7,'d13'],[0,'maj9',2]],         kit:'full',comp:'push',bass:'walk',mel:.8, pad:.22,bright:3100,lead:'guitar'},
+  'blue-hours':   {name:'BLUE HOURS',   key:5, bpm:74,swing:.6, prog:[[9,'m9'],[5,'maj9'],[0,'maj9'],[7,'sus9']],  progB:[[2,'m9'],[9,'m9'],[5,'maj9'],[7,'sus9']], kit:'warm',comp:'hold',bass:'soft',mel:.65,pad:.3, bright:2900,lead:'flute'},
+  'cocoa-break':  {name:'COCOA BREAK',  key:0, bpm:86,swing:.58,prog:[[0,'maj9'],[9,'m7'],[2,'m9'],[7,'d13']],   progB:[[5,'maj9'],[4,'m7'],[2,'m9'],[7,'sus9']], kit:'full',comp:'push',bass:'walk',mel:.8, pad:.2, bright:3300,lead:'guitar'},
+  'far-lights':   {name:'FAR LIGHTS',   key:9, bpm:70,swing:.58,prog:[[5,'maj9',2],[0,'maj9',2]],                progB:[[2,'m9',2],[9,'m9',2]],                   kit:'soft',comp:'hold',bass:'soft',mel:.55,pad:.34,bright:2700,lead:'flute'}};
+/* every older tape id (saves, the studio, episodes) plays one of today's */
 const ALIAS={'orbital-cruise':'soft-orbit','night-shift':'space-wave','deep-signal':'space-wave','empty-corridors':'space-wave','outer-dark':'space-wave','engine-room':'soft-orbit','cabin-warmth':'space-wave','slow-current':'space-wave','quiet-engines':'space-wave','engine-sleep':'soft-orbit'};
 const tapeOf=id=>TAPES[id]?id:ALIAS[id]||'soft-orbit';
 /* drum patterns, 16 steps; digits are velocities (1-9) */
@@ -44,7 +51,7 @@ function roomIR(ctx){const sr=ctx.sampleRate,n=Math.floor(sr*1.5),b=ctx.createBu
   for(let i=0;i<n;i++){const w=Math.random()*2-1;lp+=.25*(w-lp);d[i]=lp*Math.pow(1-i/n,3.2)*(i<sr*.012?i/(sr*.012):1);}}return b;}
 
 /* each tape measured with loud.js (BS.1770, 4 minutes, seed 22910001) and trimmed to about -19.5 LUFS */
-const TRIM={"soft-orbit": 0.484, "space-wave": 0.507, "warm-transit": 0.49, "night-cruise": 0.479};
+const TRIM={"soft-orbit": 0.484, "space-wave": 0.495, "warm-transit": 0.49, "night-cruise": 0.479, "paper-moons": 0.495, "slow-dock": 0.537, "window-seat": 0.49, "blue-hours": 0.513, "cocoa-break": 0.484, "far-lights": 0.55};
 
 function make(ctx,dest,o){
   o=o||{};const TK=tapeOf(o.tape),T=TAPES[TK],seed=(o.seed>>>0)||22910001,SLEEP=!!o.sleep;
@@ -84,10 +91,15 @@ function make(ctx,dest,o){
   function bell(m,t,vel){const f=mhz(m),end=t+2.4;const a=osc('sine',f,t,end),b=osc('sine',f*2,t,end),g=G(0),g2=G(0);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.075*vel,t+.008);g.gain.setTargetAtTime(0,t+.02,.55);g2.gain.setValueAtTime(.02*vel,t);g2.gain.setTargetAtTime(0,t+.01,.18);
     a.connect(g);b.connect(g2);g.connect(melB);g2.connect(melB);}
+  /* r61: a nylon guitar (a plucked triangle whose brightness closes as it rings) and a soft flute (a slow sine with a late, gentle vibrato) */
+  function guitar(m,t,vel){const f=mhz(m),end=t+1.9,a=osc('triangle',f,t,end),b=osc('sine',f*2,t,end),gb=G(.22),lp=F('lowpass',2600,.6),g=G(0);a.connect(lp);b.connect(gb);gb.connect(lp);lp.connect(g);
+    lp.frequency.setValueAtTime(2600,t);lp.frequency.setTargetAtTime(650,t+.01,.16);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.085*vel,t+.004);g.gain.setTargetAtTime(0,t+.02,.42);g.connect(melB);}
+  function flute(m,t,dur,vel){const f=mhz(m),end=t+dur+.9,a=osc('sine',f,t,end),b=osc('triangle',f,t,end),gb=G(.08),g=G(0),v=osc('sine',4.8,t,end),vg=G(0);v.connect(vg);vg.connect(a.detune);vg.gain.setValueAtTime(0,t);vg.gain.linearRampToValueAtTime(7,t+Math.min(dur,1.2));
+    a.connect(g);b.connect(gb);gb.connect(g);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05*vel,t+.14);g.gain.setTargetAtTime(.04*vel,t+.2,.6);g.gain.setTargetAtTime(0,t+dur,.22);g.connect(melB);}
   function bass(m,t,dur,vel){const f=mhz(m),end=t+dur+.5,a=osc('sine',f,t,end),b=osc('triangle',f,t,end),gb=G(.22),g=G(0);a.connect(g);b.connect(gb);gb.connect(g);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.07*vel,t+.018);g.gain.setTargetAtTime(.045*vel,t+.04,.4);g.gain.setTargetAtTime(0,t+dur,.09);g.connect(bassB);}
-  function pad(ms,t,dur){for(const m of ms){for(const dt of [-5,5]){const x=osc('triangle',mhz(m),t,t+dur+2.5);x.detune.value=dt;const g=G(0);
-    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+.9);g.gain.setValueAtTime(.03,t+Math.max(.95,dur-.1));g.gain.linearRampToValueAtTime(0,t+dur+1.6);x.connect(g);g.connect(padB);}}}
+  function pad(ms,t,dur,lv){lv=.03*(lv||1);for(const m of ms){for(const dt of [-5,5]){const x=osc('triangle',mhz(m),t,t+dur+2.5);x.detune.value=dt;const g=G(0);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(lv,t+.9);g.gain.setValueAtTime(lv,t+Math.max(.95,dur-.1));g.gain.linearRampToValueAtTime(0,t+dur+1.6);x.connect(g);g.connect(padB);}}}
   function kick(t,v){const x=osc('sine',110,t,t+.6),g=G(0);x.frequency.setValueAtTime(118,t);x.frequency.exponentialRampToValueAtTime(55,t+.09);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.62*v,t+.004);g.gain.setTargetAtTime(0,t+.02,.11);x.connect(g);g.connect(drumB);
     duck.gain.setValueAtTime(1,t);duck.gain.linearRampToValueAtTime(.8,t+.02);duck.gain.setTargetAtTime(1,t+.04,.13);}
@@ -100,13 +112,13 @@ function make(ctx,dest,o){
   function brush(t,v){const s=nz(t,.4),bp=F('bandpass',3000,.6),g=G(0);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.06*v,t+.025);g.gain.setTargetAtTime(0,t+.04,.09);s.connect(bp);bp.connect(g);g.connect(drumB);}
   function hat(t,v){const s=nz(t,.12),hp_=F('highpass',7000),g=G(0);g.gain.setValueAtTime(.05*v,t);g.gain.setTargetAtTime(0,t+.002,.022);s.connect(hp_);hp_.connect(g);g.connect(drumB);}
   /* ---- the song: the progression as bars, a voice-led keys voicing per chord, the hook ---- */
-  const BARS=[];for(const [deg,shape,n] of T.prog)for(let k=0;k<(n||1);k++)BARS.push({deg,shape,first:k===0,len:n||1});
-  let prevC=61;
-  const VOX=BARS.map(b=>{if(!b.first)return null;const root=T.key+b.deg,pcs=Q[b.shape].map(s=>(root+s)%12);
-    /* place each tone in F3..A4 nearest the last chord's centre, so the hands barely move */
-    const ms=pcs.map(pc=>{let best=null;for(let m=53;m<=70;m++)if(m%12===pc&&(best==null||Math.abs(m-prevC)<Math.abs(best-prevC)))best=m;return best;}).sort((a,b)=>a-b);
-    const uniq=[...new Set(ms)];prevC=uniq.reduce((a,b)=>a+b,0)/uniq.length*.5+61*.5;let bm=36+((root%12)+12)%12; /* r58: the bass stays between 65 and 123 Hz, where small speakers can still play it */return {keys:uniq,bass:bm,root};});
-  for(let i=0;i<BARS.length;i++)if(!VOX[i])VOX[i]=VOX[i-1];
+  function song(prog){const BARS=[];for(const [deg,shape,n] of prog)for(let k=0;k<(n||1);k++)BARS.push({deg,shape,first:k===0,len:n||1});let prevC=61;
+    const VOX=BARS.map(b=>{if(!b.first)return null;const root=T.key+b.deg,pcs=Q[b.shape].map(s=>(root+s)%12);
+      /* place each tone in F3..A4 nearest the last chord's centre, so the hands barely move */
+      const ms=pcs.map(pc=>{let best=null;for(let m=53;m<=70;m++)if(m%12===pc&&(best==null||Math.abs(m-prevC)<Math.abs(best-prevC)))best=m;return best;}).sort((a,b)=>a-b);
+      const uniq=[...new Set(ms)];prevC=uniq.reduce((a,b)=>a+b,0)/uniq.length*.5+61*.5;const bm=36+((root%12)+12)%12; /* r58: the bass stays between 65 and 123 Hz */return {keys:uniq,bass:bm,root};});
+    for(let i=0;i<BARS.length;i++)if(!VOX[i])VOX[i]=VOX[i-1];return {BARS,VOX};}
+  const SA=song(T.prog),SB=song(T.progB||T.prog.slice(2).concat(T.prog.slice(0,2))),VOX=SA.VOX,BARS=SA.BARS;
   const R0=RNG(seed^hashStr(T.name)^Math.imul((o.pass|0)+1,40503)); /* each pass of the station gets its own hook */
   /* the hook: two bars of a pentatonic line, 5-7 notes, C5-C6 */
   const PEN=[];for(let m=70;m<=86;m++)if(PENT.includes(((m-T.key)%12+12)%12))PEN.push(m);
@@ -114,46 +126,52 @@ function make(ctx,dest,o){
     let ix=2+Math.floor(R()*3);return pos.map((p,i)=>{if(i){ix+=[-2,-1,-1,1,1,2][Math.floor(R()*6)];ix=Math.max(0,Math.min(PEN.length-1,ix));}return {step:p,m:PEN[ix],vel:.55+R()*.3};});}
   const HOOK=hook(R0),HOOK2=HOOK.map((n,i)=>i<HOOK.length-2?n:Object.assign({},n,{m:PEN[Math.max(0,Math.min(PEN.length-1,PEN.indexOf(n.m)+(i%2?-1:1)))]}));
   const at=(t0,step)=>t0+step*six+(step%2?SW:0);
+  /* r61 · THE FORM, 32 bars and round again: A (the loop, the beat) · A (the bell hook comes in) · B (the middle: other chords, the kick and snare
+     sit out, long held keys, the flute if this track has one) · A (the beat back, the guitar or the hook on top). Two bars of keys alone open the track */
   function bar(b,t0){
     const R=RNG(seed^Math.imul(b+1,2654435761)^hashStr(TK)),now=ctx.currentTime,ok=t=>t>=now-.01;
-    const i=b%BARS.length,B=BARS[i],V=VOX[i],cyc=Math.floor(b/16),inC=b%16;
-    const lite=SLEEP||M.int===0||(inC>=8&&RNG(seed^cyc*31)()<.3)||M.lean; /* a lighter half-cycle now and then */
-    const intro=b<2;
+    const f=b%32,sec=f<8?0:f<16?1:f<24?2:3,mid=sec===2,S=mid?SB:SA,i=(mid?f-16:f)%S.BARS.length,B=S.BARS[i],V=S.VOX[i],cyc=Math.floor(b/32);
+    const lite=SLEEP||M.int===0||mid,intro=b<2,comp=mid?'hold':T.comp,bassK=mid?'hold':T.bass;
     /* keys */
     const kv=SLEEP?.55:.85;
     const strum=(t,vel,len)=>{if(!ok(t))return;V.keys.forEach((m,k)=>rhodes(m,t+k*(.012+R()*.012),len,vel*(1-k*.06)*(.9+R()*.2)));};
-    if(T.comp==='arp'){if(B.first)strum(t0,kv*.7,barDur*B.len*.9);const ord=[0,1,2,3,2,1];for(let s=4;s<16;s+=4){const m=V.keys[ord[(b*3+s/4)%ord.length]%V.keys.length];const t=at(t0,s);if(ok(t))rhodes(m+12,t,beat*1.5,.35+R()*.15);}}
-    else if(T.comp==='push'){if(B.first||R()<.5)strum(t0,kv,beat*2.3);if(R()<.7)strum(at(t0,6),kv*.6,beat*1.2);if(R()<.55)strum(at(t0,10),kv*.7,beat*1.8);}
+    if(comp==='push'){if(B.first||R()<.5)strum(t0,kv,beat*2.3);if(R()<.7)strum(at(t0,6),kv*.6,beat*1.2);if(R()<.55)strum(at(t0,10),kv*.7,beat*1.8);}
     else{if(B.first)strum(t0,kv,barDur*B.len*.85);else if(R()<.5)strum(at(t0,8),kv*.55,beat*3);if(R()<.35)strum(at(t0,14),kv*.45,beat*.9);}
-    /* pad: the same chord, very quietly, under everything */
-    if(B.first){const pt=Math.max(t0,now),pd=barDur*B.len-(pt-t0);if(pd>.5)pad(V.keys.map(m=>m+12>76?m:m+12).slice(0,3),pt,pd);}
+    /* pad: the same chord, very quietly, under everything; a little more of it in the middle section */
+    if(B.first){const pt=Math.max(t0,now),pd=barDur*B.len-(pt-t0);if(pd>.5)pad(V.keys.map(m=>m+12>76?m:m+12).slice(0,3),pt,pd,mid?1.5:1);}
     /* bass */
-    if(!intro||T.kit==='none'){const bv=SLEEP?.7:1;
-      if(T.bass==='hold'){if(B.first&&ok(t0))bass(V.bass,t0,barDur*B.len*.92,bv*.8);}
+    if(!intro){const bv=SLEEP?.7:1;
+      if(bassK==='hold'){if(B.first&&ok(t0))bass(V.bass,t0,barDur*B.len*.92,bv*.8);}
       else{if(ok(t0))bass(V.bass,t0,beat*1.6,bv);
-        if(T.bass==='walk'){const t=at(t0,10);if(ok(t))bass(R()<.6?V.bass:V.bass+7,t,beat*.9,bv*.75);const nx=VOX[(i+1)%BARS.length];if(R()<.5&&nx.bass!==V.bass){const t2=at(t0,14);if(ok(t2))bass(nx.bass+(nx.bass>V.bass?-1:1)*(R()<.5?1:2),t2,beat*.4,bv*.5);}}
+        if(bassK==='walk'){const t=at(t0,10);if(ok(t))bass(R()<.6?V.bass:V.bass+7,t,beat*.9,bv*.75);const nx=S.VOX[(i+1)%S.BARS.length];if(R()<.5&&nx.bass!==V.bass){const t2=at(t0,14);if(ok(t2))bass(nx.bass+(nx.bass>V.bass?-1:1)*(R()<.5?1:2),t2,beat*.4,bv*.5);}}
         else{const t=at(t0,8);if(R()<.6&&ok(t))bass(V.bass+(R()<.3?12:0),t,beat*1.4,bv*.6);}}}
-    /* drums */
-    if(!intro&&!SLEEP&&M.int>0&&T.kit!=='none'){const K=KIT[T.kit],var_=(b%4===3)?1:0,dv=M.int===1?.75:1;
-      const run=(pat,fn,swing,hum)=>{for(let s=0;s<16;s++){const c=pat[s];if(c==='.')continue;const v=(+c)/9*dv;let t=swing?at(t0,s):t0+s*six;t+=(R()-.5)*hum;if(ok(t))fn(t,v);}};
-      if(!lite)run(K.k[var_%K.k.length],kick,false,.004);
+    /* drums: out for the middle section (hats only), and the last bar before it breathes */
+    if(!intro&&!SLEEP&&M.int>0&&T.kit!=='none'){const K=KIT[T.kit],var_=(b%4===3)?1:0,dv=M.int===1?.75:1,turn=f===15||f===31;
+      const run=(pat,fn,swing,hum,upTo)=>{for(let s=0;s<(upTo||16);s++){const c=pat[s];if(c==='.')continue;const v=(+c)/9*dv;let t=swing?at(t0,s):t0+s*six;t+=(R()-.5)*hum;if(ok(t))fn(t,v);}};
+      if(!lite)run(K.k[var_%K.k.length],kick,false,.004,turn?12:16);
       if(!lite){const sn=K.snare==='snare'?snare:K.snare==='soft'?soft:K.snare==='rim'?rim:brush;run(K.s[var_%K.s.length],(t,v)=>sn(t+.012,v),false,.006);} /* the backbeat sits a hair late */
-      run(K.h[var_%K.h.length],(t,v)=>hat(t,v*(lite?.7:1)*(.8+R()*.4)),true,.008);}
-    /* the hook */
-    const want=T.mel*[.0,.6,1][SLEEP?0:M.int];
-    if(!intro&&want>0&&(inC===4||inC===6||(M.int===2&&(inC===12||inC===14)))&&RNG(seed^cyc*97^inC)()<want+.25){const H=(inC===6||inC===14)?HOOK2:HOOK;
-      for(const n of H){const bOff=n.step>=16?barDur:0,s=n.step%16;const t=at(t0+bOff,s)+(R()-.5)*.01;if(ok(t))bell(n.m,t,n.vel);}}
+      run(K.h[var_%K.h.length],(t,v)=>hat(t,v*(lite?.6:1)*(.8+R()*.4)),true,.008,turn?12:16);}
+    /* the tunes */
+    const want=T.mel*[.0,.75,1][SLEEP?0:M.int];if(intro||want<=0)return;const go=k=>RNG(seed^Math.imul(cyc+1,97)^Math.imul(k+3,7919))()<want+.2;
+    const playHook=H=>{for(const n of H){const bOff=n.step>=16?barDur:0,s=n.step%16;const t=at(t0+bOff,s)+(R()-.5)*.01;if(ok(t))bell(n.m,t,n.vel);}};
+    if(sec===1&&(f===12||f===14)&&go(f))playHook(f===14?HOOK2:HOOK);
+    if(mid&&T.lead==='flute'&&B.first&&go(f)){ /* one long note a chord: the nearest pentatonic tone above the top of the voicing */
+      const top=V.keys[V.keys.length-1]+12;let m=PEN[0];for(const p of PEN)if(Math.abs(p-top)<Math.abs(m-top))m=p;if(ok(t0+beat*.5))flute(m,t0+beat*.5,barDur*B.len-beat*1.2,.8);
+      if(R()<.4){const t=at(t0+barDur*(B.len-1),12);if(ok(t))flute(PEN[Math.max(0,PEN.indexOf(m)-1)],t,beat*.8,.6);}}
+    if(sec===3){if(T.lead==='guitar'&&go(f>>1)){ /* the guitar picks the chord: up through the voicing, a pentatonic note on top */
+        const up=V.keys.map(m=>m+12),first=f%2===0,steps=first?[0,2,4,6,10]:[8,10,12,14];steps.forEach((st,k)=>{const m=k<up.length&&k<steps.length-1?up[first?k:up.length-1-k]||up[0]:PEN[Math.min(PEN.length-1,3+Math.floor(R()*4))];const t=at(t0,st)+(R()-.5)*.012;if(ok(t))guitar(m,t,.6+R()*.25);});}
+      else if(T.lead!=='guitar'&&(f===28||f===30)&&go(f))playHook(f===30?HOOK2:HOOK);}
   }
   /* ---- clock ---- */
   const t0=o.startAt!=null?o.startAt:ctx.currentTime+.05;let bN=Math.max(0,Math.floor((ctx.currentTime-t0)/barDur));
   function tick(h){if(stopped)return;while(t0+bN*barDur<h){bar(bN,t0+bN*barDur);bN++;}}
   function setState(s){state=s;} /* r51: the ship's mood never changes the music */
   function setIntensity(n){M.int=SLEEP?0:Math.max(0,Math.min(2,n|0));}
-  function hero(kind){if(stopped||!/^(relay|scanner|chime)$/.test(kind))return;const t=ctx.currentTime+.05,V=VOX[bN%BARS.length];rhodes(V.keys[V.keys.length-1]+12,t,1.2,.35);rhodes(V.keys[V.keys.length-2]+12,t+.18,1.2,.28);}
+  function hero(kind){if(stopped||!/^(relay|scanner|chime)$/.test(kind))return;const t=ctx.currentTime+.05,V=VOX[bN%BARS.length]||VOX[0];rhodes(V.keys[V.keys.length-1]+12,t,1.2,.35);rhodes(V.keys[V.keys.length-2]+12,t+.18,1.2,.28);}
   function stop(f){if(stopped)return;stopped=true;const t=ctx.currentTime;out.gain.cancelScheduledValues(t);out.gain.setTargetAtTime(0,t,Math.max(.05,(f||.5)/3));
     setTimeout(()=>{for(const x of L){try{x.stop();}catch(e){}}try{out.disconnect();}catch(e){}},((f||.5)+.8)*1000);}
   const LV=TRIM[TK]||1;out.gain.setValueAtTime(0,ctx.currentTime);out.gain.linearRampToValueAtTime(LV,ctx.currentTime+Math.max(.3,Math.min(o.fadeIn||1.5,15)));
   return {tick,ahead:2,skip(){},setState,setIntensity,hero,stop,get state(){return state;},tape:T.name,plan:{ev:[]},bpm:T.bpm};}
-const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.7, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -23.1, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4, "warm-transit": -19.5, "warm-transit:sleep": -23.1, "night-cruise": -19.5, "night-cruise:sleep": -22.8};
+const LUFS={"soft-orbit": -19.5, "soft-orbit:sleep": -22.9, "cabin-warmth": -19.5, "cabin-warmth:sleep": -22.6, "space-wave": -19.5, "space-wave:sleep": -23.1, "slow-current": -19.5, "slow-current:sleep": -22.7, "quiet-engines": -19.5, "quiet-engines:sleep": -22.4, "engine-sleep": -19.5, "engine-sleep:sleep": -22.4, "orbital-cruise": -19.5, "orbital-cruise:sleep": -22.9, "night-shift": -19.5, "night-shift:sleep": -22.6, "deep-signal": -19.5, "deep-signal:sleep": -22.7, "empty-corridors": -19.5, "empty-corridors:sleep": -22.9, "outer-dark": -19.5, "outer-dark:sleep": -22.4, "engine-room": -19.5, "engine-room:sleep": -22.4, "warm-transit": -19.5, "warm-transit:sleep": -23.1, "night-cruise": -19.5, "night-cruise:sleep": -22.8, "paper-moons": -19.5, "paper-moons:sleep": -22.6, "slow-dock": -19.5, "slow-dock:sleep": -22.5, "window-seat": -19.5, "window-seat:sleep": -23.1, "blue-hours": -19.5, "blue-hours:sleep": -22.8, "cocoa-break": -19.5, "cocoa-break:sleep": -22.7, "far-lights": -19.5, "far-lights:sleep": -22.6};
 window.DEEP={make,TAPES,ALIAS,tapeOf,PENT,nearest,LUFS,TRIM};
 })();

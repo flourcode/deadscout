@@ -520,3 +520,17 @@ body.watching:not(.studio) .qbar,body.watching:not(.studio) #stSub,body.watching
 /* r60 · SOUND: one button, three states. Narrow screens show just the state */
 #wSound s{text-decoration:none}.compact #wSound s,body.portrait #wSound s{display:none}
 #wNext.off{opacity:.35;pointer-events:none}
+
+/* r61 · tools, top right: the clock, the focus countdown, FOCUS and FLOAT */
+.shiptime{right:calc(3% + 6px)!important}
+#wFocus{position:absolute;right:calc(3% + 6px);top:calc(3% + 34px);z-index:6;font:400 var(--f2)/1.4 Silk,monospace;letter-spacing:.16em;color:#ffb45a;background:none;text-shadow:2px 2px 0 #0b0e11;left:auto;bottom:auto;width:auto;pointer-events:none}
+#wFocus.brk{color:#8fd6cf}
+.wui-tools{position:absolute;right:calc(3% + 6px);top:calc(3% + 66px);z-index:7;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.wui-tools button{all:unset;cursor:pointer;font:400 var(--f2)/1 Silk,monospace;letter-spacing:.2em;color:#e9d7c2;padding:.9em 1.1em;background:rgba(11,14,17,.72);box-shadow:inset 0 0 0 2px rgba(231,219,192,.38),0 3px 0 #0b0e11}
+.wui-tools button.on{color:#ffb45a;box-shadow:inset 0 0 0 2px #ffb45a,0 3px 0 #0b0e11}
+.wui-tools button:focus-visible{outline:2px solid #ffb45a;outline-offset:2px}
+body.nopip #wFloat2,body.phone #wFloat2{display:none}
+body.portrait .wui-tools{top:calc(100% + 64px);right:auto;left:50%;transform:translateX(-50%);flex-direction:row}
+body.portrait #wFocus{top:calc(3% + 20px)}
+.wui-tools,.wui-tools button{pointer-events:auto}
+body.ui #wFocus{opacity:1!important}

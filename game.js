@@ -14,7 +14,7 @@ window.DS_DEFAULT_EPISODE=window.DS_GAME||window.DS_DEFAULT_EPISODE;if(!window.C
 /* ---------- the project: one reading of a manifest, shared with the Director (episode.js) ---------- */
 let P,AL,TIMES,TOTAL,watch=null,events=null;
 /* the tapes (§38): six named mixes of the same engine; the player picks one from the pause menu, the story may duck it */
-const TAPES=[['SOFT ORBIT',{style:'deadwave',tape:'soft-orbit'}],['SPACE WAVE',{style:'deadwave',tape:'space-wave'}],['WARM TRANSIT',{style:'deadwave',tape:'warm-transit'}],['NIGHT CRUISE',{style:'deadwave',tape:'night-cruise'}]]; /* r52: the station's four tracks (deep.js) */
+const TAPES=[['SOFT ORBIT',{style:'deadwave',tape:'soft-orbit'}],['SPACE WAVE',{style:'deadwave',tape:'space-wave'}],['WARM TRANSIT',{style:'deadwave',tape:'warm-transit'}],['NIGHT CRUISE',{style:'deadwave',tape:'night-cruise'}],['PAPER MOONS',{style:'deadwave',tape:'paper-moons'}],['SLOW DOCK',{style:'deadwave',tape:'slow-dock'}],['WINDOW SEAT',{style:'deadwave',tape:'window-seat'}],['BLUE HOURS',{style:'deadwave',tape:'blue-hours'}],['COCOA BREAK',{style:'deadwave',tape:'cocoa-break'}],['FAR LIGHTS',{style:'deadwave',tape:'far-lights'}]]; /* r61: the station's ten tracks (deep.js) */
 /* r37: in a watch the TAPE key (or a scene) swaps the band without reloading the ship; the new tape fades in */
 /* r40 · THE BEDS. Brown noise (warm, low, enveloping) and pink noise (soft air moving through the ship), each on its own,
    breathing very slowly; they run under everything and never stop when the tape changes. OFF / LOW / MID / HIGH. */
@@ -35,7 +35,7 @@ const curTapeId=()=>{if(!watch)return 'drift';const c=watch.cfg;return c.music||
 /* r51 · THE STATION: SOFT ORBIT and SPACE WAVE take turns, about ten minutes each, with the usual ten-second crossfade. Scenes never change it;
    each new pass of a tape gets a fresh hook (deep.js pass), so it does not come round exactly the same */
 /* r52: four tracks of one album, starting on SOFT ORBIT (Busy Ship), about eight minutes each; ⏭ (or N) skips with a short fade */
-const STN={pass:0,next:0,mins:8,order:['soft-orbit','space-wave','warm-transit','night-cruise']};window.__station=STN;
+const STN={pass:0,next:0,mins:6,order:['soft-orbit','window-seat','space-wave','paper-moons','night-cruise','blue-hours','warm-transit','slow-dock','cocoa-break','far-lights']}; /* r61: ten tracks, about six minutes each: an hour before anything comes round again; lively and gentle ones alternate */window.__station=STN;
 function stationNext(xf,dir){if(!watch)return;const cur=watch.tape||curTapeId(),L=STN.order,i=L.indexOf(cur);STN.pass++;watchTape(L[(i+(dir||1)+L.length)%L.length],xf);}
 /* r54 · MEDIA SESSION: the track on the lock screen and in the system media overlay; play/pause and next/previous keys work.
    Browsers only show it while an <audio> element plays, so a silent one loops alongside the Web Audio music */
@@ -52,6 +52,7 @@ function msMeta(id){if(!('mediaSession' in navigator)||!window.MediaMetadata)ret
   navigator.mediaSession.metadata=new MediaMetadata({title:T.name.charAt(0)+T.name.slice(1).toLowerCase(),artist:'Driftnaut',album:'HALCYON · space chill',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'},{src:'icon-192.png',sizes:'192x192',type:'image/png'}]});}catch(e){}}
 setInterval(()=>{try{if(!watch){STN.next=0;STN.t0=0;return;}if(!STN.t0)STN.t0=performance.now();
   if(state==='watch'&&!prefs.tipGame&&performance.now()-STN.t0>15*60000){prefs.tipGame=1;savePrefs();toast('LIKE IT HERE? PRESS GAME ▸ TO DRIFT THROUGH THE SHIP YOURSELF',8);}
+  if(FOC.phase){try{focusTick(now());paintFocus(now());}catch(e){}}
   if(!band||!actx||SLP)return;const t=actx.currentTime;if(!STN.next){STN.next=t+STN.mins*60;return;}if(t<STN.next)return;stationNext(10);}catch(e){}},5000);
 /* now playing: the track's name, a few seconds, top left of the ship */
 let npEl=null,npT=0;function nowPlaying(id){if(prefs.nw.sound==='ship'||!prefs.sound){msMeta(id);return;}const T=window.DEEP&&DEEP.TAPES[DEEP.tapeOf(id)];if(!T)return;if(!npEl){npEl=document.createElement('div');npEl.className='np';npEl.setAttribute('aria-live','polite');(stage.parentElement||document.body).appendChild(npEl);}
@@ -111,7 +112,11 @@ if(!prefs.r51){prefs.r51=1;prefs.nw=prefs.nw||{};prefs.nw.music='soft-orbit';sav
 if(!prefs.r48){prefs.r48=1;prefs.nw=prefs.nw||{};Object.assign(prefs.nw,{sound:'balanced',brown:'low',pink:'off',intensity:'focus'});savePrefs();} /* r48: the new chillhop tapes start from the calm default mix */
 let ambBus=null,focusM=null,focusA=null;
 function ensureAudio(){if(actx)return actx;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.gain.value=prefs.sound?1:0;master.connect(actx.destination);
-  focusM=actx.createGain();focusM.connect(master);focusA=actx.createGain();focusA.connect(master);ambBus=focusA; /* r31: music and ambience each pass a duck stage; a touch pulls them back so the object is close */musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;{const soft=actx.createBiquadFilter();soft.type='lowpass';soft.frequency.value=6200;soft.Q.value=.5;musicBus.connect(soft);soft.connect(musicMute);} /* r28: the band without its sharpest edge */musicMute.connect(focusM);if(SFX)SFX.start(actx,master);return actx;}
+  focusM=actx.createGain();focusM.connect(master);
+  /* r61 · THE LOUDNESS RULE: nothing is louder than the music. Ambience and every effect go through one limiter: under -22 dB they pass untouched,
+     above it they are squeezed 8:1, so a peak lands near -19 dB (the music's own peaks are about -15). The gain after it cancels the browser's automatic make-up */
+  const lim=actx.createDynamicsCompressor();lim.threshold.value=-22;lim.knee.value=4;lim.ratio.value=8;lim.attack.value=.002;lim.release.value=.15;const limOut=actx.createGain();limOut.gain.value=Math.pow(10,-(.6*(22-22/8))/20);lim.connect(limOut);limOut.connect(master);
+  focusA=actx.createGain();focusA.connect(lim);ambBus=focusA; /* r31: music and ambience each pass a duck stage; a touch pulls them back so the object is close */musicBus=actx.createGain();musicMute=actx.createGain();musicMute.gain.value=prefs.musicOn===false?0:1;{const soft=actx.createBiquadFilter();soft.type='lowpass';soft.frequency.value=6200;soft.Q.value=.5;musicBus.connect(soft);soft.connect(musicMute);} /* r28: the band without its sharpest edge */musicMute.connect(focusM);if(SFX)SFX.start(actx,lim);return actx;}
 function startBand(off,xf){ensureAudio();if(actx.state!=='running')actx.resume();if(band){band.stop(xf||.5);band=null;}
   t0=actx.currentTime+.08-off;
   if(P.style==='deadwave'&&window.DEEP){band=DEEP.make(actx,musicBus,{seed:P.seed,pass:STN.pass,tape:(P.music&&P.music.tape)||'soft-orbit',startAt:t0,fadeIn:xf||off+1.2,intensity:INT_N()});curCh=-1;} /* the default: HALCYON dreaming */
@@ -280,7 +285,9 @@ function promptOf(n){let name=n.name,verb='OPERATE';const O=CUT.MAP.objects[n.id
   return '<kbd>'+key+'</kbd><i>'+verb+'</i><b>'+name+'</b>';}
 /* the transmission box (§text): one short line at a time, typed, with the radio blips of an old console */
 const sayQ=[];let sayT=null;
-function say(who,line,secs,opt){sayQ.push({who,line,secs:secs||(2.2+line.length*.06),opt:opt||{}});if(!sayT)sayNext();}
+let lastTouch=0;addEventListener('pointerdown',()=>{lastTouch=performance.now();},true);addEventListener('keydown',()=>{lastTouch=performance.now();},true);
+function say(who,line,secs,opt){if(state==='watch'&&watch&&performance.now()-lastTouch>2500)return; /* r61: LISTEN is for focus: no speech boxes appear on their own, only in answer to a touch */
+  sayQ.push({who,line,secs:secs||(2.2+line.length*.06),opt:opt||{}});if(!sayT)sayNext();}
 /* where a line is shown (the UI pass, Nov 2026): a crew member we can see, close enough to read, gets a small bubble over
    their head; the ship (HOS) speaks in a thin strip at the top of the picture, never from a place; anything long, important,
    offscreen or seen from the whole-ship camera goes in the dialogue panel at the bottom of the picture. The COMMS deck below
@@ -315,7 +322,7 @@ $('oMenu').addEventListener('click',e=>{const b=e.target.closest('[data-o]');if(
   else if(o==='pad'){const m=padMode();prefs.pad=m==='auto'?'on':m==='on'?'off':'auto';savePrefs();paintMenus();}
   else if(o==='photo'){if(menuFrom==='pause'){enter('pause');photoOn();}}else if(o==='record'){if(menuFrom==='pause'){enter('pause');toggleRecord();}}else if(o==='full')toggleFull();else if(o==='text'){prefs.text=prefs.text==='large'?'xl':prefs.text==='xl'?'normal':'large';savePrefs();applyText();paintMenus();}else if(o==='back')enter(menuFrom);});
 /* ---------- NIGHT WATCH: setup ---------- */
-const NWOPT={view:['full-ship','bridge','engineering','outer-hull','auto'],activity:['quiet','routine','busy','strange'],music:['auto','soft-orbit','space-wave','warm-transit','night-cruise'] /* r40: the six tapes */,duration:[30,60,120,360],focus:[0,25,45,60,90]};const NWK=['view','activity','music','duration','focus']; /* r39: back to release 35's five rows (VIEW only if you want one room; the default is the whole ship) */
+const NWOPT={view:['full-ship','bridge','engineering','outer-hull','auto'],activity:['quiet','routine','busy','strange'],music:['auto','soft-orbit','space-wave','warm-transit','night-cruise','paper-moons','slow-dock','window-seat','blue-hours','cocoa-break','far-lights'] /* r40: the six tapes */,duration:[30,60,120,360],focus:[0,25,45,60,90]};const NWK=['view','activity','music','duration','focus']; /* r39: back to release 35's five rows (VIEW only if you want one room; the default is the whole ship) */
 let nwSel=0;
 function paintSetup(){const rows=[...$('nwRows').querySelectorAll('.row')];rows.forEach((r,i)=>{r.classList.toggle('sel',i===nwSel);const k=r.dataset.k,v=prefs.nw[k];
   if(k==='objective'){r.hidden=!prefs.nw.focus;const I=$('nwObj');if(document.activeElement!==I)I.value=prefs.nw.objective||'';if(i===nwSel&&state==='setup')I.focus();else if(document.activeElement===I)I.blur();return;}
@@ -329,11 +336,11 @@ $('nwMenu').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
 /* ---------- FOCUS: a work session on the bridge (Night Watch). The countdown is on the bridge security CRT and in one
    faint line on screen; when it runs out a relay clicks and the music settles for the break, then the next session starts.
    Nothing leaves this browser: the length and the objective are remembered here, nothing is counted anywhere. ---------- */
-const FOC={phase:null,len:0,start:0,end:0,n:0};
+const FOC={phase:null,len:0,start:0,end:0,n:0};window.__foc=FOC;
 const breakOf=m=>m<=25?5:m<=60?10:15;
 function focusInfo(){return {phase:FOC.phase,start:FOC.start,end:FOC.end,n:FOC.n,label:(prefs.nw.objective||'').toUpperCase()};}
-function focusStart(min,brk){const t=now();if(!min){FOC.phase=null;FOC.len=0;CUT.focus(null);paintFocus(t);return;}FOC.len=min;
-  if(brk){FOC.phase='break';FOC.start=t;FOC.end=t+breakOf(min)*60;}else{FOC.phase='focus';FOC.n++;FOC.start=t;FOC.end=t+min*60;}CUT.focus(focusInfo());paintFocus(t);}
+function focusStart(min,brk){const t=now();if(!min){const was=FOC.phase;FOC.phase=null;FOC.len=0;CUT.focus(null);paintFocus(t);if(was)shipFocus('stop');return;}FOC.len=min;
+  if(brk){FOC.phase='break';FOC.start=t;FOC.end=t+breakOf(min)*60;}else{FOC.phase='focus';FOC.n++;FOC.start=t;FOC.end=t+min*60;}CUT.focus(focusInfo());paintFocus(t);shipFocus(brk?'break':'focus');}
 /* ---------- SLEEP (Night Watch): over 20 or 40 minutes the music goes, the picture dims to almost nothing, one last relay
    click; then only the ventilation. The hours spent on watch are counted here, in this browser, and nowhere else. ---------- */
 let SLP=null,wsT=0;
@@ -355,12 +362,27 @@ function sleepTick(t){if(!SLP)return;const u=Math.max(0,Math.min(1,(t-SLP.t0)/(S
   $('dim').style.opacity=String(SLP.done?(peek?.55:.985):.1+.8*u*u); /* the end of sleep is black; a tap lifts it a little */
   if(u>=1&&!SLP.done){SLP.done=true;relay();if(musicBus)musicBus.gain.setTargetAtTime(0,actx.currentTime,60);if(AMB)AMB.duck(.55,30);}}
 function relay(){sfx('click',null,.55);setTimeout(()=>sfx('click',null,.35),180);try{if(band&&band.hero)band.hero('relay');}catch(e){}}
+/* r61 · the ship keeps the timer with you. FOCUS: the crew go back to their stations and the lights settle. BREAK: the lights come up warm, the crew
+   drift to the cocoa machine (it steams), K9 has a stretch. A soft two-note chime marks each change; nothing else interrupts */
+function crewBack(){if(!watch)return;const t=now(),CR=['pilot','systems','commander'];P.script=P.script.filter(b=>CUT.secs(b.at)<=t||!(CR.includes(b.actor)||CR.includes(b.move)));
+  const at={};CR.forEach((a,k)=>{const h=HOME[a];if(h){P.script.push({at:t+1+k*2.5,move:a,to:h,sneak:true});at[a]=h;}else at[a]=CUT.hereRef(P,TIMES,t,a);});HOME={};
+  const ev=NW.schedule(watch.cfg,{from:t+40,at});P.script.push(...DSE.beatsIn(ev.filter(e=>!e.camera)).beats.map(b=>Object.assign(b,{at:CUT.secs(b.at)})));P.rev++;}
+let HOME={};
+function shipFocus(kind){if(!watch)return;const t=now();try{
+  if(kind==='break'){toast('BREAK · '+breakOf(FOC.len)+' MINUTES · STRETCH, SIP SOMETHING',7);const CR=[['pilot','comms.right'],['systems','comms.chair'],['commander','comms.shelf']],N=CR.map(c=>c[0]),len=breakOf(FOC.len)*60;
+    HOME={};for(const a of N){try{HOME[a]=CUT.hereRef(P,TIMES,t,a);}catch(e){}}P.script=P.script.filter(b=>CUT.secs(b.at)<=t||!(N.includes(b.actor)||N.includes(b.move)));CR.forEach(([a,ref],k)=>{if(CUT.place(ref))P.script.push({at:t+2+k*3,move:a,to:ref,sneak:true},{at:t+30+k*3,actor:a,do:'idle',for:Math.max(20,len-40)});});
+    P.script.push({at:t+4,actor:'k9',do:'scan',for:4});P.rev++;(CUT.ROOMS||[]).forEach((r,k)=>setTimeout(()=>CUT.toy({room:{[r]:1}}),600+k*220));
+    setTimeout(()=>{try{if(FOC.phase==='break')feel('meal-unit');}catch(e){}},26000);}
+  else{if(kind==='focus')toast(FOC.n>1?'FOCUS · SESSION '+FOC.n+' · '+FOC.len+' MINUTES':'FOCUS · '+FOC.len+' MINUTES · THE CREW IS AT WORK TOO',6);crewBack();try{if(window.__toys)__toys.mood(__toys.S.mood);}catch(e){}}
+  }catch(e){}paintWatch();}
+function focusToggle(){ensureAudio();if(FOC.phase){focusStart(0);toast('FOCUS TIMER STOPPED',3);}else{FOC.n=0;prefs.nw.focus=25;savePrefs();focusStart(25);}document.title=FOC.phase?document.title:TITLE0;}
+var TITLE0=document.title;try{document.body.classList.toggle('nopip',!document.pictureInPictureEnabled);}catch(e){}
 function focusTick(t){if(FOC.phase==='focus'&&!FOC.k9&&t-FOC.start>480){FOC.k9=true;try{k9Rest(t,true);}catch(e){}}
   if(!FOC.phase||t<FOC.end)return;if(FOC.k9){FOC.k9=false;try{k9Rest(t,false);}catch(e){}}relay();
   if(FOC.phase==='focus'){try{band.setState('quiet',20);}catch(e){}focusStart(FOC.len,true);}
   else{try{band.setState(NW.ACTIVITY[watch.cfg.activity].state,20);}catch(e){}focusStart(FOC.len);}}
-function paintFocus(t){const el=$('wFocus');if(!FOC.phase||!watch){el.hidden=true;return;}t=t==null?now():t;const left=Math.max(0,FOC.end-t),lab=prefs.nw.objective?' · '+prefs.nw.objective.toUpperCase():'';
-  el.hidden=false;el.classList.toggle('brk',FOC.phase==='break');el.textContent=FOC.phase==='focus'?'FOCUS '+FOC.n+' · '+mmss(left)+lab:'BREAK · '+mmss(left)+' · SESSION '+FOC.n+' DONE';}
+function paintFocus(t){const el=$('wFocus');{const b=$('wFocus25');if(b){b.textContent=FOC.phase&&watch?'STOP TIMER':'FOCUS · 25 MIN';b.classList.toggle('on',!!(FOC.phase&&watch));}}if(!FOC.phase||!watch){el.hidden=true;try{if(document.title!==TITLE0)document.title=TITLE0;}catch(e){}return;}t=t==null?now():t;const left=Math.max(0,FOC.end-t),lab=prefs.nw.objective?' · '+prefs.nw.objective.toUpperCase():'';
+  el.hidden=false;el.classList.toggle('brk',FOC.phase==='break');el.textContent=(FOC.phase==='focus'?'FOCUS · ':'BREAK · ')+mmss(left);try{document.title=mmss(left)+' · '+(FOC.phase==='focus'?'FOCUS':'BREAK')+' — Driftnaut';}catch(e){}}
 /* ---------- PHOTO: the frame exactly as the ship draws it (640 × 360), scaled by whole pixels, with nothing on top ---------- */
 const PHOTO_K=[1,2,3,4,6];let photoFrom=null;
 function photoOn(){if(!['pause','watch','play'].includes(state))return;if(state==='play'&&!watch){enter('pause');}photoFrom=state;
@@ -391,6 +413,7 @@ function wake(keep){if(BC)return;/* the mouse moved: show the few controls, then
 document.addEventListener('pointermove',()=>{if(watch&&(state==='watch'||state==='play'))wake();});
 $('wui').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w;
   if(w==='next'){if(soundState()==='all')stationNext(3);wake();return;} /* r52 ⏭ */
+  if(w==='focus25'){focusToggle();wake();return;}if(w==='float2'){floatWindow();wake();return;}
   if(w==='more'){const m=$('wMore'),open=m.hidden;m.hidden=!open;$('wMoreBtn').setAttribute('aria-expanded',String(open));$('wMoreBtn').classList.toggle('on',open);wake();return;} /* r31: the rest, out of the way */
   if(w==='play'){enterPlay();return;}if(w==='listen'){exitPlay();return;}if(w==='k9'){callK9();wake();return;}if(w==='sound'){ensureAudio();soundCycle();wake();return;} /* r60: one button, three states: MUSIC + SHIP → SHIP ONLY → OFF */if(w==='aud'){audioOnly(true);return;}
   if(w==='fade'){const L=[0,30,60],i=L.indexOf(SLP?SLP.min:0);sleepStart(L[(i+1)%3]);wake();return;}if(w==='menu'){endWatch();return;}
@@ -629,7 +652,9 @@ function camTick(t){const pn=performance.now(),dt=Math.min(.1,(pn-(camT||pn))/10
   stage.style.touchAction='none';}
 /* turn the phone: a one-time hint when GAME starts on an upright phone */
 function rotateHint(){if(!document.body.classList.contains('phone')||!document.body.classList.contains('portrait')||prefs.rotTip)return;prefs.rotTip=1;savePrefs();setTimeout(()=>{if(state==='play'&&document.body.classList.contains('portrait'))toast('⟲ TURN YOUR PHONE SIDEWAYS FOR A BIGGER SHIP',5);},1200);}
-function frame(){requestAnimationFrame(frame);driftTick();if(DT&&state!=='play'&&state!=='opening'&&state!=='route'&&state!=='deck')driftTone(0,0);pollPad();tickExterior();if(state==='opening')openingTick(now());const t=state==='title'||state==='registry'||(state==='controls'||state==='options')&&menuFrom==='title'||state==='setup'?(TIMES[1]?TIMES[1].start:0)+5+((performance.now()/1000-idle0)%24):now();
+let hidT=0;document.addEventListener('visibilitychange',()=>{clearInterval(hidT);hidT=0;if(document.hidden&&inPip())hidT=setInterval(()=>{try{frame(true);}catch(e){}},100);});
+function frame(viaTimer){if(viaTimer!==true)requestAnimationFrame(frame);if(document.hidden&&!(viaTimer===true&&inPip()))return; /* r61 */
+  driftTick();if(DT&&state!=='play'&&state!=='opening'&&state!=='route'&&state!=='deck')driftTone(0,0);pollPad();tickExterior();if(state==='opening')openingTick(now());const t=state==='title'||state==='registry'||(state==='controls'||state==='options')&&menuFrom==='title'||state==='setup'?(TIMES[1]?TIMES[1].start:0)+5+((performance.now()/1000-idle0)%24):now();
   if(state==='title'||state==='registry'||state==='setup'||(state==='controls'||state==='options')&&menuFrom==='title'){CUT.force('drift');LCV.render(t,{});CUT.force(null);if(DEV&&showMap)drawMap(t);return;}
   camTick(t);if(CAMV)CUT.force(CAMV);LCV.render(t,{});if(CAMV)CUT.force(null);if(DEV&&showMap)drawMap(t);
   if(story&&!watch&&(state==='play'||state==='opening'||state==='route'||state==='deck')){sfxTick(t);story.update();if(k9&&state==='play'){k9.update(t);if(events&&!resting)events.update(t);idleGlance(t);const r=CUT.roomAt(P,TIMES,t,me);if(r!==lastRoom){lastRoom=r;lastProgress=t;}}if(!(hudN%6))paintNotes();if(SCAN.found&&state==='play'){const p=CUT.actorAt(P,TIMES,t,me),k=Math.max(2,Math.round(stage.width/384)),R=SCAN.read(p.x,p.y);if(SCAN.tick(t,R)==='lock'){tuneReq=true;ping();}scanSound(R);if(scanVisible(t,R)){const c2=stage.getContext('2d');c2.save();c2.globalAlpha=scanA;SCAN.draw(c2,t,R,k,1);c2.restore();}}else scanSound(null);}else{tuneReq=false;scanSound(null);}
