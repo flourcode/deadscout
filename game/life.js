@@ -88,7 +88,7 @@ const POOL={
   dip:()=>{dip();setTimeout(()=>scoutSay('worried'),500);setTimeout(()=>scoutSay('happy'),5200);return true;},
   bloom:()=>{setTimeout(()=>scoutSay('curious'),1500);TANK.bloom=performance.now()+26000;note({i:[0,2,4,5,7],v:.34,voice:'rhodes',gap:.2});return true;}};
 let nextAt=0,lastKind='',wasOn=false;
-function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(140000,240000);}
+function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower')&&!(G.calm&&k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(140000,240000);}
 function tick(dt,pn){const g=GP();if(!A.active()||!G.on){wasOn=false;return;}if(!wasOn){wasOn=true;nextAt=pn+108000;scoutAt=pn+52000;}
   for(const b of BOTS){botTick(b,dt,pn);if(b.stuck&&!G.space&&Math.hypot(b.x-G.x,b.y-G.y)<80&&pn-b.stuck>1500)free(b,pn);}
   for(const f of FL)try{flTick(f,dt,g);}catch(e){}

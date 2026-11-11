@@ -15,7 +15,7 @@ const stage=document.getElementById('stage'),rnd=(a,b)=>a+Math.random()*(b-a),cl
 const M=CUT.MAP,NODES=M.nodes,HULL=[110,250,2080,1200],HOV=6;
 const QN=(location.search.match(/[?&]night=(\d)/)||[])[1];
 const G={x:736,y:846-HOV,vx:0,vy:0,path:[],face:1,last:0,wanderAt:0,slow:false,ext:0,on:false,t0:0,space:false,act:null,mug:0,k9At:0,night:null,asleep:false,acts:0,roll:0};
-window.__naut=window.__ghost=G;try{CUT.hideHer(true);}catch(e){}G.isNight=()=>{if(G.forceNight!=null)return !!G.forceNight;return QN==='1';}; /* r74: the visitor's clock no longer changes anything; a nap is one of the routines */
+window.__naut=window.__ghost=G;/* r82: a visitor who has asked their device for less motion gets a calmer ship: no roll, no gas puffs, no shooting stars, still dust */G.calm=/[?&]calm=1/.test(location.search)||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);try{CUT.hideHer(true);}catch(e){}G.isNight=()=>{if(G.forceNight!=null)return !!G.forceNight;return QN==='1';}; /* r74: the visitor's clock no longer changes anything; a nap is one of the routines */
 /* strictly inside a room's outline, or nowhere (the engine's own roomOf answers with the nearest room even from open space) */
 const roomAt=(x,y)=>{for(const r in M.rooms){const P=M.rooms[r].poly;let in_=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)in_=!in_;}if(in_)return r;}return null;};
 /* the ship's ways: the same nodes the crew walk, and the two ladders */
@@ -97,7 +97,7 @@ function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exte
   else{const f=Math.pow(.05,dt);G.vx*=f;G.vy*=f;}
   /* r72: outside, the pack answers every change of speed or heading with a small puff of cold gas, pushed the opposite way. Coasting needs none.
      (A real suit's jet pack is cold nitrogen: no flame, no glow, a faint white puff.) Indoors there are no jets: you push off the walls */
-  if(G.space&&dt>0){const ax=(G.vx-(G.pvx||0))/dt,ay=(G.vy-(G.pvy||0))/dt,am=Math.hypot(ax,ay);if(am>26&&pn-(G.puffAt||0)>110){G.puffAt=pn;const px=G.x-ax/am*30,py=G.y-58-ay/am*40;
+  if(G.space&&dt>0&&!G.calm){const ax=(G.vx-(G.pvx||0))/dt,ay=(G.vy-(G.pvy||0))/dt,am=Math.hypot(ax,ay);if(am>26&&pn-(G.puffAt||0)>110){G.puffAt=pn;const px=G.x-ax/am*30,py=G.y-58-ay/am*40;
       for(let i=0;i<3;i++)PUFF.push({x:px+rnd(-3,3),y:py+rnd(-4,4),vx:-ax/am*rnd(60,110)+rnd(-14,14)+G.vx*.3,vy:-ay/am*rnd(60,110)+rnd(-14,14)+G.vy*.3,t:pn,life:rnd(650,1100)});if(PUFF.length>48)PUFF.splice(0,PUFF.length-48);}}
   G.pvx=G.vx;G.pvy=G.vy;
   G.x=clamp(G.x+G.vx*dt,40,CUT.W-40);G.y=clamp(G.y+G.vy*dt,90,CUT.H-20);if(Math.abs(G.vx)>6)G.face=G.vx>0?1:-1;
@@ -195,7 +195,7 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
   if(vis<.03)return;
   if(G.asleep)return; /* she is in the bunk; the blanket is drawn with the room */
   const fr=sp>10||G.space?DRIFT[Math.floor(pn/700)%4]:0,im=suit(fr);
-  if(im){const X=Math.round(G.x/u)*u,Yr=Math.round(Y/u)*u;x.save();x.globalAlpha=vis;x.imageSmoothingEnabled=false;G.roll+=((G.space?1:0)-G.roll)*.02;if(G.roll>.02){const cy=Yr-64,a=(Math.sin(pn/3700)*.24+Math.sin(pn/9100)*.12)*G.roll;x.translate(X,cy);x.rotate(a);x.translate(-X,-cy);} /* outside she turns a little as she drifts */
+  if(im){const X=Math.round(G.x/u)*u,Yr=Math.round(Y/u)*u;x.save();x.globalAlpha=vis;x.imageSmoothingEnabled=false;G.roll+=((G.space&&!G.calm?1:0)-G.roll)*.02;if(G.roll>.02){const cy=Yr-64,a=(Math.sin(pn/3700)*.24+Math.sin(pn/9100)*.12)*G.roll;x.translate(X,cy);x.rotate(a);x.translate(-X,-cy);} /* outside she turns a little as she drifts */
     if(G.face<0){x.translate(X,0);x.scale(-1,1);x.translate(-X,0);}x.drawImage(im,X-AX,Yr-AY);x.restore();}
   else try{CUT.sprite('deadscout','idle',G.x,Y,G.face<0,t,x,vis,[[fr,1]]);}catch(e){}
   if(PR.water){const wa=(pn-PR.water)/1000;if(wa>6)PR.water=0;else for(let i=0;i<5;i++){const w=(wa*1.3+i*.37)%1.6;if(w>1||wa<.8)continue;x.globalAlpha=.9*(1-w);x.fillStyle='#f6efe4';const q=u*2;x.fillRect(Math.round((G.x+G.face*30+w*10)/q)*q,Math.round((G.y-70+w*w*44)/q)*q,q,q);}x.globalAlpha=1;}
@@ -214,7 +214,7 @@ CUT.overlay((x,t,SS)=>{const u=SS||2,pn=performance.now(),sp=Math.hypot(G.vx,G.v
 /* the sky keeps to itself: stars, the planet, the comet and the far beacon the ship already had. Added here: a shooting star now and then,
    quick and small, behind the hull */
 function streak(x,q,sx,sy,dx,len,u){const hx=sx+dx*len*u,hy=sy+len*.34*u;for(let k=0;k<9;k++){const a=(1-k/9)*(u<.8?1:(1-u)/.2);if(a<=.05)continue;x.globalAlpha=a;x.fillStyle=k<2?'#f6efe4':k<5?'#7ee3e5':'#1fb4ce';x.fillRect(Math.round((hx-dx*k*q*1.6)/q)*q,Math.round((hy-k*q*.55)/q)*q,q,q);}x.globalAlpha=1;}
-CUT.behind&&CUT.behind((x,t,SS)=>{if(!active())return;const q=(SS||2)*2,pn=performance.now(),per=47,n=Math.floor(t/per),ph=t-n*per,h=k=>CUT._hash(n,7200+k);
+CUT.behind&&CUT.behind((x,t,SS)=>{if(!active()||G.calm)return;const q=(SS||2)*2,pn=performance.now(),per=47,n=Math.floor(t/per),ph=t-n*per,h=k=>CUT._hash(n,7200+k);
   if(!(h(0)>.62||ph>1.1))streak(x,q,CUT.W*(.08+.84*h(1)),CUT.H*(h(2)<.5?.02+.1*h(3):.86+.1*h(3)),h(4)<.5?-1:1,220+260*h(5),ph/1.1);
   if(G.star&&pn>G.star){const u=(pn-G.star)/1400;if(u>1)G.star=0;else streak(x,q,CUT.W*.2,CUT.H*.03,1,520,u);} /* the one every visit gets, a little over a minute in */
   if(G.shower){const e=(pn-G.shower)/1000;if(e>9)G.shower=0;else for(let i=0;i<11;i++){const u=(e-i*.62-CUT._hash(i,7301)*.4)/1.2;if(u<0||u>1)continue;streak(x,q,CUT.W*(.05+.9*CUT._hash(i,7302)),CUT.H*(CUT._hash(i,7303)<.6?.01+.11*CUT._hash(i,7304):.87+.08*CUT._hash(i,7304)),-1,260+200*CUT._hash(i,7305),u);}}});

@@ -1,0 +1,36 @@
+DRIFTNAUT — RELEASE 82
+=======================
+Upright phones and tablets, and three smaller things.
+
+Upright
+- Aboard on an upright phone or tablet, the picture now fills the whole
+  screen: a tall slice of the ship, as tall as the hull, about one and a
+  half rooms wide. (It was a small wide picture at the top with empty sky
+  below.)
+- The camera follows the astronaut, so tapping to explore also moves the
+  view.
+- The bar lies over the bottom of the picture and fades when idle; a tap
+  brings it back.
+- Pinch in for the whole ship (small, with sky above and below); pinch
+  out for the close view.
+- The opening captions are laid out for the tall picture, on a dark band.
+- Turn the device sideways and it goes back to the whole-ship picture.
+- One picture pixel is two screen points, the same chunk as the
+  whole-ship view on a desktop.
+
+Also
+- Link preview: the picture shown when the link is shared is now the
+  orange astronaut and Scout on the welcome screen (og.png).
+- Less motion: if the device asks for reduced motion, there is no roll
+  outside, no gas puffs, no shooting stars or meteor shower, the dust
+  hangs still, and the interface does not fade. (?calm=1 to try it.)
+- Scout's colours: checked, nothing changed. Scout is already cream, with
+  orange joints and a teal eye.
+- A tap now brings the bar back on touch screens (it needed a mouse move).
+
+For the maintainer
+- run/suite.sh is the release check now. The old smoke.js tested menus
+  that were removed in release 63.
+- Cache bumped (driftnaut-v82).
+
+

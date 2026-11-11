@@ -27,7 +27,7 @@ function lightDraw(x,pn){if(!LM)LM=lightmap();if(pn>dimAt){dimAt=pn+1200;try{con
   x.save();x.globalAlpha=dimK;x.imageSmoothingEnabled=false;x.drawImage(LM,0,0,LW*Q,LH*Q);x.restore();}
 /* ---- air: dust in the lamp light ---- */
 const MOTES=[];for(const L of (M.lamps||[])){if(L.warn||!RINFO[L.room]||L.room==='eva')continue;const fl=RINFO[L.room].floor,n=L.soft?3:5;for(let i=0;i<n;i++)MOTES.push({x:L.x+rnd(-80,80),y:rnd(L.y+26,fl-20),lx:L.x,y0:L.y+26,y1:fl-16,vx:rnd(-3,3),vy:rnd(-2.2,2.2),ph:rnd(0,6.28)});}
-function motes(x,u,pn,dt){const q=u*2;for(const m of MOTES){m.x+=m.vx*dt+Math.sin(pn/2300+m.ph)*.05;m.y+=m.vy*dt;if(m.x<m.lx-90||m.x>m.lx+90)m.vx=-m.vx;if(m.y<m.y0||m.y>m.y1)m.vy=-m.vy;
+function motes(x,u,pn,dt){const q=u*2;if(G.calm)dt=0;for(const m of MOTES){m.x+=m.vx*dt+(G.calm?0:Math.sin(pn/2300+m.ph)*.05);m.y+=m.vy*dt;if(m.x<m.lx-90||m.x>m.lx+90)m.vx=-m.vx;if(m.y<m.y0||m.y>m.y1)m.vy=-m.vy;
     const a=.16+.3*(.5+.5*Math.sin(pn/1700+m.ph*3));x.globalAlpha=a;x.fillStyle='#f6efe4';x.fillRect(Math.round(m.x/q)*q,Math.round(m.y/q)*q,q,q);}x.globalAlpha=1;}
 /* ---- signs of habit (a = one block; the whole ship is drawn small, so these are drawn in blocks of 3 world units) ---- */
 const INK='#14181c';

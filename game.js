@@ -91,6 +91,12 @@ const portrait=()=>!BC&&window.innerHeight>window.innerWidth*1.15;
 const isPhone=()=>!BC&&!!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)&&Math.min(window.innerWidth,window.innerHeight)<=540; /* r55: a phone: touch, and a short side under ~540 px */
 function fit1(){const u=document.getElementById('unit');const cw0=stage.offsetWidth,ch0=stage.offsetHeight,cx=u.offsetWidth-cw0,cy=u.offsetHeight-ch0;
   const P_=portrait();document.body.classList.toggle('portrait',P_);const PH=isPhone();document.body.classList.toggle('phone',PH);
+  /* r82: UPRIGHT. Aboard on an upright phone or tablet the picture fills the whole screen: a tall slice of the ship, as tall as the hull,
+     that follows the astronaut. One picture pixel is two CSS pixels, the same chunk as the whole-ship view on a desktop */
+  const TALL=P_&&!BC&&document.body.classList.contains('watching')&&!document.body.classList.contains('studio')&&!recording;document.body.classList.toggle('tall',TALL);
+  if(TALL){const D=Math.max(1,Math.min(3,window.devicePixelRatio||1)),cw=window.innerWidth,chh=window.innerHeight,div=cw/2>470?3:2,iw=Math.round(cw/div),ih=Math.round(chh/div),m=Math.max(1,Math.round(div*D)),bw=iw*m,bh=ih*m;
+    if(bw!==stage.width||bh!==stage.height||CUT.pictureSize()[0]!==iw)LCV.setSize(bw,bh,iw,ih);stage.style.width=cw+'px';stage.style.height=chh+'px';stage.style.imageRendering='';document.body.classList.remove('lb-v','lb-h');return;}
+  if(CUT.pictureSize()[0]!==640){LCV.setSize(stage.width||1280,Math.round((stage.width||1280)*9/16));}
   const mg=BC||PH?0:P_?8:20;let k=Math.min((window.innerWidth-cx-mg)/640,(P_?window.innerHeight*.5:window.innerHeight-cy-mg)/360);k=Math.max(k,P_?.4:.6); /* an upright phone: as small as the width needs */
   /* r56: the canvas is drawn in device pixels, and each of the 640 x 360 picture pixels is a whole number of them when it can be */
   const D=BC?1:Math.max(1,Math.min(3,window.devicePixelRatio||1));let kd=k*D;const ki=Math.floor(kd+1e-6);if(ki>=1&&ki>=(BC?.97:.8)*kd)kd=ki;
@@ -424,7 +430,7 @@ function paintWatch(){/* full labels on a big screen; on a small one the words i
   {const sd=$('wSound');if(sd){const st=soundState();sd.innerHTML=st==='off'?'<s>SOUND<u> · </u></s>OFF':'<s>SOUND<u> · </u></s>'+(st==='ship'?'SHIP ONLY':'MUSIC + SHIP');sd.classList.toggle('off',st==='off');sd.setAttribute('aria-label','Sound: '+(st==='off'?'off':st==='ship'?'ship sounds only':'music and ship')+' (tap to change)');const nx=$('wNext');if(nx){nx.classList.toggle('off',st!=='all');nx.disabled=st!=='all';}}const fd=$('wFade');if(fd){fd.innerHTML='FADE OUT<em> · '+(SLP?SLP.min+' MIN':'OFF')+'</em>';fd.classList.toggle('on',!!SLP);}}{const t=$('wTape');if(t&&watch){const id=watch.tape||curTapeId();t.innerHTML='TAPE<em> · '+((NW.MUSIC[id]||{}).name||'')+'</em>';}const am=$('wAmb');if(am)am.innerHTML='AMBIENCE<em> · '+String(prefs.nw.ambience||'mid').toUpperCase()+'</em>';const wi=$('wInt');if(wi)wi.innerHTML='INTENSITY<em> · '+INTN[prefs.nw.intensity||'focus']+'</em>';for(const k of ['brown','pink']){const b=$('w'+k);if(b)b.innerHTML=k.toUpperCase()+' NOISE<em> · '+String(prefs.nw[k]||'low').toUpperCase()+'</em>';}}{const r=$('wRec');if(r){r.innerHTML=recording?'● REC<em> · STOP</em>':'REC<em> · LONG TAKE</em>';r.classList.toggle('on',!!recording);}}$('wFloat').innerHTML=document.pictureInPictureElement?'FLOAT<em> · ON</em>':'FLOAT';$('wFloat').classList.toggle('on',!!document.pictureInPictureElement);$('wFloat').hidden=!document.pictureInPictureEnabled;{const f=document.querySelector('[data-w=full]');if(f)f.hidden=!document.fullscreenEnabled;}} /* only what this browser can do */ /* r27: the seven per-sound sliders are gone; MUSIC on the quick bar turns the music off */
 function wake(keep){if(BC)return;/* the mouse moved: show the few controls, then hide them again */
   if(!watch)return;$('wui').hidden=false;$('wui').classList.add('on');document.body.classList.add('ui');clearTimeout(uiT);if(!keep&&!uiKeep)uiT=setTimeout(()=>{if(document.activeElement===$('wObj')){wake();return;}$('wui').classList.remove('on');document.body.classList.remove('ui');},4000);}
-document.addEventListener('pointermove',()=>{if(watch&&(state==='watch'||state==='play'))wake();});
+document.addEventListener('pointermove',()=>{if(watch&&(state==='watch'||state==='play'))wake();});document.addEventListener('pointerdown',()=>{if(watch&&state==='watch')wake();}); /* r82: a tap brings the bar back (a finger makes no pointermove) */
 $('wui').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w;
   if(w==='next'){if(soundState()==='all')stationNext(3);wake();return;} /* r52 ⏭ */
   if(w==='focus25'){focusToggle();wake();return;}if(w==='float2'){floatWindow();wake();return;}if(w==='full'){fullToggle();wake();return;}if(w==='about'){aboutOpen(true);return;}
@@ -647,9 +653,12 @@ let DRV=0,drvT=0;function driftTick(){const pn=performance.now(),dt=Math.min(1,(
    LISTEN on an upright phone pans slowly along the whole ship, bow to stern and back, about two minutes a pass */
 let CAMV=null,camT=0;const CAM={wide:false,tip:false};window.__cam=CAM;
 const vw=t=>CAMV||CUT.view(P,TIMES,t);
-function camTarget(t){if(!document.body.classList.contains('phone')||!watch||BC||recording)return null;const W=CUT.W,H=CUT.H,por=document.body.classList.contains('portrait'),asp=stage.height/stage.width||9/16;
+function camTarget(t){if(!(document.body.classList.contains('phone')||document.body.classList.contains('tall'))||!watch||BC||recording)return null;const W=CUT.W,H=CUT.H,por=document.body.classList.contains('portrait'),asp=stage.height/stage.width||9/16;
   if(state==='play'&&!CAM.wide){let s=null;try{s=window.__eva||CUT.actorAt(P,TIMES,t,me);}catch(e){}if(!s)return null;const w=W/(por?2.3:1.8),h=w*asp;
     return [Math.max(0,Math.min(W-w,s.x-w/2)),Math.max(0,Math.min(H-h,s.y-40-h/2)),w,h];}
+  if(state==='watch'&&document.body.classList.contains('tall')){const gh=window.__ghost,a=stage.height/stage.width||16/9;
+    if(CAM.wide){const w=W,h=w*a;return [0,H/2-h/2,w,h];} /* pinched out: the whole ship, with sky above and below */
+    const h=Math.min(H,1230),w=h/a,gx=gh&&gh.on?gh.x:820,gy=gh&&gh.on?gh.y:700;return [Math.max(0,Math.min(W-w,gx-w/2)),Math.max(0,Math.min(H-h,gy-40-h/2)),w,h];}
   if(state==='watch'&&por){const w=W/1.7,h=w*asp,gh=window.__ghost; /* r63: an upright phone follows the ghost (she wanders by herself, so the camera does too) */
     if(gh&&gh.on)return [Math.max(0,Math.min(W-w,gh.x-w/2)),Math.max(0,Math.min(H-h,gh.y-40-h/2)),w,h];const u=.5-.5*Math.cos(performance.now()/1000*2*Math.PI/240);return [(W-w)*u,Math.max(0,Math.min(H-h,H*.5-h/2)),w,h];}
   return null;}
@@ -671,7 +680,7 @@ let hidT=0;document.addEventListener('visibilitychange',()=>{clearInterval(hidT)
 function frame(viaTimer){if(viaTimer!==true)requestAnimationFrame(frame);if(document.hidden&&!(viaTimer===true&&inPip()))return; /* r61 */
   driftTick();if(DT&&state!=='play'&&state!=='opening'&&state!=='route'&&state!=='deck')driftTone(0,0);pollPad();tickExterior();if(state==='opening')openingTick(now());const t=state==='title'||state==='registry'||(state==='controls'||state==='options')&&menuFrom==='title'||state==='setup'?(TIMES[1]?TIMES[1].start:0)+5+((performance.now()/1000-idle0)%24):now();
   if(state==='title'||state==='registry'||state==='setup'||(state==='controls'||state==='options')&&menuFrom==='title'){CUT.force('drift');LCV.render(t,{});CUT.force(null);if(DEV&&showMap)drawMap(t);return;}
-  camTick(t);if(CAMV)CUT.force(CAMV);LCV.render(t,{});if(CAMV)CUT.force(null);if(DEV&&showMap)drawMap(t);
+  camTick(t);if(CAMV)CUT.force(CAMV);LCV.render(t,document.body.classList.contains('tall')&&CAMV?{view:CAMV}:{});if(CAMV)CUT.force(null);if(DEV&&showMap)drawMap(t);
   if(story&&!watch&&(state==='play'||state==='opening'||state==='route'||state==='deck')){sfxTick(t);story.update();if(k9&&state==='play'){k9.update(t);if(events&&!resting)events.update(t);idleGlance(t);const r=CUT.roomAt(P,TIMES,t,me);if(r!==lastRoom){lastRoom=r;lastProgress=t;}}if(!(hudN%6))paintNotes();if(SCAN.found&&state==='play'){const p=CUT.actorAt(P,TIMES,t,me),k=Math.max(2,Math.round(stage.width/384)),R=SCAN.read(p.x,p.y);if(SCAN.tick(t,R)==='lock'){tuneReq=true;ping();}scanSound(R);if(scanVisible(t,R)){const c2=stage.getContext('2d');c2.save();c2.globalAlpha=scanA;SCAN.draw(c2,t,R,k,1);c2.restore();}}else scanSound(null);}else{tuneReq=false;scanSound(null);}
   if(recording&&(state==='play'||state==='watch')){layersOnto();recording.frame(Math.max(0,t-recording.t0));}
   else if(document.pictureInPictureElement&&watch)layersOnto();
