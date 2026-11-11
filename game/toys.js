@@ -41,7 +41,7 @@ const TOYS=ROOMS.map(r=>({id:'light-'+r,room:r,light:1,at:()=>lamp(r),label:()=>
  {id:'comms',room:'comms',at:up('c-console',78),label:()=>'COMMS',act:()=>comp('comms','squelch',['+0 screen comms.main waveform for 5s','+0 screen comms.wave signal for 5s','+0 screen comms.small signal-bars for 5s'],'HAILING · OPEN CHANNEL')},
  {id:'term',room:'crew-quarters',at:up('q-term',74),label:()=>'TERMINAL',act:()=>comp('term','teletype',['+0 screen quarters.terminal waveform for 5s','+0 screen quarters.monitor signal-bars for 5s'],null)},
  {id:'eterm',room:'engineering',at:up('e-term',74),label:()=>'ENGINEERING PANEL',act:()=>comp('eterm','typing',['+0 screen engineering.panel signal-bars for 4s','+0 screen engineering.load waveform for 4s'],null)},
- {id:'pumps',room:'service',at:up('sv-mid',70),label:()=>'SERVICE PUMPS',act(){if(S.busy.p)return null;S.busy.p=1;A.sfx('pumps',1);later(5500,()=>{S.busy.p=0;});return 'PUMPS CYCLING';}},
+ {id:'pumps',room:'service',at:()=>[1115,1066], /* r86: the pump housing east of the tank (the old spot is the tank's now) */label:()=>'SERVICE PUMPS',act(){if(S.busy.p)return null;S.busy.p=1;A.sfx('pumps',1);later(5500,()=>{S.busy.p=0;});return 'PUMPS CYCLING';}},
  {id:'beacon',room:'eva',at:()=>{const n=M.navlights&&M.navlights[M.navlights.length-1];return n?[n[0],n[1]+14]:up('eva-antenna',120)();},label:()=>'BEACON · '+(S.beacon?'ON':'OFF'),off:()=>!S.beacon,act(){S.beacon=!S.beacon;A.sfx(S.beacon?'switchon':'switchoff',1.6);if(S.beacon)later(200,()=>A.sfx('ping',.4));CUT.toy({beacon:S.beacon?1:0});return null;}},
  {id:'k9',room:'*',at:()=>{const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');return k?[k.x,k.y-50]:null;},label:()=>'SCOUT',hide:()=>{const r=CUT.report(G.P,G.TIMES,G.now()).k9;return !r||r==='GONE';},act(){A.chirp();return null;}}]);
 /* ---------- the reticle: four corner brackets and a dot, drawn in pixels ---------- */
@@ -76,6 +76,18 @@ let ptr=null,ptrT=0;const NEAR=80; /* r30: a reticle shows only near the pointer
 document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){hoverRoom=roomAtScreen(e.clientX,e.clientY);ptr=[e.clientX,e.clientY];ptrT=performance.now();}},{passive:true});
 scr.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){hoverRoom=null;ptr=null;}});
 document.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&!e.target.closest('.toy')){tapRoom=roomAtScreen(e.clientX,e.clientY);tapUntil=performance.now()+5000;ptr=[e.clientX,e.clientY];ptrT=performance.now();}},{passive:true,capture:true});
+/* r86 · NO MARKS, SAME SWITCHES. The reticles are gone (r77) and they were the buttons, so nothing could be switched. Now the thing itself
+   is the target: tap a lamp, the reactor, a console, the pumps, a hatch, the beacon, the bridge window, and it answers at once (the astronaut
+   still drifts over, but nothing waits on that). Scout, the bots, the loose objects and the tank answer for themselves (game/life.js). */
+const REACH={drive:120,bus:54,inner:60,outer:60,beacon:70};let dn=null;
+function toyAt(wx,wy){let best=null;for(const T of TOYS){if(T.id==='k9'||(T.hide&&T.hide()))continue;let w=null;try{w=T.at();}catch(e){}if(!w)continue;const d=Math.hypot(w[0]-wx,(w[1]-wy)*(T.light?1.5:1)),R=REACH[T.id]||(T.light?60:74);if(d<R&&(!best||d/R<best.k))best={T,k:d/R};}return best&&best.T;}
+function taken(wx,wy){try{const L=window.__life;if(L){const K=L.TANK;if(Math.abs(wx-K.x)<K.w/2+10&&wy>K.y-K.h-10&&wy<K.y+6)return true;for(const b of L.BOTS)if(Math.abs(wx-b.x)<44&&Math.abs(wy-(b.y-14))<40)return true;for(const f of L.FL)if(Math.hypot(f.x-wx,f.y-wy)<40)return true;}
+  const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');if(k&&Math.abs(wx-k.x)<46&&Math.abs(wy-(k.y-26))<44)return true;}catch(e){}return false;}
+document.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY,performance.now()];},{passive:true,capture:true});
+document.addEventListener('click',e=>{const d=dn;dn=null;if(G.state!=='watch'||G.now()<11.4||document.body.classList.contains('photo')||document.body.classList.contains('bc'))return;
+  const t=e.target;if(!t||!scr.contains(t)||(t.closest&&t.closest('button,a,.wui,.np,.about')))return;if(d&&(Math.hypot(e.clientX-d[0],e.clientY-d[1])>12||performance.now()-d[2]>600))return; /* a drag or a hold is leading the astronaut, not a tap */
+  const V=G.view(),r=scr.getBoundingClientRect(),wx=V[0]+(e.clientX-r.left)/r.width*V[2],wy=V[1]+(e.clientY-r.top)/r.height*V[3];if(taken(wx,wy))return;const T=toyAt(wx,wy);if(!T)return;
+  let m=null;try{m=T.act();}catch(_){}if(m){try{const el=document.querySelector('.toast');el&&el.classList.remove('jk');window.__gp&&__gp.toast(m,2.4);}catch(_){}}},true);
 /* held sounds stop when you leave the ship (title, pause, options) and come back when you return */
 let wasOn=false;
 function tick(){const st=G.state,on=(st==='play'||st==='watch')&&!document.body.classList.contains('photo')&&!document.body.classList.contains('bc');layer.hidden=!on;
@@ -140,6 +152,6 @@ function haunt(){if(window.__ghost)return; /* r63: she is always aboard now, not
     if(Math.random()<.6)setTimeout(()=>{if(A.watch())G.say('HOS',Math.random()<.5?'CREW: 3 · COUNT: 4':'OCCUPANCY: 4 · RECOUNT: 3',3);},6500);
     G.beat({at:D,hide:'deadscout'});setTimeout(()=>{haunting=false;},(D+1)*1000);}catch(e){haunting=false;}}
 setInterval(()=>{if(!A.watch()){nextHaunt=0;return;}const t=G.now();if(!nextHaunt){nextHaunt=t+480+Math.random()*720;return;}if(t>nextHaunt){nextHaunt=t+1500+Math.random()*2100;haunt();}},5000);
-window.__toys={mood,MOODS,S,TOYS,light,haunt,resume:()=>{},shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
+window.__toys={mood,MOODS,S,TOYS,toyAt,light,haunt,resume:()=>{},shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
   sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{applyLights();mixTo((LOOK[S.mood]||LOOK.drift).mix);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
 })();
