@@ -209,7 +209,7 @@ function compile(P,times){const key=P.rev!=null?'r'+P.rev+'/'+(PLAY.rev||0)+'/'+
     const posAt=(s,t)=>{if(s.k==='hold')return s.pos;const u=clamp((t-s.t0)/(s.t1-s.t0),0,1);return {a:s.ea,b:s.eb,f:s.f0+(s.f1-s.f0)*u};};
     const cut=t=>{/* a new command at t: stop where she is (finish a hoist ride), drop what was planned after */
       let i=S.length-1;while(i>0&&S[i].t0>t)i--;const s=S[i];if(s.k!=='walk')S.length=i+1; /* a walk is cut on its eased run, which needs the plan it was part of */
-      if(s.k==='walk'){let i0=i;while(i0>0&&S[i0-1].k==='walk'&&Math.abs(S[i0].t0-S[i0-1].t1)<1e-6)i0--;const {run:R}=mkRun(S,i0,CUTS),E=evalRun(R,t),q=E.lg.s,f=q.f0+(q.f1-q.f0)*E.fr;
+      if(s.k==='walk'){let i0=i;while(i0>0&&S[i0-1].k==='walk'&&Math.abs(S[i0].t0-S[i0-1].t1)<1e-6&&!CUTS.some(c=>Math.abs(c.t-S[i0].t0)<1e-6))i0--; /* r84: a run starts where an earlier command cut in; looking back past that put her at the earlier cut (Scout snapped back to the shaft) */const {run:R}=mkRun(S,i0,CUTS),E=evalRun(R,t),q=E.lg.s,f=q.f0+(q.f1-q.f0)*E.fr;
         S.length=E.lg.i+1;q.t1=t;q.f1=f;CUTS.push({t,v:E.v,d:R.d0+E.d,dir:R.dir});pos=f>=1?{a:q.eb,b:null,f:0}:f<=0?{a:q.ea,b:null,f:0}:{a:q.ea,b:q.eb,f};}
       else if(s.k==='hoist'){t=s.t1;pos={a:s.eb,b:null,f:0};}else if(s.k==='hold'){s.t1=t;pos=s.pos;}else{const p=posAt(s,t);s.t1=t;s.f1=p.f;pos=p.f>=1?{a:s.eb,b:null,f:0}:p.f<=0?{a:s.ea,b:null,f:0}:p;}
       for(let j=oev.length-1;j>=0;j--)if(oev[j].at>=t){const e=oev[j];const L=e.list,idx=L.indexOf(e.ev);if(idx>=0)L.splice(idx,1);oev.splice(j,1);}

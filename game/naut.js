@@ -110,7 +110,7 @@ function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exte
   if(pn>PR.bedAt){PR.bedAt=pn+4000;const n=G.isNight();if(n!==G.night){G.night=n;G.acts=0;if(!n&&G.asleep)wake();}}
   /* K9 keeps her company when it can reach her */
   if(pn>G.k9At){G.k9At=pn+6500;try{const k=CUT.actorAt(g.P,g.TIMES,g.now(),'k9');if(k&&!G.space&&!G.path.length&&!G.asleep){const r=roomAt(G.x,G.y-34),fl=r&&RINFO[r].floor;
-        if(fl&&r!=='eva'&&Math.abs(k.y-fl)<30&&Math.abs(k.x-G.x)>150&&window.K9NAV&&!K9NAV.busy()){const hit=CUT.pick(g.P,g.TIMES,g.now(),G.x-G.face*60,fl-40);if(hit&&hit.type==='place')K9NAV.go(hit.ref,{});}}}catch(e){}}}
+        if(fl&&r!=='eva'&&Math.abs(k.y-fl)<30&&Math.abs(k.x-G.x)>150&&!k.walk&&window.K9NAV&&!K9NAV.busy()){const hit=CUT.pick(g.P,g.TIMES,g.now(),G.x-G.face*60,fl-40);if(hit&&hit.type==='place')K9NAV.go(hit.ref,{});}}}catch(e){}}}
 /* HALCYON looks after her; it never asks anything of her.
    - a dim room warms while she is in it, and settles back a few seconds after she leaves (at night the quarters stay low for the sleepers)
    - doors slide open as she comes to them, and close behind her
