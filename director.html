@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Driftnaut Director</title>
-<meta name="description" content="The authoring desk behind Driftnaut: script the ship in Director JSON, watch it play on the HALCYON cutaway, generate a Night Watch, record a transmission.">
+<title>Adrift FM · Director</title>
+<meta name="description" content="The desk behind Adrift FM: build a clean broadcast link of the ship for OBS, for long videos and Shorts.">
 <meta name="theme-color" content="#06060a">
-<link rel="icon" href="favicon.png" type="image/png">
+<link rel="icon" href="favicon.png?v=2" type="image/png">
 <link rel="stylesheet" href="director.css?v=3">
 </head>
 <body>
 <header class="top">
-  <h1>DRIFT<span>NAUT</span> <small>DIRECTOR</small></h1>
-  <nav><a href="index.html">PLAY THE GAME ↗</a><a href="privacy.html">PRIVACY</a></nav>
+  <h1>ADRIFT <span>FM</span> <small>DIRECTOR</small></h1>
+  <nav><a href="index.html">THE SHIP ↗</a><a href="privacy.html">PRIVACY</a></nav>
 </header>
 <main class="desk">
   <section class="screen">
-    <div class="vscreen" id="vscreen"><canvas id="stage" width="960" height="540"></canvas><div class="vfd" id="vfd"><span id="vfdName">DRIFTNAUT</span><span id="vfdLoud"></span><span id="vfdTime">0:00 / 0:00</span></div></div>
+    <div class="vscreen" id="vscreen"><canvas id="stage" width="960" height="540"></canvas><div class="vfd" id="vfd"><span id="vfdName">ADRIFT FM</span><span id="vfdLoud"></span><span id="vfdTime">0:00 / 0:00</span></div></div>
     <div class="transport">
       <button type="button" id="tPlay">▶ PLAY</button><button type="button" id="tStop">■ STOP</button>
       <span class="chapters" id="tChapters"></span>
@@ -28,20 +28,21 @@
   </section>
   <section class="panes">
     <div class="pane bcast">
-      <h2>BROADCAST LINK <small class="sub">the live game in a clean window, for OBS</small></h2>
-      <div class="row"><label>MODE<select id="lMode"><option value="watch">NIGHT WATCH · AMBIENT</option><option value="play">GAMEPLAY</option></select></label></div>
-      <div class="row lw"><label>VIEW<select id="lView"><option value="full-ship">FULL SHIP</option><option value="bridge">BRIDGE</option><option value="engineering">ENGINEERING</option><option value="outer-hull">OUTER HULL</option><option value="auto">AUTO</option></select></label><label>MOOD<select id="lMood"><option value="quiet">QUIET</option><option value="routine">ROUTINE</option><option value="strange">STRANGE</option></select></label><label>MUSIC<select id="lMusic"></select></label></div>
-      <div class="row lw"><label>LENGTH<select id="lMins"><option>30</option><option selected>60</option><option>120</option><option>180</option><option>240</option><option>480</option><option value="600">ENDLESS</option></select> MIN</label><label>SEED<input id="lSeed" size="9" placeholder="random"></label><label><input type="checkbox" id="lSleep"> SLEEP FADE</label><label><input type="checkbox" id="lLabel"> LABEL</label></div>
-      <div class="row lp" hidden><label>CAMERA<select id="lCam"><option value="follow">FOLLOW HER · 9:16 SAFE</option><option value="ship">WHOLE SHIP</option></select></label></div>
+      <h2>BROADCAST LINK <small class="sub">the ship as it is now, in a clean window, for OBS</small></h2>
+      <div class="row"><label>FORMAT<select id="lFormat"><option value="long">LONG · 16:9 · 1920 × 1080 · WHOLE SHIP</option><option value="short">SHORT · 9:16 · 1080 × 1920 · STAYS WITH THE ASTRONAUT</option></select></label></div>
+      <div class="row"><label>SCENE<select id="lScene"></select></label><label>MUSIC<select id="lMusic"></select></label></div>
+      <div class="row"><label>PACE<select id="lPace"><option value="calm">CALM · AS ON THE SITE</option><option value="lively">LIVELY · MORE HAPPENS</option></select></label><label>OPENING<select id="lIntro"><option value="1">STORY CAPTIONS · 13 S</option><option value="0">STRAIGHT IN</option></select></label></div>
+      <div class="row"><label>SEED<input id="lSeed" size="9" placeholder="random"></label><label><input type="checkbox" id="lSleep"> FADE OUT OVER 30 MIN</label><label><input type="checkbox" id="lLabel"> LABEL</label></div>
       <input id="lUrl" readonly class="lurl">
-      <div class="row btns"><button type="button" id="lOpen">OPEN IN A NEW WINDOW</button><button type="button" id="lCopy">COPY LINK</button></div>
+      <div class="row btns"><button type="button" id="lOpen">OPEN A PREVIEW WINDOW</button><button type="button" id="lCopy">COPY LINK</button></div>
       <p class="hint" id="lHint"></p>
     </div>
+    <p class="hint old">Below is the older scripting desk (crew episodes and Night Watch scripts). It still works but is not part of the ship as it is now; for videos, use the broadcast link above.</p>
     <div class="pane">
       <h2>PROJECT</h2>
       <div class="row"><label>TITLE<input id="pName" maxlength="60"></label><label>YEAR<input id="pYear" maxlength="6" size="6"></label><label>LENGTH<select id="pLen"><option>30</option><option>45</option><option>60</option><option>75</option><option>90</option><option>120</option><option>180</option><option>240</option></select> MIN</label><label>SEED<input id="pSeed" size="8"><button type="button" id="pReseed">↻</button></label></div>
       <div class="row"><label>STYLE<select id="pStyle"></select></label><label>TAPE<select id="pTape"></select></label><label>VIBE<select id="pVibe"><option value="calm">CALM</option><option value="cruising">CRUISING</option><option value="driving">DRIVING</option><option value="dark">DARK</option></select></label><label>DRUMS<select id="pDrums"><option>low</option><option>mid</option><option>high</option></select></label><label>SYNTH<select id="pSynth"><option>low</option><option>mid</option><option>high</option></select></label><label>AMBIENCE<select id="pAmb"><option>low</option><option>mid</option><option>high</option></select></label></div>
-      <div class="row"><label>INTRO<select id="pIntro"><option value="halcyon">HALCYON OPEN · 13 S</option><option value="1">CARD · 2.6 S</option><option value="0">OFF</option></select></label><label>OUTRO<select id="pOutro"><option value="card">END CARD</option><option value="fade">FADE TO BLACK</option><option value="0">HARD CUT</option></select></label></div>
+      <div class="row"><label>INTRO<select id="pIntro"><option value="halcyon">HALCYON OPEN · 8 S</option><option value="1">CARD · 2.6 S</option><option value="0">OFF</option></select></label><label>OUTRO<select id="pOutro"><option value="card">END CARD</option><option value="fade">FADE TO BLACK</option><option value="0">HARD CUT</option></select></label></div>
       <div class="row btns"><button type="button" id="bGame">LOAD THE GAME'S OPENING</button><button type="button" id="bEpisode">LOAD THE SIGNAL (60 MIN)</button><label class="file">OPEN MANIFEST<input type="file" id="bOpen" accept=".json,application/json" hidden></label><button type="button" id="bExport">EXPORT MANIFEST</button></div>
       <div class="row"><span class="l">NIGHT WATCH</span><select id="nwView"><option value="full-ship">FULL SHIP</option><option value="bridge">BRIDGE</option><option value="engineering">ENGINEERING</option><option value="outer-hull">OUTER HULL</option><option value="auto">AUTO WATCH</option></select><select id="nwAct"><option value="quiet">QUIET</option><option value="routine" selected>ROUTINE</option><option value="strange">STRANGE</option></select><select id="nwLen"><option>30</option><option>60</option><option>120</option><option>180</option><option>240</option></select><button type="button" id="nwMake">GENERATE</button></div>
       <div class="row" hidden><span class="l">BROADCAST</span><label>PROFILE<select id="bProfile"><option value="focus">FOCUS</option><option value="sleep">SLEEP · CALM</option></select></label><label>LOUDNESS<select id="bLoud"><option value="-14">−14 LUFS · YOUTUBE</option><option value="-16">−16 LUFS</option><option value="-18">−18 LUFS</option><option value="off">AS MIXED</option></select></label><label>FILES<select id="bParts"><option value="0">ONE FILE</option><option value="60">1-HOUR PARTS</option><option value="120">2-HOUR PARTS</option></select></label><label>CARDS<select id="bCards"><option value="all">TITLE + CHAPTERS</option><option value="title">TITLE</option><option value="none">NONE</option></select></label></div>
@@ -78,10 +79,10 @@
 <script src="episode.js?v=3"></script>
 <script src="episodes/default.js?v=7"></script>
 <script src="story/halcyon.js?v=13"></script>
-<script src="watch.js?v=20"></script>
-<script src="lc.js?v=15"></script>
+<script src="watch.js?v=21"></script>
+<script src="lc.js?v=16"></script>
 <script src="loud.js?v=2"></script>
 <script src="rec.js?v=9"></script>
-<script src="director.js?v=7"></script>
+<script src="director.js?v=9"></script>
 </body>
 </html>

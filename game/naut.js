@@ -56,7 +56,7 @@ function plan(tx,ty,slow){const cur=G.space?null:roomAt(G.x,G.y-34);let room=roo
   /* ease into the sharp turns (the shaft, a door at a height) so she never clips a corner */
   let px=G.x,py=G.y;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],d1=Math.hypot(a.x-px,a.y-py)||1,d2=Math.hypot(b.x-a.x,b.y-a.y)||1;a.turn=((a.x-px)*(b.x-a.x)+(a.y-py)*(b.y-a.y))/(d1*d2)<.6;px=a.x;py=a.y;}
   G.path=P;}
-G.go=(x,y,slow)=>plan(x,y,slow);G.api={NODES,NROOM,RINFO,route,roomAt,rnd,clamp,pick,active:()=>active(),pois:()=>pois(),mark:(a,kind)=>PR.marks.push({a,t:performance.now(),kind}),hold:ms=>{PR.at=performance.now()+ms;}};G.under=[];
+G.go=(x,y,slow)=>plan(x,y,slow);G.suitFrame=fr=>suit(fr); /* r87: the site's icons are drawn from the suit itself */G.api={NODES,NROOM,RINFO,route,roomAt,rnd,clamp,pick,active:()=>active(),pois:()=>pois(),mark:(a,kind)=>PR.marks.push({a,t:performance.now(),kind}),hold:ms=>{PR.at=performance.now()+ms;}};G.under=[];
 let POI=null;function pois(){if(POI)return POI;POI=[];try{const O=M.objects;for(const k in O){const o=O[k];if(!o.spot)continue;let p=null;try{p=CUT.place(o.spot);}catch(e){}if(p&&p.x!=null&&!POI.some(q=>q.x===p.x&&q.y===p.y))POI.push({id:k,x:p.x,y:p.y});}}catch(e){}return POI;}
 function active(){const g=GP();return !!(g&&g.state==='watch'&&g.watch);}
 /* HALCYON speaks seldom: never twice in five minutes */
@@ -64,6 +64,7 @@ const HAL={at:-1e9,said:{}};function halcyon(text,key,pn){pn=pn||performance.now
 /* her own watch, when nobody is steering */
 function wander(pn,g){const acts=[['poi',3],['window',4],['k9',2],['table',1],['out',G.space?0:1.2]];if(pn>(G.plantAt||0))acts.push(['plant',2.2]);if(pn>G.mug)acts.push(['cocoa',2.4]);if(G.acts>=3&&!G.night)acts.push(['bed',.9]);if(G.night&&G.acts>=2)acts.push(['bed',9]);G.acts++;let tot=acts.reduce((s,a)=>s+a[1],0),u=Math.random()*tot,kind='poi';for(const [k,w] of acts){u-=w;if(u<=0){kind=k;break;}}
   if(G.act&&G.act.next){kind=G.act.next;}
+  const intro=G.intro;if(intro===0){kind=document.body.classList.contains('tall')?'k9':'window';G.intro=1;} /* on an upright phone the camera stays in the room, so the astronaut stays with Scout */else if(intro===1){kind='cocoa';G.intro=2;} /* r88 · THE FIRST MINUTE, hands off: the lamps come up, Scout trots over, the astronaut goes up to the bridge window for a look, then makes a cocoa. A tap ends it (send) */
   let tx,ty,stay=rnd(14,30),face=0;
   if(kind==='window'){const w=pick([[227,552,-1],[1168,552,-1]]);tx=w[0]+18;ty=w[1]-rnd(6,40);face=w[2];stay=rnd(90,180);} /* a long look: nothing has to happen */
   else if(kind==='cocoa'){const p=CUT.place('comms.shelf');tx=p.x+34;ty=p.y-HOV;face=-1;stay=13;} /* made with care: steam, a wait, more steam, then the cup */
@@ -73,7 +74,7 @@ function wander(pn,g){const acts=[['poi',3],['window',4],['k9',2],['table',1],['
   else if(kind==='bed'){tx=BUNK[0]+24;ty=BUNK[1]-HOV;face=-1;stay=1e7;}
   else if(kind==='out'){tx=2131;ty=1116-HOV;face=1;stay=rnd(40,75);}
   if(kind==='poi'){const L=pois();const p=L.length?pick(L):{x:rnd(300,1900),y:846};tx=p.x+rnd(-36,36);ty=p.y-rnd(6,60);}
-  G.act={kind,stay,face};plan(tx,ty,true);}
+  if(intro===0)stay=kind==='k9'?14:9;G.act={kind,stay,face};plan(tx,ty,true);}
 function arrived(pn,g){const a=G.act;
   if(a){G.wanderAt=pn+a.stay*1000;G.last=pn-30000;if(a.face)G.face=a.face;
     if(a.kind==='cocoa'){PR.steam={x:G.x-34,y:G.y-54,t:pn};PR.steamAt=pn;try{g.sfx('valve',G.x,.4);}catch(e){}G.mugFrom=pn+7000;G.mug=pn+170000;setTimeout(()=>{if(G.on&&!G.path.length)PR.steam={x:G.x-34,y:G.y-54,t:performance.now()};},5200);G.act={next:'window'};return;}
@@ -85,8 +86,10 @@ function arrived(pn,g){const a=G.act;
   for(const p of pois()){if(Math.hypot(p.x-G.x,(p.y-40)-(G.y-36))<56){let h=0;for(const c of p.id)h=(h*31+c.charCodeAt(0))>>>0;const b=h%5,sh=[[0,2,4],[4,2,3],[0,3,2],[2,4,5],[1,3,5],[4,5,2]][(h>>3)%6];
       try{g.hero('touch',{i:sh.map(v=>b+v),v:.42,voice:'rhodes',gap:.17});}catch(e){}try{window.__town&&__town.ring(p.x,p.y-36,'#ff9a3c',1.2,30);}catch(e){}break;}}}
 function tick(dt,pn){const g=GP();if(!active()){if(G.on){G.on=false;try{CUT.exterior(null);}catch(e){}}return;}
-  if(!G.on){G.on=true;G.t0=pn;G.wanderAt=pn+26000;G.last=pn;hint();WK={t0:pn,st:0};PR.k9=pn-45000+17000;G.act={next:'cocoa'};G.star=pn+72000;try{CUT.toy({drive:.06,dv:.06});}catch(e){} /* r68: asleep from the very first frame, so the running engines never flash before the spool */try{g.P.script.push({at:g.now(),hide:'deadscout'});g.P.rev++;}catch(e){}}
-  if(!G.path.length&&pn-G.last>24000&&pn>G.wanderAt){G.wanderAt=pn+20000;try{wander(pn,g);}catch(e){}}
+  if(!G.on){G.on=true;G.t0=pn;G.wanderAt=pn+12500;G.last=pn;G.intro=0;hint();WK={t0:pn,st:0};PR.k9=pn-45000+17000;G.act={next:'cocoa'};G.star=pn+72000;try{CUT.toy({drive:.06,dv:.06});}catch(e){} /* r68: asleep from the very first frame, so the running engines never flash before the spool */try{g.P.script.push({at:g.now(),hide:'deadscout'});g.P.rev++;}catch(e){}
+    /* r88: Scout starts on its cushion in the cabin, beside the astronaut, as on the welcome picture (it used to start in engineering and take ten seconds to arrive, out of sight on a phone) */
+    try{const k=CUT.actorAt(g.P,g.TIMES,g.now(),'k9');if(k&&Math.abs(k.y-846)<30&&Math.abs(k.x-G.x)>300){const hit=CUT.pick(g.P,g.TIMES,g.now(),1000,806);if(hit&&hit.type==='place'){g.P.script.push({at:g.now(),move:'k9',to:hit.ref,teleport:true,interrupt:true});g.P.rev++;}}}catch(e){}}
+  if(!G.path.length&&(pn-G.last>24000*((window.__bc&&__bc.pace)||1)||(G.intro<2&&pn-G.last>11000))&&pn>G.wanderAt){G.wanderAt=pn+20000*((window.__bc&&__bc.pace)||1);try{wander(pn,g);}catch(e){}}
   const wp=G.path[0];
   if(wp){if(wp.space&&!G.space){G.space=true;}
     const dx=wp.x-G.x,dy=wp.y-G.y,d=Math.hypot(dx,dy),fin=G.path.length===1,top=G.space?(G.slow?46:84):(G.slow?62:160),sp=Math.hypot(G.vx,G.vy);
@@ -219,21 +222,17 @@ CUT.behind&&CUT.behind((x,t,SS)=>{if(!active()||G.calm)return;const q=(SS||2)*2,
   if(G.star&&pn>G.star){const u=(pn-G.star)/1400;if(u>1)G.star=0;else streak(x,q,CUT.W*.2,CUT.H*.03,1,520,u);} /* the one every visit gets, a little over a minute in */
   if(G.shower){const e=(pn-G.shower)/1000;if(e>9)G.shower=0;else for(let i=0;i<11;i++){const u=(e-i*.62-CUT._hash(i,7301)*.4)/1.2;if(u<0||u>1)continue;streak(x,q,CUT.W*(.05+.9*CUT._hash(i,7302)),CUT.H*(CUT._hash(i,7303)<.6?.01+.11*CUT._hash(i,7304):.87+.08*CUT._hash(i,7304)),-1,260+200*CUT._hash(i,7305),u);}}});
 /* input: one verb. The arrow keys are the same verb in steps */
-let noteAt=0;function send(tx,ty){const pn=performance.now();wake();G.act=null;G.last=pn;if(!G.found){G.found=true;try{localStorage.setItem('driftnaut.found','1');}catch(e){}}
+let noteAt=0;function send(tx,ty){const pn=performance.now();wake();G.act=null;G.last=pn;G.sentAt=pn;G.intro=2;if(!G.found){G.found=true;try{localStorage.setItem('driftnaut.found','1');}catch(e){}}
   if(pn-noteAt>110){noteAt=pn;const i=Math.round(clamp(1-((ty-34)-230)/(1180-230),0,1)*9);try{GP().hero('touch',{i,v:.5});}catch(e){}} /* higher up the ship, higher in pitch */
-  plan(tx,ty,false);const f=G.path[G.path.length-1];try{window.__town&&f&&__town.ring(f.x,f.y-34,'#e9d7c2',.8,22);}catch(_){}}
+  plan(tx,ty,false);const f=G.path[G.path.length-1];try{window.__town&&f&&__town.ring(f.x,f.y-34,'#e9d7c2',.8,22);}catch(_){}G.dest=f&&Math.hypot(f.x-G.x,f.y-G.y)>260?{x:f.x,y:f.y-34,t:pn}:null;} /* r88: a longer walk keeps a small marker where it ends */
 const DIR={ArrowLeft:[-230,0],ArrowRight:[230,0],ArrowUp:[0,-290],ArrowDown:[0,290]};
-addEventListener('keydown',e=>{if(!active()||!DIR[e.code]||e.metaKey||e.ctrlKey||e.altKey)return;e.preventDefault();if(e.repeat)return;const f=G.path[G.path.length-1]||G,d=DIR[e.code];send(f.x+d[0],f.y+d[1]);},true);
-addEventListener('pointerdown',e=>{if(!active())return;const t=e.target;if(t!==stage&&!(t.closest&&t.closest('.toy')))return;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw();
-  send(V[0]+(e.clientX-r.left)/r.width*V[2],V[1]+(e.clientY-r.top)/r.height*V[3]+34);G.lead=e.pointerType!=='touch'?performance.now():0;},true);
+addEventListener('keydown',e=>{if(!active()||!DIR[e.code]||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target&&e.target.closest&&e.target.closest('.fm,.ab'))return; /* r88: arrows on the volume slider are the slider's */e.preventDefault();if(e.repeat)return;const f=G.path[G.path.length-1]||G,d=DIR[e.code];send(f.x+d[0],f.y+d[1]);},true);
 /* r78: hold and move. With the button held, the astronaut follows the pointer; let go and the astronaut stays. (Not following a pointer
    that is merely moving: this is a window left open on a desk, and the mouse has other places to be. Touch keeps to taps, because a
    finger dragged on a phone moves the camera) */
-addEventListener('pointermove',e=>{if(!G.lead||!(e.buttons&1)||!active())return;const pn=performance.now();if(pn-G.lead<150)return;G.lead=pn;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw();G.act=null;G.last=pn;plan(V[0]+(e.clientX-r.left)/r.width*V[2],V[1]+(e.clientY-r.top)/r.height*V[3]+34,false);},true);
-addEventListener('pointerup',()=>{G.lead=0;},true);addEventListener('pointercancel',()=>{G.lead=0;},true);
-/* r78: discovery first. The line is shown once, 24 seconds in, only to a visitor who has never clicked the ship */
-function hint(){let done=false;try{done=!!localStorage.getItem('driftnaut.found');}catch(e){}if(done)return;setTimeout(()=>{if(!active()||G.found)return;
-  GP().toast((window.matchMedia&&matchMedia('(pointer: coarse)').matches?'TAP ANYWHERE TO EXPLORE':'CLICK ANYWHERE TO EXPLORE'),8);},24000);}
+/* r88: the pointer is read in one place now (game/tap.js): it decides whether a tap is for an object or for the floor, and calls these */
+G.send=(x,y)=>send(x,y);G.leadTo=(x,y)=>{G.act=null;G.last=performance.now();plan(x,y,false);};G.waking=()=>!!WK;G.roomReady=r=>!WK||(WK.st===3&&WK.order&&WK.order.indexOf(r)>-1&&WK.order.indexOf(r)<WK.i);
+function hint(){} /* r88: the first-visit line is shown by game/fm.js the moment the ship can be touched */
 let last=0;function loop(now){requestAnimationFrame(loop);const dt=Math.min(.12,(now-(last||now))/1000);last=now;if(document.hidden)return;try{tick(dt,now);}catch(e){}}
 requestAnimationFrame(loop);
 })();

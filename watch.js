@@ -131,10 +131,10 @@ function manifest(cfg){cfg=Object.assign({},DEFAULTS,cfg||{});if(cfg.seed==null)
     cutaway:{ship:'deadscout-2',v3:true,era:cfg.era==='2291'?'past':'present',start:Object.assign({deadscout:(SCENES[cfg.scene]&&SCENES[cfg.scene].spot)||'quarters.table'},HOME),rooms:cfg.era==='2291'?undefined:{bridge:'powered',sensor:'powered','upper-access':'powered',comms:'powered','crew-quarters':'powered','central-shaft':'powered',engineering:'powered',service:'powered','lower-access':'powered',airlock:'powered'}},
     music:{mode:'generated',style:mu.style,tape:mu.tape,vibe:mu.vibe,drums:mu.drums,synth:mu.synth,ambience:mu.ambience},
     chapters:Array.from({length:n},(_,k)=>({title:'WATCH '+(k+1),role:'ROUTINE',energy:cfg.activity==='quiet'?.22:cfg.activity==='strange'?.4:cfg.activity==='busy'?.36:.32,beat:'The ship on its night watch.',story_mode:'EXPLORE',traffic:'off',nominal_minutes:per,beats:[]})),
-    events:(EV=schedule(cfg)),props:EV.props,ending:{type:'resolved',outro:'fade'},publish:{title:title(cfg),subtitle:'DSV HALCYON • '+mu.name+' • Living Spaceship • Ambient',series:'Driftnaut Night Watch',ship:'DSV HALCYON',registry:'DSV-0417'}};}
+    events:(EV=schedule(cfg)),props:EV.props,ending:{type:'resolved',outro:'fade'},publish:{title:title(cfg),subtitle:'DSV HALCYON • '+mu.name+' • Living Spaceship • Ambient',series:'Adrift FM',ship:'DSV HALCYON',registry:'DSV-0417'}};}
 function title(cfg){cfg=Object.assign({},DEFAULTS,cfg||{});const A=ACTIVITY[cfg.activity]||ACTIVITY.routine,mu=MUSIC[cfg.music||(SCENES[cfg.scene]&&SCENES[cfg.scene].music)||A.music]||MUSIC.drift,V=VIEWS[cfg.view]||VIEWS['full-ship'],mins=+cfg.duration_minutes||30;
   const dur=mins>=300?'ENDLESS':mins>=120?Math.round(mins/60)+' HOURS':mins>=60?'1 HOUR':mins+' MINUTES';
-  const where='DRIFTNAUT // '+(SCENES[cfg.scene]?SCENES[cfg.scene].name:'NIGHT WATCH');
+  const where='ADRIFT FM // '+(SCENES[cfg.scene]?SCENES[cfg.scene].name:'NIGHT WATCH');
   const tail={quiet:'A SHIP AT REST · DEEP SPACE AMBIENT',busy:'BUSY TOWN ON A LIVING SPACESHIP',strange:'FAINT SIGNALS ON A QUIET SHIP'}[cfg.activity]||'SPACE CHILL FOR FOCUS & STUDY';
   return where+' · '+dur+' · '+mu.name+' TAPE · '+tail;}
 window.NW={manifest,schedule,title,VIEWS,SCENES,ACTIVITY,MUSIC,DEFAULTS,STORYLETS,STRANGE};

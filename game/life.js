@@ -64,7 +64,7 @@ function flDraw(x,f,u,pn){const a=Math.round(u*1.5),X=Math.round(f.x/a)*a,Y=Math
   else if(f.kind==='ball'){x.fillStyle=INK;x.fillRect(X-3*a,Y-2*a,6*a,4*a);x.fillRect(X-2*a,Y-3*a,4*a,6*a);x.fillStyle='#7ee3e5';x.fillRect(X-2*a,Y-2*a,4*a,4*a);x.fillStyle='#d8fff0';x.fillRect(X-a,Y-2*a,a,a);x.fillStyle='#1fb4ce';x.fillRect(X-2*a,Y+a,4*a,a);}
   else{const v=Math.floor(pn/2600+f.x*.01)%2;x.fillStyle=INK;if(v){x.fillRect(X-2*a,Y-5*a,4*a,10*a);x.fillStyle='#9aa0a6';x.fillRect(X-a,Y-4*a,2*a,8*a);x.fillStyle=INK;x.fillRect(X-a+ (a>>1),Y-4*a,a,2*a);}else{x.fillRect(X-5*a,Y-2*a,10*a,4*a);x.fillStyle='#9aa0a6';x.fillRect(X-4*a,Y-a,8*a,2*a);x.fillStyle=INK;x.fillRect(X+2*a,Y-a+(a>>1),2*a,a);}}}
 /* ---- Scout's own life: now and then, the ball ---- */
-let scoutAt=0;function scout(pn,g){if(pn<scoutAt)return;scoutAt=pn+rnd(38000,70000);fetch(g);}
+let scoutAt=0;function scout(pn,g){if(pn<scoutAt)return;scoutAt=pn+rnd(38000,70000)*PACE;fetch(g);}
 function fetch(g){const b=FL.find(f=>f.kind==='ball');if(!b||!window.K9NAV)return false;try{if(K9NAV.busy())return false;const fl=RINFO[b.room].floor,hit=CUT.pick(g.P,g.TIMES,g.now(),b.x,fl-40);if(hit&&hit.type==='place'){K9NAV.go(hit.ref,{});return true;}}catch(e){}return false;}
 /* ---- surprises ---- */
 function dip(){const T=CUT.toy({}),lv={},low={};for(const r in RINFO){lv[r]=T.room[r]==null?1:T.room[r];low[r]=Math.min(lv[r],.18);}CUT.toy({room:low});A.hold(8000);
@@ -87,9 +87,9 @@ const POOL={
     if(!G.path.length&&!G.asleep&&!G.space&&performance.now()-G.last>12000){G.act={kind:'poi',stay:5,face:0};G.go(b.x-44,b.y-6,true);}return true;},
   dip:()=>{dip();setTimeout(()=>scoutSay('worried'),500);setTimeout(()=>scoutSay('happy'),5200);return true;},
   bloom:()=>{setTimeout(()=>scoutSay('curious'),1500);TANK.bloom=performance.now()+26000;note({i:[0,2,4,5,7],v:.34,voice:'rhodes',gap:.2});return true;}};
-let nextAt=0,lastKind='',wasOn=false;
-function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower')&&!(G.calm&&k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(140000,240000);}
-function tick(dt,pn){const g=GP();if(!A.active()||!G.on){wasOn=false;return;}if(!wasOn){wasOn=true;nextAt=pn+108000;scoutAt=pn+52000;}
+const PACE=(window.__bc&&__bc.pace)||1; /* r87: a broadcast can ask for more to happen (the Director's LIVELY) */let nextAt=0,lastKind='',wasOn=false;
+function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower')&&!(G.calm&&k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(140000,240000)*PACE;}
+function tick(dt,pn){const g=GP();if(!A.active()||!G.on){wasOn=false;return;}if(!wasOn){wasOn=true;nextAt=pn+52000*PACE; /* r88: the first surprise inside the first minute */scoutAt=pn+52000*PACE;}
   for(const b of BOTS){botTick(b,dt,pn);if(b.stuck&&!G.space&&Math.hypot(b.x-G.x,b.y-G.y)<80&&pn-b.stuck>1500)free(b,pn);}
   for(const f of FL)try{flTick(f,dt,g);}catch(e){}
   try{scout(pn,g);}catch(e){}surprise(pn);try{comedy(pn,g);}catch(e){}}
@@ -142,15 +142,26 @@ let jBag=[],jokeAt=0,nearSince=0,soloAt=0;
 function rimshot(){let a=null;try{a=window.__game.audio();}catch(e){}note({i:[0,0],v:.3,voice:'rhodes',gap:.11});if(!a||!a.ctx)return;try{const c=a.ctx,t=c.currentTime+.3,n=Math.floor(c.sampleRate*.3),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
     const src=c.createBufferSource(),hp=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;hp.type='highpass';hp.frequency.value=5200;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.028,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.28);src.connect(hp);hp.connect(g);g.connect(a.out);src.start(t);src.stop(t+.3);}catch(e){}}
 function joke(pn){if(pn<jokeAt)return false;if(!jBag.length){jBag=JOKES.map((_,i)=>i);for(let i=jBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jBag[i],jBag[j]]=[jBag[j],jBag[i]];}}
-  const q=JOKES[jBag.pop()],secs=3.2+q.length*.045;jokeAt=pn+secs*1000+600;soloAt=pn+rnd(70000,120000);TANK.dart=pn+700;try{GP().toast(q,secs);const el=document.querySelector('.toast');if(el){el.classList.add('jk');clearTimeout(joke.t);joke.t=setTimeout(()=>el.classList.remove('jk'),secs*1000+500);}}catch(e){} /* jk: shown at the top, so the caption never covers the tank it comes from */
+  const q=JOKES[jBag.pop()],secs=3.2+q.length*.045;jokeAt=pn+secs*1000+600;soloAt=pn+rnd(70000,120000)*PACE;TANK.dart=pn+700;try{GP().toast(q,secs);const el=document.querySelector('.toast');if(el){el.classList.add('jk');clearTimeout(joke.t);joke.t=setTimeout(()=>el.classList.remove('jk'),secs*1000+500);}}catch(e){} /* jk: shown at the top, so the caption never covers the tank it comes from */
   setTimeout(()=>{if(!A.active())return;TANK.dart=performance.now()+1600;rimshot();if(Math.random()<.35)setTimeout(()=>scoutSay('happy',true),900);},Math.min(secs-1.2,1.6+q.length*.03)*1000);return true;}
-setInterval(()=>{const pn=performance.now();if(!A.active()||!G.on||document.hidden||G.asleep||G.space){nearSince=0;return;}const near=Math.abs(G.x-TANK.x)<170&&Math.abs(G.y-TANK.y)<150&&!G.path.length;if(!near){nearSince=0;return;}if(!nearSince)nearSince=pn;if(pn-nearSince>5000&&pn>soloAt)joke(pn);},1000);
+setInterval(()=>{const pn=performance.now();if(!A.active()||!G.on||document.hidden||G.asleep||G.space){nearSince=0;return;}const near=Math.abs(G.x-TANK.x)<170&&Math.abs(G.y-TANK.y)<150&&!G.path.length;if(!near){nearSince=0;return;}if(!nearSince)nearSince=pn;if(pn-nearSince>5000&&pn>soloAt&&G.sentAt&&pn-G.sentAt<90000)joke(pn); /* r88: no text nobody asked for: only when the visitor sent the astronaut to the tank */},1000);
 /* a click on any of them is answered */
-addEventListener('pointerdown',e=>{if(!A.active())return;const t=e.target;if(t!==stage&&!(t.closest&&t.closest('.toy')))return;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw(),wx=V[0]+(e.clientX-r.left)/r.width*V[2],wy=V[1]+(e.clientY-r.top)/r.height*V[3],pn=performance.now();
-  {const k=scoutPos();if(k&&Math.abs(wx-k.x)<46&&Math.abs(wy-(k.y-26))<44){scoutSay('happy');A.mark('k9','heart');return;}}
-  for(const b of BOTS)if(Math.abs(wx-b.x)<44&&Math.abs(wy-(b.y-14))<40){if(b.stuck)free(b,pn);else{b.spin=pn+700;note({i:[5,7],v:.36,gap:.1});}return;}
-  for(const f of FL){const dx=f.x-wx,dy=f.y-wy,d=Math.hypot(dx,dy);if(d<40){f.vx=dx/(d||1)*60+rnd(-10,10);f.vy=dy/(d||1)*60-10;note({i:[4,6],v:.34,gap:.1});return;}}
-  if(Math.abs(wx-TANK.x)<TANK.w/2+10&&wy>TANK.y-TANK.h-10&&wy<TANK.y+6){if(!joke(pn)){TANK.dart=pn+2600;note({i:[2,4,7],v:.36,voice:'rhodes',gap:.14});}}},true);
-window.__life={BOTS,TANK,FL,JOKES,joke:()=>joke(performance.now()),say:scoutSay,fire:k=>{try{return POOL[k]();}catch(e){return String(e);}},kinds:Object.keys(POOL)};
+/* r88 · ONE DECISION PER TAP. Nothing here listens to the pointer any more: game/tap.js asks hit() what is under a point and runs what comes back.
+   pad widens the targets for a finger. Scout, the tank and the cabin lamp also have real buttons over them (hover, focus, a name): see tap.js */
+let PETAT=0;
+function pet(){const pn=performance.now();PETAT=pn;scoutSay('happy');A.mark('k9','heart');}
+function tankTap(){const pn=performance.now();TANK.rip=pn;if(!joke(pn)){TANK.dart=pn+2600;note({i:[2,4,7],v:.36,voice:'rhodes',gap:.14});}}
+function hit(wx,wy,pad){pad=pad||0;const pn=performance.now();
+  {const k=scoutPos();if(k&&Math.abs(wx-k.x)<46+pad&&Math.abs(wy-(k.y-26))<44+pad)return {kind:'scout',act:pet};}
+  for(const b of BOTS)if(Math.abs(wx-b.x)<44+pad*.5&&Math.abs(wy-(b.y-14))<40+pad*.5)return {kind:'bot',act:()=>{if(b.stuck)free(b,performance.now());else{b.spin=performance.now()+700;note({i:[5,7],v:.36,gap:.1});}}};
+  for(const f of FL){const dx=f.x-wx,dy=f.y-wy,d=Math.hypot(dx,dy);if(d<40+pad*.5)return {kind:'floater',act:()=>{f.vx=dx/(d||1)*60+rnd(-10,10);f.vy=dy/(d||1)*60-10;note({i:[4,6],v:.34,gap:.1});}};}
+  if(Math.abs(wx-TANK.x)<TANK.w/2+10+pad*.4&&wy>TANK.y-TANK.h-10-pad*.4&&wy<TANK.y+6+pad*.4)return {kind:'tank',act:tankTap};
+  return null;}
+/* what a touch looks like: Scout wags (a few quick marks over the back), the tank's glass ripples */
+G.under.push((x,t,u,pn)=>{const a=u;
+  if(TANK.rip&&pn-TANK.rip<1100){const k=(pn-TANK.rip)/1100,T=TANK,cx=T.x,cy=T.y-T.h/2;x.save();x.beginPath();x.rect(T.x-T.w/2,T.y-T.h,T.w,T.h);x.clip();x.globalAlpha=(1-k)*.85;x.fillStyle='#bff3f0';
+    for(const j of [0,.28]){const kk=k-j;if(kk<=0)continue;const w=Math.round((10+kk*T.w*.62)/a)*a,h=Math.round((8+kk*T.h*.62)/a)*a;x.fillRect(cx-w,cy-h,2*w,a);x.fillRect(cx-w,cy+h,2*w,a);x.fillRect(cx-w,cy-h,a,2*h);x.fillRect(cx+w-a,cy-h,a,2*h);}x.restore();}
+  if(PETAT&&pn-PETAT<1000){const k=scoutPos();if(k){const ph=Math.floor((pn-PETAT)/110)%2;x.globalAlpha=1-(pn-PETAT)/1000*.6;x.fillStyle='#f6efe4';for(const sx of [-1,1]){const bx=k.x+sx*(34+ph*4),by=k.y-44-ph*4;x.fillRect(Math.round(bx/a)*a,Math.round(by/a)*a,2*a,a);x.fillRect(Math.round((bx+sx*6)/a)*a,Math.round((by+8)/a)*a,2*a,a);}x.globalAlpha=1;}}});
+window.__life={BOTS,TANK,FL,hit,pet,tankTap,scoutPos,JOKES,joke:()=>joke(performance.now()),say:scoutSay,fire:k=>{try{return POOL[k]();}catch(e){return String(e);}},kinds:Object.keys(POOL)};
 let last=0;(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.12,(now-(last||now))/1000);last=now;if(document.hidden)return;try{tick(dt,now);}catch(e){}})(performance.now());
 })();

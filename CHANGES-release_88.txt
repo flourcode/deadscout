@@ -1,0 +1,156 @@
+ADRIFT FM — RELEASE 88  (formerly Driftnaut; built on release 87)
+================================================================
+Renamed
+- Driftnaut is now Adrift FM everywhere a visitor can see: the opening
+  screen (ADRIFT FM / A LO-FI RADIO, A LONG WAY OUT / COME ABOARD, with
+  "Listen to lo-fi. Watch life aboard the Halcyon." beneath), browser
+  title, search and social description, canonical URL
+  (https://adriftfm.com/), social tags and image, app manifest, the
+  lock-screen and mini-window track info (it still said NIGHT WATCH),
+  About, the Privacy & Terms page, and the Director.
+- About uses the new copy, with a quiet YouTube · @adriftfm link and the
+  Privacy & Terms link. The privacy page is rewritten for what the site
+  does now, and says the YouTube link leaves the site.
+- The old title menu behind the opening screen no longer offers GAME or
+  THE STORY.
+- Kept as they were so nothing saved is lost: preference keys, the
+  first-visit key and the offline cache name prefix.
+
+The first ten seconds
+- The opening is shorter: the hull opens after 2.8 s (it was 7), and the
+  two captions end as it finishes. The ship can be touched about 7 s
+  after COME ABOARD (it was about 14).
+- The music comes up as soon as the ship is on screen, not 2.6 s later.
+- Switches work as soon as their room's lamps have come up; there is no
+  fixed lockout any more.
+- "Tap a room to explore" (touch) / "Click a room to explore" (mouse)
+  appears as soon as the ship can be touched, on a first visit only, and
+  goes at the first touch.
+- Scout now starts on its cushion in the cabin, beside the astronaut.
+
+Sound
+- The three-state SOUND button is replaced by a speaker that opens a
+  small panel: volume, mute, ship sounds, tap sounds. Turn the last two
+  off for music alone. All of it is remembered; unmuting restores the
+  last volume. M mutes.
+- One NOW PLAYING label, in the bar. It and the speaker stay on screen,
+  dimmer, when the rest of the bar fades.
+- "Ship only" (music off) is gone.
+
+One tap, one action
+- A tap is for one thing: Scout, a bot, a loose object or the tank
+  answers; a lamp or machine switches; anything else sends the
+  astronaut. An object tap no longer also moves the astronaut.
+- Scout, the tank and the cabin lamp have real buttons over them: a
+  generous target, corner marks on hover and keyboard focus, a name for
+  screen readers, and a brief first-visit cue on touch. Scout wags, the
+  tank's glass ripples, the lamp switches.
+- A longer walk shows a small marker where it ends.
+- Dragging with a mouse still leads the astronaut; letting go over a
+  lamp does not switch it.
+
+Hands off
+- A first-minute routine: the lamps come up, Scout trots over, the
+  astronaut goes up to the bridge window and then makes a cocoa (on an
+  upright phone the astronaut stays with Scout). Any tap ends it.
+- The first surprise comes inside the first minute (it was 108 s).
+- The jelly only volunteers a joke when you sent the astronaut to the
+  tank. Tapping the tank still gets one.
+
+Phone
+- Upright: a VIEW button switches between the room (closer than before,
+  and steady: it only slides when the astronaut nears the room's edge)
+  and the whole ship.
+
+The bar
+- NOW PLAYING · SKIP · speaker · SCENE · (VIEW on upright screens) · a
+  "more" button holding MINI WINDOW, FULL SCREEN and ABOUT.
+
+Also
+- An existing install picks up the new build on its next visit and
+  swaps its offline copy (cache driftnaut-v88).
+- New files: game/tap.js, game/fm.js.
+
+DRIFTNAUT — RELEASE 87
+=======================
+Changed
+- The helmet and skull are gone from the site. The favicon, the app icons
+  (192, 512, Apple touch) and the loading mark are now the astronaut in
+  the orange suit, drifting, drawn from the game's own sprite. The skull
+  image file is deleted.
+- Preview image (og.png) redone: the welcome picture (cabin, astronaut,
+  Scout, the name and the line) with no button on it.
+- director.html: the BROADCAST LINK is rebuilt for the ship as it is now.
+    FORMAT   LONG  16:9, 1920 x 1080, the whole ship
+             SHORT 9:16, 1080 x 1920, the camera stays with the astronaut
+    SCENE, MUSIC (any of the ten tapes, or the scene's own)
+    PACE     CALM as on the site, or LIVELY: surprises, Scout, the jelly
+             and the astronaut's wandering all come about three times
+             as often
+    OPENING  the story captions, or straight in
+    SEED, FADE OUT, LABEL
+  Choosing SHORT presets LIVELY and STRAIGHT IN. The old MODE (gameplay),
+  VIEW, MOOD (strange) and LENGTH options are gone; they no longer did
+  anything. The link runs with no controls and no hints; clicks still
+  work through OBS's Interact.
+- The older scripting desk below it is unchanged and marked as old.
+- Cache bumped (driftnaut-v87).
+
+DRIFTNAUT — RELEASE 86
+=======================
+Fixed
+- The ship's switches work again. When the reticle marks were removed in
+  release 77, the switches went with them, because the marks were the
+  buttons. Now the thing itself is the target and it answers at once,
+  without waiting for the astronaut to get there:
+    a ceiling lamp        that room's light on or off
+    the shaft junction    every light aboard, bay by bay
+    the reactor           drive: idle, full burn, shutdown, idle
+    nav, sensor, comms    the screens come alive and the machine answers
+    the two terminals     keys and a readout
+    the service pumps     they cycle
+    the airlock hatches   open with a hiss, then close
+    the beacon mast       beacon on or off
+    the bridge window     a look at the ship from outside
+- No marks, labels or hints. A short caption names what happened where it
+  is not obvious (DRIVE · SHUTDOWN, HAILING · OPEN CHANNEL).
+- Scout, the bots, the loose objects and the jelly still answer for
+  themselves. Nothing can be switched during the opening.
+- Cache bumped (driftnaut-v86).
+
+DRIFTNAUT — RELEASE 85
+=======================
+Added
+- The jelly in the tank is a comic. It gets no respect. Tap the tank and
+  it tells a one-liner: a caption at the top of the picture, the jelly
+  gives a wiggle, then a soft rimshot (two notes and a brush, in the key
+  of the tape). Now and then Scout laughs.
+- If the astronaut stays by the tank for a few seconds, the jelly tries
+  one unprompted (it has an audience), at most every minute or two.
+- 22 original jokes, shuffled; none repeats until all have been told.
+- Cache bumped (driftnaut-v85).
+
+DRIFTNAUT — RELEASE 84
+=======================
+Fixed
+- Scout no longer snaps back to the shaft on the way to the astronaut in
+  the opening. Two causes, both fixed:
+  1. The engine mislaid a walker's position when a walk was redirected a
+     second time: it put them back where the first redirect happened.
+     Any walk redirected twice could do this, not just the opening.
+  2. The astronaut was calling Scout over again every few seconds while
+     Scout was already on the way. Now it waits until Scout has stopped.
+- Cache bumped (driftnaut-v84).
+
+DRIFTNAUT — RELEASE 83
+=======================
+Changed
+- The welcome screen on upright phones and tablets. The scene now fills
+  the whole screen: the same tall slice of the ship you get once aboard, a
+  little closer. The title lies over the top of it and COME ABOARD over
+  the bottom, in thumb reach. It used to be a small wide picture with the
+  title above, empty dark below, and the button at the very bottom.
+- Desktop and sideways phones are unchanged.
+- Cache bumped (driftnaut-v83).
+
+

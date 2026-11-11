@@ -4,7 +4,7 @@
    are 1920x1080; the canvas can be any size. */
 (function(){
 "use strict";
-let DW=1920,DH=1080;const INTRO=2.6,OUTRO=5,HAL=7,HAL_X=4.2; /* r26: the open ends on CURRENT STATUS · LOST *//* HAL: the HALCYON open, over the hull outside, with the music already running; then HAL_X seconds dissolving in */
+let DW=1920,DH=1080;const INTRO=2.6,OUTRO=5,HAL=2.8,HAL_X=2.2,CAPS=5; /* r88: the hull opens after 2.8 s (it was 7) and is open by 5; the two captions run on over the open ship until 5, so the ship can be touched inside ten seconds of COME ABOARD */ /* r26: the open ends on CURRENT STATUS · LOST *//* HAL: the HALCYON open, over the hull outside, with the music already running; then HAL_X seconds dissolving in */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),sm=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
 const hash=(a,b)=>{let h=Math.imul((a|0)^0x9e3779b9,0x85ebca6b)^Math.imul((b|0)+0x7f4a7c15|0,0xc2b2ae35);h^=h>>>15;h=Math.imul(h,0x2c1b3c6d);h^=h>>>12;return (h>>>0)/4294967296;};
 const vn=(x,s)=>{const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return hash(i,s)*(1-u)+hash(i+1,s)*u;};
@@ -21,10 +21,10 @@ function create(canvas){
   const chapterAt=t=>{for(let k=times.length-1;k>=0;k--)if(t>=times[k].start)return k;return 0;};
   function cfgOf(ch,sd){const role=String(ch.role||ch.title||'').toUpperCase(),mk=ch.motion&&ch.motion!=='auto'?ch.motion:(ROLE_SET[role]||P.motion||'synthwave'),S=SETS[mk]||SETS.synthwave,e=FX_ENERGY[ch.fxEnergy||P.fxEnergy||'mid']||1;
     return {dark:!!S.dark,e,sd,scan:Math.min(S.scan,.6),bump:Math.min(S.bump,.6),vsync:Math.min(S.vsync,.4),tear:Math.min(S.tear,.4),chroma:Math.min(S.chroma,.4),expo:Math.min(S.expo,1.2),calm:/ESCALATION|REALIZATION/.test(role)?.8:1,stars:false};}
-  const HAL_BLOCKS=[['2291 // DSV HALCYON',0,2.4],['DRIFTING PEACEFULLY','150 AU FROM SOL',2.4,7]];
-  function halcyonOpen(c,t){c.save();c.setTransform(scale,0,0,scale,0,0);c.fillStyle='rgba(2,3,8,.38)';c.fillRect(0,0,DW,DH);c.globalAlpha=sm(t/.8);
+  const HAL_BLOCKS=[['2291 // DSV HALCYON',0,2.2],['DRIFTING PEACEFULLY','150 AU FROM SOL',2.2,5]];
+  function halcyonOpen(c,t){c.save();c.setTransform(scale,0,0,scale,0,0);const openK=t<HAL?0:Math.min(1,(t-HAL)/HAL_X);c.fillStyle='rgba(2,3,8,'+(.38*(1-openK)).toFixed(3)+')';c.fillRect(0,0,DW,DH);c.globalAlpha=sm(t/.8);
     for(const b of HAL_BLOCKS){const two=b.length===4,t0=b[two?2:1],t1=b[two?3:2];if(t<t0||t>=t1)continue;const u=t-t0,a=Math.min(sm(u/.45),1-sm((u-(t1-t0-.5))/.5));c.globalAlpha=sm(t/.8)*a;c.textAlign='left';
-      c.font='400 30px Silk,"LR Clean",monospace';try{c.letterSpacing='9px';}catch(e){}const TALL=DH>DW,X0=TALL?70:150,Y0=TALL?DH-470:DH-250,K=TALL?.8:1;if(TALL){const ga=c.globalAlpha;c.globalAlpha=ga*.72;c.fillStyle='#0b0e11';c.fillRect(0,Y0-70,DW,two?200:110);c.globalAlpha=ga;} /* upright: the words lie over the hull, so they get a dark band of their own */c.font='400 '+Math.round(30*K)+'px Silk,"LR Clean",monospace';c.fillStyle='#8fd8c0';c.fillText(b[0],X0,Y0);
+      c.font='400 30px Silk,"LR Clean",monospace';try{c.letterSpacing='9px';}catch(e){}const TALL=DH>DW,X0=TALL?70:150,Y0=TALL?DH-470:DH-250,K=TALL?.8:1;if(TALL||openK>0){const ga=c.globalAlpha;c.globalAlpha=ga*.72*(TALL?1:openK);c.fillStyle='#0b0e11';c.fillRect(TALL?0:X0-50,Y0-70,TALL?DW:980,two?200:110);c.globalAlpha=ga;} /* upright: the words lie over the hull, so they get a dark band of their own */c.font='400 '+Math.round(30*K)+'px Silk,"LR Clean",monospace';c.fillStyle='#8fd8c0';c.fillText(b[0],X0,Y0);
       if(two){c.font='400 64px Silk,"LR Clean",monospace';try{c.letterSpacing='12px';}catch(e){}c.font='400 '+Math.round(64*K)+'px Silk,"LR Clean",monospace';c.fillStyle=b[1]==='INTERNAL'||b[1]==='LOST'?'#e8a33a':'#e7dbc0';c.fillText(b[1],X0,Y0+90*K);}}
     try{c.letterSpacing='0px';}catch(e){}c.restore();}
   function card(c,line,alpha){c.save();c.setTransform(scale,0,0,scale,0,0);c.globalAlpha=alpha;c.fillStyle='#0c0a09';c.fillRect(0,0,DW,DH);c.fillStyle='#e7dbc0';c.textAlign='center';c.font='400 58px Silk,monospace';try{c.letterSpacing='8px';}catch(e){}c.fillText('DRIFTNAUT',DW/2+4,DH/2+8);
@@ -84,10 +84,10 @@ function create(canvas){
     const B=P.brand||{},total=times.length?times[times.length-1].end:0,hal=B.intro==='halcyon'&&CUT.hasExterior&&CUT.hasExterior();
     if(B.intro&&!hal&&t<INTRO){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);card(ctx,B.line||'RECOVERED TRANSMISSION · DSV HALCYON',sm(t/.6));return;}
     ctx.setTransform(1,0,0,1,0,0);
-    if(hal&&t<HAL+HAL_X+3){const u=t<HAL+HAL_X?0:sm((t-HAL-HAL_X)/3),Vs=opts.view||CUT.view(P,times,t);CUT.force((opts.view||[0,0,CUT.W,CUT.H]).map((v,i)=>v+(Vs[i]-v)*u)); /* r82: a caller's own camera (the upright phone) holds through the open */CUT.exterior(t<HAL?1:clamp(1-(t-HAL)/HAL_X,0,1));drawCut(ctx,t,opts);CUT.force(null);CUT.exterior(null);if(t<HAL)halcyonOpen(ctx,t);} /* the open holds the whole ship, then the script's camera takes over */
+    if(hal&&t<HAL+HAL_X+3){const u=t<HAL+HAL_X?0:sm((t-HAL-HAL_X)/3),Vs=opts.view||CUT.view(P,times,t);CUT.force((opts.view||[0,0,CUT.W,CUT.H]).map((v,i)=>v+(Vs[i]-v)*u)); /* r82: a caller's own camera (the upright phone) holds through the open */CUT.exterior(t<HAL?1:clamp(1-(t-HAL)/HAL_X,0,1));drawCut(ctx,t,opts);CUT.force(null);CUT.exterior(null);if(t<CAPS)halcyonOpen(ctx,t);} /* the open holds the whole ship, then the script's camera takes over */
     else drawCut(ctx,t,opts);
     const os=B.outro===true?'card':B.outro;if(os==='card'&&total&&t>total-OUTRO)card(ctx,'END OF TRANSMISSION'+(P.code?' · '+P.code:''),sm((t-(total-OUTRO))/1.4));
     else if(os==='fade'&&total&&t>total-3){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=`rgba(0,0,0,${sm((t-(total-3))/2.6)})`;ctx.fillRect(0,0,canvas.width,canvas.height);}}
   return {setSize,setProject,render,chapterAt,get scale(){return scale;}};}
-window.LC={create,EVENTS,INTRO,OUTRO,HAL,HAL_X,get DW(){return DW;},get DH(){return DH;}};
+window.LC={create,EVENTS,INTRO,OUTRO,HAL,HAL_X,CAPS,get DW(){return DW;},get DH(){return DH;}};
 })();

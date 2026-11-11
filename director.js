@@ -6,7 +6,7 @@
 const $=id=>document.getElementById(id),E=window.LMX,X=window.LMXS,M=window.LMXM,LR=window.LSR,DSE=window.DSE,STORE='deadScoutDirector';
 const mmss=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the Driftnaut folder.</p>';return;}
+if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the Adrift FM folder.</p>';return;}
 /* ---------- the project ---------- */
 let P,AL,TIMES,TOTAL,selCh=0,man=null;
 const stage=$('stage'),LCV=LC.create(stage);
@@ -34,7 +34,7 @@ function cardAt(){const B=P.brand||{};return B.intro==='halcyon'?LC.HAL+LC.HAL_X
 function overlay(t){const c=stage.getContext('2d'),k=stage.width/LC.DW;c.save();c.setTransform(k,0,0,k,0,0);
   if(sleepy()){c.fillStyle='rgba(0,0,0,.34)';c.fillRect(0,0,LC.DW,LC.DH);}
   const a0=cardAt(),fade=(u,d)=>Math.max(0,Math.min(1,u/1.5,(d-u)/1.5));c.textBaseline='top';try{c.letterSpacing='6px';}catch(e){}
-  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'DRIFTNAUT').slice(0,34),100,96);
+  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'ADRIFT FM').slice(0,34),100,96);
     c.fillStyle='#8f8878';c.font='400 20px Silk,monospace';c.fillText(((P.watch?'NIGHT WATCH':'TRANSMISSION')+' // DSV HALCYON · DSV-0417 // '+(P.len>=60?(P.len/60)+(P.len>=120?' HOURS':' HOUR'):P.len+' MIN')).toUpperCase(),100,166);}
   if(BC.cards==='all'){for(let i=1;i<TIMES.length;i++){const s0=TIMES[i].start+1;if(t>=s0&&t<s0+6){const a=fade(t-s0,6);c.globalAlpha=a*.9;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,LC.DH-150,720,70);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 22px Silk,monospace';c.fillText(String(i+1).padStart(2,'0')+' · '+String(P.chapters[i].title||'').toUpperCase().slice(0,40),96,LC.DH-128);}}}
   c.restore();}
@@ -122,7 +122,7 @@ $('pDel').addEventListener('click',()=>{const S=saved(),i=+$('pSaved').value;if(
 /* ---------- publish ---------- */
 const ytTitle=()=>{const pb=P.publish||{};return (pb.title||((P.year?P.year+': ':'')+P.name))+' // '+(P.len>=120?Math.round(P.len/60)+' HOURS':P.len>=60?'1 HOUR':P.len+' MIN')+' '+STY(P.style).name.toUpperCase()+(pb.subtitle?' · '+pb.subtitle.split(' • ')[0]:'');};
 function ytDesc(){const St=STY(P.style),pb=P.publish||{};const tl=AL.tracks.map(T=>mmss(T.start<1?0:T.start)+' Track '+String(T.i+1).padStart(2,'0')+' — '+T.name).join('\n'),cl=P.chapters.map((c,k)=>mmss(TIMES[k]?TIMES[k].start:0)+' '+c.title).join('\n');
-  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'Driftnaut')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nA Driftnaut transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the Driftnaut engine: no samples, no loops. Royalty-free.\nPlay Driftnaut: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
+  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'Adrift FM')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nAn Adrift FM transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the Driftnaut engine: no samples, no loops. Royalty-free.\nPlay Driftnaut: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
 function paintPublish(){$('yTitle').value=ytTitle();$('yDesc').value=ytDesc();}
 const copy=async(v,ok)=>{try{await navigator.clipboard.writeText(v);say(ok);}catch(e){say('SELECT AND COPY IT');}};
 $('cTitleBtn').addEventListener('click',()=>copy(ytTitle(),'TITLE COPIED'));$('cDescBtn').addEventListener('click',()=>copy(ytDesc(),'DESCRIPTION COPIED'));
@@ -146,15 +146,19 @@ function paintAll(){paintProject();paintChapters();paintPublish();}
 /* ---------- start ---------- */
 /* ---------- the broadcast link (Nov 2026): the Director no longer renders video. It builds a link to the real game in a
    clean window (index.html?broadcast=1...) for OBS: a browser source, or a window capture with the sound. ---------- */
-$('lMusic').innerHTML='<option value="auto">AUTO (BY MOOD)</option>'+Object.entries(NW.MUSIC).map(([k,m])=>`<option value="${k}">${esc(m.name)}</option>`).join('');
-function bcUrl(){const q=new URLSearchParams({broadcast:'1'}),m=$('lMode').value;q.set('mode',m);
-  if(m==='watch'){q.set('view',$('lView').value);q.set('mood',$('lMood').value);q.set('music',$('lMusic').value);q.set('mins',$('lMins').value);const sd=parseInt($('lSeed').value,10);if(sd)q.set('seed',sd);if($('lSleep').checked)q.set('sleep','1');if($('lLabel').checked)q.set('label','1');}
-  else q.set('cam',$('lCam').value);
+$('lMusic').innerHTML='<option value="auto">AUTO (THE SCENE\'S OWN)</option>'+Object.entries(NW.MUSIC).map(([k,m])=>`<option value="${k}">${esc(m.name)}</option>`).join('');
+$('lScene').innerHTML=Object.entries(NW.SCENES).map(([k,m])=>`<option value="${k}">${esc(m.name)}</option>`).join('');
+/* r87: the link is for the ship as it is now: the astronaut, Scout, the bots, the jelly. LONG is the whole ship; SHORT is an upright window that stays with the astronaut */
+function bcUrl(){const q=new URLSearchParams({broadcast:'1'}),f=$('lFormat').value;q.set('format',f);q.set('scene',$('lScene').value);if($('lMusic').value!=='auto')q.set('music',$('lMusic').value);
+  if($('lPace').value==='lively')q.set('pace','lively');if($('lIntro').value==='0')q.set('intro','0');const sd=parseInt($('lSeed').value,10);if(sd)q.set('seed',sd);if($('lSleep').checked)q.set('sleep','1');if($('lLabel').checked)q.set('label','1');
   return new URL('index.html?'+q.toString(),location.href).href;}
-function paintLink(){const m=$('lMode').value;document.querySelectorAll('.bcast .lw').forEach(e=>e.hidden=m!=='watch');document.querySelector('.bcast .lp').hidden=m!=='play';$('lUrl').value=bcUrl();
-  $('lHint').textContent=m==='watch'?'Opens Night Watch running by itself: no frame, no controls. In OBS add a Browser Source with this link at 1920 × 1080 (it plays its own sound), or open it and use a Window Capture. Same seed, same night.':'Opens the game itself in a clean window: you play, OBS records. For Shorts, set the OBS canvas to 1080 × 1920 and centre the window capture; the follow camera keeps her in the middle.';}
-for(const id of ['lMode','lView','lMood','lMusic','lMins','lSeed','lSleep','lLabel','lCam'])$(id).addEventListener('input',paintLink);
-$('lOpen').addEventListener('click',()=>{window.open(bcUrl(),'_blank','noopener,width=1920,height=1080');});
+function paintLink(){const sh=$('lFormat').value==='short';$('lUrl').value=bcUrl();
+  $('lHint').innerHTML=(sh?'<b>SHORT.</b> In OBS set the canvas to 1080 × 1920 (Settings → Video, both resolutions). Add a Browser Source with this link, width 1080, height 1920. The camera stays with the astronaut. LIVELY and STRAIGHT IN suit a Short: more happens in the first minute.'
+    :'<b>LONG.</b> In OBS, with a 1920 × 1080 canvas, add a Browser Source with this link, width 1920, height 1080. The whole ship, running by itself for as long as you record.')
+   +' Tick “Control audio via OBS” on the source so the music is recorded. It runs with no controls and no hints. To touch things while recording (send the astronaut somewhere, tap the jelly, the reactor, a lamp), right-click the source and choose Interact. Stop the recording when you have enough; the ship does not end.';}
+for(const id of ['lFormat','lScene','lMusic','lPace','lIntro','lSeed','lSleep','lLabel'])$(id).addEventListener('input',paintLink);
+$('lFormat').addEventListener('input',()=>{const sh=$('lFormat').value==='short';$('lPace').value=sh?'lively':'calm';$('lIntro').value=sh?'0':'1';paintLink();});
+$('lOpen').addEventListener('click',()=>{const sh=$('lFormat').value==='short';window.open(bcUrl(),'_blank',sh?'noopener,width=540,height=960':'noopener,width=1280,height=720');});
 $('lCopy').addEventListener('click',()=>copy(bcUrl(),'LINK COPIED'));
 paintLink();
 if(LR&&LR.cleanup)LR.cleanup(); /* last session's recording parts go, as the game already does */

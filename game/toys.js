@@ -79,15 +79,12 @@ document.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&!e.targe
 /* r86 · NO MARKS, SAME SWITCHES. The reticles are gone (r77) and they were the buttons, so nothing could be switched. Now the thing itself
    is the target: tap a lamp, the reactor, a console, the pumps, a hatch, the beacon, the bridge window, and it answers at once (the astronaut
    still drifts over, but nothing waits on that). Scout, the bots, the loose objects and the tank answer for themselves (game/life.js). */
-const REACH={drive:120,bus:54,inner:60,outer:60,beacon:70};let dn=null;
-function toyAt(wx,wy){let best=null;for(const T of TOYS){if(T.id==='k9'||(T.hide&&T.hide()))continue;let w=null;try{w=T.at();}catch(e){}if(!w)continue;const d=Math.hypot(w[0]-wx,(w[1]-wy)*(T.light?1.5:1)),R=REACH[T.id]||(T.light?60:74);if(d<R&&(!best||d/R<best.k))best={T,k:d/R};}return best&&best.T;}
-function taken(wx,wy){try{const L=window.__life;if(L){const K=L.TANK;if(Math.abs(wx-K.x)<K.w/2+10&&wy>K.y-K.h-10&&wy<K.y+6)return true;for(const b of L.BOTS)if(Math.abs(wx-b.x)<44&&Math.abs(wy-(b.y-14))<40)return true;for(const f of L.FL)if(Math.hypot(f.x-wx,f.y-wy)<40)return true;}
-  const k=CUT.actorAt(G.P,G.TIMES,G.now(),'k9');if(k&&Math.abs(wx-k.x)<46&&Math.abs(wy-(k.y-26))<44)return true;}catch(e){}return false;}
-document.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY,performance.now()];},{passive:true,capture:true});
-document.addEventListener('click',e=>{const d=dn;dn=null;if(G.state!=='watch'||G.now()<11.4||document.body.classList.contains('photo')||document.body.classList.contains('bc'))return;
-  const t=e.target;if(!t||!scr.contains(t)||(t.closest&&t.closest('button,a,.wui,.np,.about')))return;if(d&&(Math.hypot(e.clientX-d[0],e.clientY-d[1])>12||performance.now()-d[2]>600))return; /* a drag or a hold is leading the astronaut, not a tap */
-  const V=G.view(),r=scr.getBoundingClientRect(),wx=V[0]+(e.clientX-r.left)/r.width*V[2],wy=V[1]+(e.clientY-r.top)/r.height*V[3];if(taken(wx,wy))return;const T=toyAt(wx,wy);if(!T)return;
-  let m=null;try{m=T.act();}catch(_){}if(m){try{const el=document.querySelector('.toast');el&&el.classList.remove('jk');window.__gp&&__gp.toast(m,2.4);}catch(_){}}},true);
+const REACH={drive:120,bus:54,inner:60,outer:60,beacon:70,'light-crew-quarters':96};
+function toyAt(wx,wy,pad){pad=pad||0;let best=null;for(const T of TOYS){if(T.id==='k9'||(T.hide&&T.hide()))continue;let w=null;try{w=T.at();}catch(e){}if(!w)continue;const d=Math.hypot(w[0]-wx,(w[1]-wy)*(T.light?1.5:1)),R=(REACH[T.id]||(T.light?60:74))+pad*.5;if(d<R&&(!best||d/R<best.k))best={T,k:d/R};}return best&&best.T;}
+/* r88: game/tap.js decides what a tap is for and calls fire(). Readiness, not a fixed wait: a room's switches work as soon as its lamps have
+   come up in the opening (the cabin first, about four seconds in), and the drive once it has finished spooling */
+function ready(T){const N=window.__naut;if(!N||!N.on)return false;if(!N.waking||!N.waking())return true;return !!(T.light&&T.room&&N.roomReady&&N.roomReady(T.room));}
+function fire(T){if(!T||!ready(T))return false;let m=null;try{m=T.act();}catch(_){}if(m){try{const el=document.querySelector('.toast');el&&el.classList.remove('jk');window.__gp&&__gp.toast(m,2.4);}catch(_){}}return true;}
 /* held sounds stop when you leave the ship (title, pause, options) and come back when you return */
 let wasOn=false;
 function tick(){const st=G.state,on=(st==='play'||st==='watch')&&!document.body.classList.contains('photo')&&!document.body.classList.contains('bc');layer.hidden=!on;
@@ -127,7 +124,7 @@ function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({a
   if(A.watch()&&!quiet){const sc=SC[id]||{}; /* r51: a scene is lights and pace only; the music station plays on untouched */
     if(A.pace)A.pace(sc.pace||'routine');visit(id);if(A.nw){A.nw().scene=id;A.save();}}
   paintMood();}
-function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='<s>SCENE<u> · </u></s>'+(SC[S.mood]||SC.drift).name;b.setAttribute('aria-label','Scene: '+(SC[S.mood]||SC.drift).name+' (tap for the next)');b.classList.toggle('on',S.mood!=='drift');}
+function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='ADRIFT FM · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='<s>SCENE<u> · </u></s>'+(SC[S.mood]||SC.drift).name;b.setAttribute('aria-label','Scene: '+(SC[S.mood]||SC.drift).name+' (tap for the next)');b.classList.toggle('on',S.mood!=='drift');}
   const l=document.getElementById('wLight');if(l){l.innerHTML='LIGHT<em> · '+S.light.toUpperCase()+'</em>';l.classList.toggle('on',S.light!=='warm');}}
 function light(){const L=['warm','low','off'];S.light=L[(L.indexOf(S.light)+1)%3];A.sfx('chunk',.6);applyLights();paintMood();}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood,#wLight');if(!b)return;e.stopPropagation();
@@ -152,6 +149,6 @@ function haunt(){if(window.__ghost)return; /* r63: she is always aboard now, not
     if(Math.random()<.6)setTimeout(()=>{if(A.watch())G.say('HOS',Math.random()<.5?'CREW: 3 · COUNT: 4':'OCCUPANCY: 4 · RECOUNT: 3',3);},6500);
     G.beat({at:D,hide:'deadscout'});setTimeout(()=>{haunting=false;},(D+1)*1000);}catch(e){haunting=false;}}
 setInterval(()=>{if(!A.watch()){nextHaunt=0;return;}const t=G.now();if(!nextHaunt){nextHaunt=t+480+Math.random()*720;return;}if(t>nextHaunt){nextHaunt=t+1500+Math.random()*2100;haunt();}},5000);
-window.__toys={mood,MOODS,S,TOYS,toyAt,light,haunt,resume:()=>{},shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
+window.__toys={mood,MOODS,S,TOYS,toyAt,fire,ready,light,haunt,resume:()=>{},shift:on=>{if(on==='dark'){LROOMS.forEach(r=>{S.lit[r]=0;CUT.toy({room:{[r]:0}});});return;}if(on){LROOMS.forEach(r=>{S.lit[r]=0;});allLights(true);}else allLights(false);}, /* r29: the start and end of a shift */
   sleepLights:on=>{if(on){lightsTo({'crew-quarters':.45},.12);mixTo({machinery:.4,ventilation:.85,radio:.3});}else{applyLights();mixTo((LOOK[S.mood]||LOOK.drift).mix);}},show:()=>{allUntil=performance.now()+6000;},room:r=>{tapRoom=r;tapUntil=performance.now()+6000;}};
 })();
