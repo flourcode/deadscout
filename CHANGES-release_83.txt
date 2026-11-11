@@ -1,0 +1,12 @@
+DRIFTNAUT — RELEASE 83
+=======================
+Changed
+- The welcome screen on upright phones and tablets. The scene now fills
+  the whole screen: the same tall slice of the ship you get once aboard, a
+  little closer. The title lies over the top of it and COME ABOARD over
+  the bottom, in thumb reach. It used to be a small wide picture with the
+  title above, empty dark below, and the button at the very bottom.
+- Desktop and sideways phones are unchanged.
+- Cache bumped (driftnaut-v83).
+
+
