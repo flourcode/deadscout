@@ -114,12 +114,43 @@ function blanketDraw(x,u,pn){if(!BLANKET)return;const k=scoutPos();if(!k)return;
   /* it hangs: the middle rides on Scout's back, the corners droop and sway */x.fillStyle=INK;x.fillRect(X-13*a,Y+2*a,4*a,(13+w)*a);x.fillRect(X+9*a,Y+2*a,4*a,(14-w)*a);x.fillStyle='#c6ab92';x.fillRect(X-12*a,Y+3*a,3*a,(11+w)*a);x.fillRect(X+10*a,Y+3*a,3*a,(12-w)*a);x.fillStyle='#ff9a3c';x.fillRect(X-12*a,Y+6*a,3*a,a);x.fillRect(X+10*a,Y+6*a,3*a,a);x.fillStyle='#907763';x.fillRect(X-6*a,Y+10*a,3*a,a);x.fillRect(X+2*a,Y+10*a,4*a,a);x.globalAlpha=1;}
 G.under.push((x,t,u,pn)=>{try{blanketDraw(x,u,pn);}catch(e){}});
 G.under.unshift((x,t,u,pn)=>{try{tankDraw(x,u,pn);}catch(e){}for(const b of BOTS)try{botDraw(x,b,u,pn);}catch(e){}for(const f of FL)try{flDraw(x,f,u,pn);}catch(e){}});
+/* r85 · THE JELLY IS A COMIC. It gets no respect. Tap the tank and it tells one (a line of text, then a soft two-note-and-a-brush rimshot in the
+   key of the tape); stay by the tank a while and it tries one on its own, because it has an audience. Never the same one twice until all are told. */
+const JOKES=["I GET NO RESPECT. NO BRAIN, NO SPINE, NO HEART. THEY PUT ME IN RESEARCH. I SHOULD'VE BEEN IN MANAGEMENT.",
+"I'M 95 PERCENT WATER. THE OTHER 5 PERCENT IS DISAPPOINTMENT.",
+"THE DOG GETS A CUSHION. I GET A FILTER. NO RESPECT, I TELL YA.",
+"I GLOW IN THE DARK. THEY STILL LEAVE A LIGHT ON. NOBODY TRUSTS ME.",
+"MY FAMILY GOES BACK 500 MILLION YEARS. I STILL GET CARDED.",
+"I'M A RESEARCH SUBJECT. FINDINGS SO FAR: STILL JELLY.",
+"I TRIED TO STING THE CLEANING ROBOT. IT FILED A MAINTENANCE REPORT. ON ME.",
+"THEY CALL THIS A DEEP SPACE VESSEL. ME, I'M IN THE SHALLOW END.",
+"I BLOOMED INTO THREE ONCE. GOT NO RESPECT IN TRIPLICATE.",
+"I DRIFT ALL DAY. THE SHIP DRIFTS ALL DAY. GUESS WHICH ONE GOT ITS NAME ON THE HULL.",
+"I'VE GOT NO BONES. THE DOG STILL TRIED TO BURY ME.",
+"MY DOCTOR SAYS I NEED MORE BACKBONE. I SAID DOC, I'LL TAKE ANY.",
+"I WAVED AT A COMET. IT KEPT GOING. STORY OF MY LIFE.",
+"NICE MUSIC. NOBODY ASKS IF I DANCE. ALL I DO IS DANCE.",
+"PEOPLE SEE RIGHT THROUGH ME. THEN THEY KEEP LOOKING AT THE DOG.",
+"I ASKED FOR A PLUS ONE. THEY SENT A BUBBLE. IT LEFT.",
+"150 AU FROM THE NEAREST OCEAN AND I STILL CAN'T GET A ROOM WITH A VIEW.",
+"MY TANK IS SO SMALL I HAVE TO LEAVE TO CHANGE MY MIND. AND I DON'T HAVE ONE.",
+"I ASKED THE ROBOT TO DO MY GLASS. IT SAID IT ONLY DOES IMPORTANT WINDOWS.",
+"I TOLD THE DOG A JOKE. IT WAGGED. FIRST LAUGH I GOT ALL YEAR, AND IT WAS A REFLEX.",
+"TOUGH ROOM. IT'S GLASS.",
+"I'M HERE ALL WEEK. I'M HERE EVERY WEEK. SOMEBODY CHECK THE LID."];
+let jBag=[],jokeAt=0,nearSince=0,soloAt=0;
+function rimshot(){let a=null;try{a=window.__game.audio();}catch(e){}note({i:[0,0],v:.3,voice:'rhodes',gap:.11});if(!a||!a.ctx)return;try{const c=a.ctx,t=c.currentTime+.3,n=Math.floor(c.sampleRate*.3),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    const src=c.createBufferSource(),hp=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;hp.type='highpass';hp.frequency.value=5200;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.028,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.28);src.connect(hp);hp.connect(g);g.connect(a.out);src.start(t);src.stop(t+.3);}catch(e){}}
+function joke(pn){if(pn<jokeAt)return false;if(!jBag.length){jBag=JOKES.map((_,i)=>i);for(let i=jBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jBag[i],jBag[j]]=[jBag[j],jBag[i]];}}
+  const q=JOKES[jBag.pop()],secs=3.2+q.length*.045;jokeAt=pn+secs*1000+600;soloAt=pn+rnd(70000,120000);TANK.dart=pn+700;try{GP().toast(q,secs);const el=document.querySelector('.toast');if(el){el.classList.add('jk');clearTimeout(joke.t);joke.t=setTimeout(()=>el.classList.remove('jk'),secs*1000+500);}}catch(e){} /* jk: shown at the top, so the caption never covers the tank it comes from */
+  setTimeout(()=>{if(!A.active())return;TANK.dart=performance.now()+1600;rimshot();if(Math.random()<.35)setTimeout(()=>scoutSay('happy',true),900);},Math.min(secs-1.2,1.6+q.length*.03)*1000);return true;}
+setInterval(()=>{const pn=performance.now();if(!A.active()||!G.on||document.hidden||G.asleep||G.space){nearSince=0;return;}const near=Math.abs(G.x-TANK.x)<170&&Math.abs(G.y-TANK.y)<150&&!G.path.length;if(!near){nearSince=0;return;}if(!nearSince)nearSince=pn;if(pn-nearSince>5000&&pn>soloAt)joke(pn);},1000);
 /* a click on any of them is answered */
 addEventListener('pointerdown',e=>{if(!A.active())return;const t=e.target;if(t!==stage&&!(t.closest&&t.closest('.toy')))return;const g=GP(),r=stage.getBoundingClientRect(),V=g.vw(),wx=V[0]+(e.clientX-r.left)/r.width*V[2],wy=V[1]+(e.clientY-r.top)/r.height*V[3],pn=performance.now();
   {const k=scoutPos();if(k&&Math.abs(wx-k.x)<46&&Math.abs(wy-(k.y-26))<44){scoutSay('happy');A.mark('k9','heart');return;}}
   for(const b of BOTS)if(Math.abs(wx-b.x)<44&&Math.abs(wy-(b.y-14))<40){if(b.stuck)free(b,pn);else{b.spin=pn+700;note({i:[5,7],v:.36,gap:.1});}return;}
   for(const f of FL){const dx=f.x-wx,dy=f.y-wy,d=Math.hypot(dx,dy);if(d<40){f.vx=dx/(d||1)*60+rnd(-10,10);f.vy=dy/(d||1)*60-10;note({i:[4,6],v:.34,gap:.1});return;}}
-  if(Math.abs(wx-TANK.x)<TANK.w/2+10&&wy>TANK.y-TANK.h-10&&wy<TANK.y+6){TANK.dart=pn+2600;note({i:[2,4,7],v:.36,voice:'rhodes',gap:.14});}},true);
-window.__life={BOTS,TANK,FL,say:scoutSay,fire:k=>{try{return POOL[k]();}catch(e){return String(e);}},kinds:Object.keys(POOL)};
+  if(Math.abs(wx-TANK.x)<TANK.w/2+10&&wy>TANK.y-TANK.h-10&&wy<TANK.y+6){if(!joke(pn)){TANK.dart=pn+2600;note({i:[2,4,7],v:.36,voice:'rhodes',gap:.14});}}},true);
+window.__life={BOTS,TANK,FL,JOKES,joke:()=>joke(performance.now()),say:scoutSay,fire:k=>{try{return POOL[k]();}catch(e){return String(e);}},kinds:Object.keys(POOL)};
 let last=0;(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.12,(now-(last||now))/1000);last=now;if(document.hidden)return;try{tick(dt,now);}catch(e){}})(performance.now());
 })();

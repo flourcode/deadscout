@@ -1,0 +1,36 @@
+DRIFTNAUT — RELEASE 85
+=======================
+Added
+- The jelly in the tank is a comic. It gets no respect. Tap the tank and
+  it tells a one-liner: a caption at the top of the picture, the jelly
+  gives a wiggle, then a soft rimshot (two notes and a brush, in the key
+  of the tape). Now and then Scout laughs.
+- If the astronaut stays by the tank for a few seconds, the jelly tries
+  one unprompted (it has an audience), at most every minute or two.
+- 22 original jokes, shuffled; none repeats until all have been told.
+- Cache bumped (driftnaut-v85).
+
+DRIFTNAUT — RELEASE 84
+=======================
+Fixed
+- Scout no longer snaps back to the shaft on the way to the astronaut in
+  the opening. Two causes, both fixed:
+  1. The engine mislaid a walker's position when a walk was redirected a
+     second time: it put them back where the first redirect happened.
+     Any walk redirected twice could do this, not just the opening.
+  2. The astronaut was calling Scout over again every few seconds while
+     Scout was already on the way. Now it waits until Scout has stopped.
+- Cache bumped (driftnaut-v84).
+
+DRIFTNAUT — RELEASE 83
+=======================
+Changed
+- The welcome screen on upright phones and tablets. The scene now fills
+  the whole screen: the same tall slice of the ship you get once aboard, a
+  little closer. The title lies over the top of it and COME ABOARD over
+  the bottom, in thumb reach. It used to be a small wide picture with the
+  title above, empty dark below, and the button at the very bottom.
+- Desktop and sideways phones are unchanged.
+- Cache bumped (driftnaut-v83).
+
+
