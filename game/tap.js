@@ -39,7 +39,7 @@ const css=document.createElement('style');css.textContent=`
 .hot[hidden]{display:none}
 @media (hover:hover){.hot:hover{--c:rgba(246,239,228,.75)}}
 .hot:focus-visible{--c:#ff9a3c;outline:none}
-.hot.cue{animation:hotcue 1.3s ease-in-out 4}
+.hot.cue{animation:hotcue 1.3s ease-in-out 2}
 @keyframes hotcue{0%,100%{--c:rgba(246,239,228,0)}50%{--c:rgba(246,239,228,.85)}}
 @media (prefers-reduced-motion: reduce){.hot.cue{animation:none;--c:rgba(246,239,228,.6)}}
 body.bc .hot{--c:transparent!important;animation:none!important}body.about .hot,body.photo .hot{display:none}`;document.head.appendChild(css);
@@ -52,7 +52,7 @@ const HOT=[
 for(const h of HOT){const b=document.createElement('button');b.type='button';b.id=h.id;b.className='hot';b.hidden=true;b.setAttribute('aria-label',h.name());h.el=b;document.body.appendChild(b);
   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!ready()||(h.ok&&!h.ok()))return;try{h.act();}catch(_){}G.last=performance.now();G.intro=2;used(h.kind);b.setAttribute('aria-label',h.name());});
   b.addEventListener('pointerdown',e=>e.stopPropagation());}
-let cueDone=false;function cue(){if(cueDone||BC)return;cueDone=true;let seen=false;try{seen=!!localStorage.getItem('driftnaut.found');}catch(e){}if(seen)return;for(const h of HOT)h.el.classList.add('cue');setTimeout(uncue,5600);}
+let cueDone=false;function cue(){if(cueDone||BC)return;cueDone=true;if(!coarse())return; /* r89: a mouse has hover; only a finger gets the brief first-visit marks */let seen=false;try{seen=!!localStorage.getItem('driftnaut.found');}catch(e){}if(seen)return;for(const h of HOT)h.el.classList.add('cue');setTimeout(uncue,2800);}
 function uncue(){for(const h of HOT)h.el.classList.remove('cue');}addEventListener('fm:used',uncue);
 (function place(){requestAnimationFrame(place);const on=ready();let ext=0;try{ext=CUT.extAt()||0;}catch(e){}
   if(!on||ext>.5||G.space){for(const h of HOT)if(!h.el.hidden)h.el.hidden=true;return;}

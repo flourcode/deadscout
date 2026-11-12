@@ -17,10 +17,10 @@ body.watching:not(.studio):not(.bc):not(.photo):not(.about):not(.aonly) .fm{disp
 .fm button[aria-expanded=true],.fm button[aria-pressed=true]{color:#ff9a3c;box-shadow:inset 0 0 0 2px #ff9a3c,0 3px 0 #0b0e11}
 .fm button[hidden]{display:none}
 .fm svg{width:20px;height:20px;display:block}
-.fm-now{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 10px 0 2px;text-shadow:2px 2px 0 #0a0c10;transition:opacity .6s;max-width:42vw;overflow:hidden}
-.fm-now i{color:#8fd6cf}.fm-now b{font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body:not(.ui):not(.fmk) .fm>button:not(#fmSnd){opacity:0;pointer-events:none}
-body:not(.ui):not(.fmk) .fm>#fmSnd,body:not(.ui):not(.fmk) .fm-now{opacity:.62}
+.fm-now{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 16px 0 2px;text-shadow:2px 2px 0 #0a0c10;transition:opacity .6s;max-width:42vw;overflow:hidden}
+.fm-now i{color:#8fd6cf}.fm-now b{font-weight:400;font-size:14px;letter-spacing:.16em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:not(.ui):not(.fmk) .fm>button:not(#fmSnd):not(#fmSkip){opacity:0;pointer-events:none}
+body:not(.ui):not(.fmk) .fm>#fmSnd,body:not(.ui):not(.fmk) .fm>#fmSkip,body:not(.ui):not(.fmk) .fm-now{opacity:.6} /* r89: the radio's three controls never leave: what is playing, skip, sound */
 .fm-pop{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;padding:12px;min-width:236px;box-sizing:border-box;background:rgba(11,14,17,.96);box-shadow:inset 0 0 0 2px rgba(231,219,192,.38),0 4px 0 #000}
 .fm-pop[hidden]{display:none}
 .fm-pop button{flex-direction:row;justify-content:space-between;gap:14px;width:100%;min-height:44px;background:rgba(246,239,228,.04)}
@@ -89,7 +89,7 @@ paintSound();
 /* ---- the first-visit line: there the moment the ship can be touched, gone at the first touch ---- */
 let hinted=false,hintT=0;function hideHint(){if(hint.hidden)return;hint.classList.remove('on');clearTimeout(hintT);setTimeout(()=>{hint.hidden=true;},600);}
 addEventListener('fm:used',hideHint);
-setInterval(()=>{if(hinted||BC||!window.__tap||!__tap.ready())return;try{if(CUT.extAt()>.08||__gp.now()<((window.LC&&LC.CAPS)||5))return;}catch(e){} /* after the hull has opened and the two captions have gone */hinted=true;let seen=false;try{seen=!!localStorage.getItem('driftnaut.found');}catch(e){}if(seen||G.found)return;
+setInterval(()=>{return; /* r89: no prompt. Nothing is asked of a listener who is settling in; a hover mark is enough for the curious */if(hinted||BC||!window.__tap||!__tap.ready())return;try{if(CUT.extAt()>.08||__gp.now()<((window.LC&&LC.CAPS)||5))return;}catch(e){} /* after the hull has opened and the two captions have gone */hinted=true;let seen=false;try{seen=!!localStorage.getItem('driftnaut.found');}catch(e){}if(seen||G.found)return;
   hint.textContent=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)?'TAP A ROOM TO EXPLORE':'CLICK A ROOM TO EXPLORE';hint.hidden=false;requestAnimationFrame(()=>hint.classList.add('on'));hintT=setTimeout(hideHint,45000);},200);
 setInterval(()=>{if(!hint.hidden&&G.found)hideHint();if(!B.contains('watching')&&!hint.hidden)hint.hidden=true;},400);
 window.__fm={paintSound,paintScene,paintTrack,pop};

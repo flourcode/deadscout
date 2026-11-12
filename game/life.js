@@ -17,7 +17,12 @@ const note=o=>{try{GP().hero('touch',o);}catch(e){}},INK='#14181c';
 const VOX={hello:[[4,7,.1],[7,5,.1],[5,9,.17]],happy:[[5,7,.09],[7,9,.09],[9,10,.15]],excited:[[7,9,.06],[7,9,.06],[9,12,.13]],curious:[[5,6,.12],[6,9,.22]],
   worried:[[7,5,.16],[5,4,.24]],whine:[[8,5,.42]],alert:[[9,9,.07],[9,9,.07]],sleepy:[[4,2,.3],[2,1,.42]],muffled:[[2,3,.12],[3,2,.14],[2,4,.16]],small:[[6,7,.1]]};
 const PENT=[0,2,4,7,9];let voxAt=0;
-function scoutSay(mood,quiet){const pn=performance.now();if(pn-voxAt<900)return;voxAt=pn;let a=null;try{a=window.__game.audio();}catch(e){}if(!a||!a.ctx||!A.active())return;const c=a.ctx,seq=VOX[mood]||VOX.small;
+/* r89 · SCOUT IS QUIET. The chirps are gone from the normal experience: Scout says nothing unprompted, in any mood. Petting Scout gives a soft two-part
+   mechanical tick (a servo settling), and only if the listener has turned Tap sounds on. Low and short, so it does not stick out of a quiet passage */
+function scoutTick(){let a=null,on=false;try{a=window.__game.audio();on=window.__game.snd.get().tap;}catch(e){}if(!a||!a.ctx||!on||!A.active())return;const c=a.ctx,dst=a.tap||a.out;
+  for(const [dt,f,lv] of [[.02,520,.016],[.085,390,.011]]){const t=c.currentTime+dt,n=Math.floor(c.sampleRate*.03),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+    const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();s.buffer=buf;bp.type='bandpass';bp.frequency.value=f;bp.Q.value=2.2;g.gain.value=lv;s.connect(bp);bp.connect(g);g.connect(dst);s.start(t);}}
+function scoutSay(mood,quiet){return; /* r89: see above. The old voice is kept below, unreachable, in case it is ever wanted behind a switch */const pn=performance.now();if(pn-voxAt<900)return;voxAt=pn;let a=null;try{a=window.__game.audio();}catch(e){}if(!a||!a.ctx||!A.active())return;const c=a.ctx,seq=VOX[mood]||VOX.small;
   let key=0;try{key=GP().tapeKey()||0;}catch(e){}key=((key%12)+12)%12;const base=(mood==='muffled'?64:76)+(key>6?key-12:key),hz=i=>440*Math.pow(2,(base+PENT[((i%5)+5)%5]+12*Math.floor(i/5)-69)/12);
   const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=mood==='muffled'?900:3400;const out=c.createGain();out.gain.value=(quiet?.5:1)*.05;lp.connect(out);out.connect(a.out);let t=c.currentTime+.03;
   for(const [i0,i1,d] of seq){const o=c.createOscillator(),g=c.createGain();o.type='triangle';o.frequency.setValueAtTime(hz(i0),t);o.frequency.exponentialRampToValueAtTime(hz(i1),t+d*.85);
@@ -88,7 +93,7 @@ const POOL={
   dip:()=>{dip();setTimeout(()=>scoutSay('worried'),500);setTimeout(()=>scoutSay('happy'),5200);return true;},
   bloom:()=>{setTimeout(()=>scoutSay('curious'),1500);TANK.bloom=performance.now()+26000;note({i:[0,2,4,5,7],v:.34,voice:'rhodes',gap:.2});return true;}};
 const PACE=(window.__bc&&__bc.pace)||1; /* r87: a broadcast can ask for more to happen (the Director's LIVELY) */let nextAt=0,lastKind='',wasOn=false;
-function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower')&&!(G.calm&&k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(140000,240000)*PACE;}
+function surprise(pn){if(pn<nextAt)return;const inside=!G.space&&!G.asleep,kinds=Object.keys(POOL).filter(k=>k!==lastKind&&(inside||k==='shower')&&!(G.calm&&k==='shower'));const k=pick(kinds);let ok=false;try{ok=POOL[k]();}catch(e){}if(ok)lastKind=k;nextAt=pn+rnd(95000,165000)*PACE;} /* r89: a little more happens by itself (it was every 140 to 240 s) */
 function tick(dt,pn){const g=GP();if(!A.active()||!G.on){wasOn=false;return;}if(!wasOn){wasOn=true;nextAt=pn+52000*PACE; /* r88: the first surprise inside the first minute */scoutAt=pn+52000*PACE;}
   for(const b of BOTS){botTick(b,dt,pn);if(b.stuck&&!G.space&&Math.hypot(b.x-G.x,b.y-G.y)<80&&pn-b.stuck>1500)free(b,pn);}
   for(const f of FL)try{flTick(f,dt,g);}catch(e){}
@@ -149,7 +154,7 @@ setInterval(()=>{const pn=performance.now();if(!A.active()||!G.on||document.hidd
 /* r88 · ONE DECISION PER TAP. Nothing here listens to the pointer any more: game/tap.js asks hit() what is under a point and runs what comes back.
    pad widens the targets for a finger. Scout, the tank and the cabin lamp also have real buttons over them (hover, focus, a name): see tap.js */
 let PETAT=0;
-function pet(){const pn=performance.now();PETAT=pn;scoutSay('happy');A.mark('k9','heart');}
+function pet(){const pn=performance.now();PETAT=pn;scoutTick();A.mark('k9','heart');}
 function tankTap(){const pn=performance.now();TANK.rip=pn;if(!joke(pn)){TANK.dart=pn+2600;note({i:[2,4,7],v:.36,voice:'rhodes',gap:.14});}}
 function hit(wx,wy,pad){pad=pad||0;const pn=performance.now();
   {const k=scoutPos();if(k&&Math.abs(wx-k.x)<46+pad&&Math.abs(wy-(k.y-26))<44+pad)return {kind:'scout',act:pet};}

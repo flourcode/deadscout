@@ -150,13 +150,13 @@ $('lMusic').innerHTML='<option value="auto">AUTO (THE SCENE\'S OWN)</option>'+Ob
 $('lScene').innerHTML=Object.entries(NW.SCENES).map(([k,m])=>`<option value="${k}">${esc(m.name)}</option>`).join('');
 /* r87: the link is for the ship as it is now: the astronaut, Scout, the bots, the jelly. LONG is the whole ship; SHORT is an upright window that stays with the astronaut */
 function bcUrl(){const q=new URLSearchParams({broadcast:'1'}),f=$('lFormat').value;q.set('format',f);q.set('scene',$('lScene').value);if($('lMusic').value!=='auto')q.set('music',$('lMusic').value);
-  if($('lPace').value==='lively')q.set('pace','lively');if($('lIntro').value==='0')q.set('intro','0');const sd=parseInt($('lSeed').value,10);if(sd)q.set('seed',sd);if($('lSleep').checked)q.set('sleep','1');if($('lLabel').checked)q.set('label','1');
+  if($('lPace').value==='lively')q.set('pace','lively');if($('lIntro').value==='0')q.set('intro','0');const sd=parseInt($('lSeed').value,10);if(sd)q.set('seed',sd);if($('lSleep').checked)q.set('sleep','1');if($('lLabel').checked)q.set('label','1');if(!$('lShip').checked)q.set('ship','0');
   return new URL('index.html?'+q.toString(),location.href).href;}
 function paintLink(){const sh=$('lFormat').value==='short';$('lUrl').value=bcUrl();
   $('lHint').innerHTML=(sh?'<b>SHORT.</b> In OBS set the canvas to 1080 × 1920 (Settings → Video, both resolutions). Add a Browser Source with this link, width 1080, height 1920. The camera stays with the astronaut. LIVELY and STRAIGHT IN suit a Short: more happens in the first minute.'
     :'<b>LONG.</b> In OBS, with a 1920 × 1080 canvas, add a Browser Source with this link, width 1920, height 1080. The whole ship, running by itself for as long as you record.')
-   +' Tick “Control audio via OBS” on the source so the music is recorded. It runs with no controls and no hints. To touch things while recording (send the astronaut somewhere, tap the jelly, the reactor, a lamp), right-click the source and choose Interact. Stop the recording when you have enough; the ship does not end.';}
-for(const id of ['lFormat','lScene','lMusic','lPace','lIntro','lSeed','lSleep','lLabel'])$(id).addEventListener('input',paintLink);
+   +' Tick “Control audio via OBS” on the source so the music is recorded. Untick SHIP SOUNDS to record music alone. It runs with no controls and no hints. To touch things while recording (send the astronaut somewhere, tap the jelly, the reactor, a lamp), right-click the source and choose Interact. Stop the recording when you have enough; the ship does not end.';}
+for(const id of ['lFormat','lScene','lMusic','lPace','lIntro','lSeed','lSleep','lLabel','lShip'])$(id).addEventListener('input',paintLink);
 $('lFormat').addEventListener('input',()=>{const sh=$('lFormat').value==='short';$('lPace').value=sh?'lively':'calm';$('lIntro').value=sh?'0':'1';paintLink();});
 $('lOpen').addEventListener('click',()=>{const sh=$('lFormat').value==='short';window.open(bcUrl(),'_blank',sh?'noopener,width=540,height=960':'noopener,width=1280,height=720');});
 $('lCopy').addEventListener('click',()=>copy(bcUrl(),'LINK COPIED'));
