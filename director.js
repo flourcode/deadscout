@@ -6,7 +6,7 @@
 const $=id=>document.getElementById(id),E=window.LMX,X=window.LMXS,M=window.LMXM,LR=window.LSR,DSE=window.DSE,STORE='deadScoutDirector';
 const mmss=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the Adrift FM folder.</p>';return;}
+if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open director.html from the Driftnaut Radio folder.</p>';return;}
 /* ---------- the project ---------- */
 let P,AL,TIMES,TOTAL,selCh=0,man=null;
 const stage=$('stage'),LCV=LC.create(stage);
@@ -34,7 +34,7 @@ function cardAt(){const B=P.brand||{};return B.intro==='halcyon'?LC.HAL+LC.HAL_X
 function overlay(t){const c=stage.getContext('2d'),k=stage.width/LC.DW;c.save();c.setTransform(k,0,0,k,0,0);
   if(sleepy()){c.fillStyle='rgba(0,0,0,.34)';c.fillRect(0,0,LC.DW,LC.DH);}
   const a0=cardAt(),fade=(u,d)=>Math.max(0,Math.min(1,u/1.5,(d-u)/1.5));c.textBaseline='top';try{c.letterSpacing='6px';}catch(e){}
-  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'ADRIFT FM').slice(0,34),100,96);
+  if(BC.cards!=='none'&&t>=a0&&t<a0+10){const a=fade(t-a0,10);c.globalAlpha=a*.92;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,72,980,150);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 44px Silk,monospace';c.fillText((P.name||'DRIFTNAUT RADIO').slice(0,34),100,96);
     c.fillStyle='#8f8878';c.font='400 20px Silk,monospace';c.fillText(((P.watch?'NIGHT WATCH':'TRANSMISSION')+' // DSV HALCYON · DSV-0417 // '+(P.len>=60?(P.len/60)+(P.len>=120?' HOURS':' HOUR'):P.len+' MIN')).toUpperCase(),100,166);}
   if(BC.cards==='all'){for(let i=1;i<TIMES.length;i++){const s0=TIMES[i].start+1;if(t>=s0&&t<s0+6){const a=fade(t-s0,6);c.globalAlpha=a*.9;c.fillStyle='rgba(6,6,10,.55)';c.fillRect(72,LC.DH-150,720,70);c.globalAlpha=a;c.fillStyle='#e7dbc0';c.font='400 22px Silk,monospace';c.fillText(String(i+1).padStart(2,'0')+' · '+String(P.chapters[i].title||'').toUpperCase().slice(0,40),96,LC.DH-128);}}}
   c.restore();}
@@ -122,7 +122,7 @@ $('pDel').addEventListener('click',()=>{const S=saved(),i=+$('pSaved').value;if(
 /* ---------- publish ---------- */
 const ytTitle=()=>{const pb=P.publish||{};return (pb.title||((P.year?P.year+': ':'')+P.name))+' // '+(P.len>=120?Math.round(P.len/60)+' HOURS':P.len>=60?'1 HOUR':P.len+' MIN')+' '+STY(P.style).name.toUpperCase()+(pb.subtitle?' · '+pb.subtitle.split(' • ')[0]:'');};
 function ytDesc(){const St=STY(P.style),pb=P.publish||{};const tl=AL.tracks.map(T=>mmss(T.start<1?0:T.start)+' Track '+String(T.i+1).padStart(2,'0')+' — '+T.name).join('\n'),cl=P.chapters.map((c,k)=>mmss(TIMES[k]?TIMES[k].start:0)+' '+c.title).join('\n');
-  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'Adrift FM')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nAn Adrift FM transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the Driftnaut engine: no samples, no loops. Royalty-free.\nPlay Driftnaut: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
+  return ytTitle().split(' // ')[0]+'\n'+(pb.episode?(pb.series||'Driftnaut Radio')+' · Episode '+pb.episode+'\n':'')+'DSV HALCYON · DSV-0417\n\nA Driftnaut Radio transmission: '+AL.tracks.length+' original '+St.name.toLowerCase()+' tracks, and the deep survey vessel HALCYON — presumed lost with all hands in the outer heliosphere, 167 AU from Sol, until something aboard began transmitting. Told without a word across '+P.chapters.length+' chapters. Leave it on for coding, gaming, driving or focus, and look up now and then: something is happening.\n\nTRACKLIST\n'+tl+'\n\nVISUAL TRANSMISSION\n'+cl+'\n\n'+St.genres+'\nMusic synthesized live in the Driftnaut engine: no samples, no loops. Royalty-free.\nPlay Driftnaut: the ship is a game.\n\n'+St.tags+' #deadscout #halcyon';}
 function paintPublish(){$('yTitle').value=ytTitle();$('yDesc').value=ytDesc();}
 const copy=async(v,ok)=>{try{await navigator.clipboard.writeText(v);say(ok);}catch(e){say('SELECT AND COPY IT');}};
 $('cTitleBtn').addEventListener('click',()=>copy(ytTitle(),'TITLE COPIED'));$('cDescBtn').addEventListener('click',()=>copy(ytDesc(),'DESCRIPTION COPIED'));

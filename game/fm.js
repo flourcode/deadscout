@@ -1,4 +1,4 @@
-/* r88 · ADRIFT FM · the listener's bar. What a radio needs and nothing else:
+/* r88 · DRIFTNAUT RADIO · the listener's bar. What a radio needs and nothing else:
      NOW PLAYING · SKIP · SOUND (a small panel: volume, mute, ship sounds, tap sounds) · SCENE · and one more button (mini window, full screen, about).
    On an upright screen there is also VIEW: the room, or the whole ship.
    The bar fades when nothing is happening, but the track name and the speaker stay, dimmer, so the sound is always one tap or one Tab away.
@@ -38,8 +38,8 @@ body.tall #fmView{display:inline-flex}#fmView{display:none}
 @media (max-height:460px){.fm{bottom:calc(6px + env(safe-area-inset-bottom))}.fm button{min-height:44px}.fm-hint{bottom:calc(64px + env(safe-area-inset-bottom))}}
 @media (prefers-reduced-motion: reduce){.fm button,.fm-now,.fm-hint{transition:none}}`;document.head.appendChild(css);
 const SPK=m=>'<svg viewBox="0 0 20 20" aria-hidden="true" shape-rendering="crispEdges" fill="currentColor"><path d="M2 7h4l4-4h2v14h-2l-4-4H2z"/>'+(m?'<path d="M14 7h2v2h-2zM18 7h-2v2h2zM16 9h-2v2h2zM14 11h2v2h-2zM16 11h2v2h-2z" opacity=".9"/>':'<path d="M14 7h2v6h-2zM17 5h2v10h-2z"/>')+'</svg>';
-const el=document.createElement('div');el.className='fm';el.id='fm';el.setAttribute('role','toolbar');el.setAttribute('aria-label','Adrift FM controls');
-el.innerHTML=`<div class="fm-now" id="fmNow" aria-live="polite"><i>NOW PLAYING</i><b id="fmTrack">ADRIFT FM</b></div>
+const el=document.createElement('div');el.className='fm';el.id='fm';el.setAttribute('role','toolbar');el.setAttribute('aria-label','Driftnaut Radio controls');
+el.innerHTML=`<div class="fm-now" id="fmNow" aria-live="polite"><i>NOW PLAYING</i><b id="fmTrack">DRIFTNAUT RADIO</b></div>
 <button type="button" id="fmSkip" aria-label="Skip to the next track" title="Next track (N)">SKIP</button>
 <button type="button" id="fmSnd" aria-label="Sound" aria-expanded="false" aria-controls="fmSndP" title="Sound (M mutes)"></button>
 <button type="button" id="fmScene" title="Change the ship's lights and mood. The music carries on"><i>SCENE</i><b id="fmSceneN" style="font-weight:400">QUIET DRIFT</b></button>

@@ -124,7 +124,7 @@ function mood(id,quiet){const was=S.mood;if(was===id)return;S.mood=id;CUT.toy({a
   if(A.watch()&&!quiet){const sc=SC[id]||{}; /* r51: a scene is lights and pace only; the music station plays on untouched */
     if(A.pace)A.pace(sc.pace||'routine');visit(id);if(A.nw){A.nw().scene=id;A.save();}}
   paintMood();}
-function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='ADRIFT FM · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='<s>SCENE<u> · </u></s>'+(SC[S.mood]||SC.drift).name;b.setAttribute('aria-label','Scene: '+(SC[S.mood]||SC.drift).name+' (tap for the next)');b.classList.toggle('on',S.mood!=='drift');}
+function paintMood(){{const n=document.getElementById('wName');if(n&&document.body.classList.contains('watching'))n.textContent='DRIFTNAUT RADIO · '+(SC[S.mood]||SC.drift).name;}const b=document.getElementById('wMood');if(b){b.innerHTML='<s>SCENE<u> · </u></s>'+(SC[S.mood]||SC.drift).name;b.setAttribute('aria-label','Scene: '+(SC[S.mood]||SC.drift).name+' (tap for the next)');b.classList.toggle('on',S.mood!=='drift');}
   const l=document.getElementById('wLight');if(l){l.innerHTML='LIGHT<em> · '+S.light.toUpperCase()+'</em>';l.classList.toggle('on',S.light!=='warm');}}
 function light(){const L=['warm','low','off'];S.light=L[(L.indexOf(S.light)+1)%3];A.sfx('chunk',.6);applyLights();paintMood();}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#wMood,#wLight');if(!b)return;e.stopPropagation();

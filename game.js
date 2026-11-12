@@ -10,7 +10,7 @@
 const $=id=>document.getElementById(id),E=window.LMX,X=window.LMXS,LR=window.LSR,NW=window.NW,AMB=window.AMB,SFX=window.SFX,DSE=window.DSE,ENV=DSE.ENV;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},hhmm=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600);return (h?h+':':'')+String(Math.floor(s%3600/60)).padStart(h?2:1,'0')+':'+String(s%60).padStart(2,'0');};
 const SAVE='deadScoutGame',PREF='deadScoutGamePrefs';
-window.DS_DEFAULT_EPISODE=window.DS_GAME||window.DS_DEFAULT_EPISODE;if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open index.html from the Adrift FM folder.</p>';return;}
+window.DS_DEFAULT_EPISODE=window.DS_GAME||window.DS_DEFAULT_EPISODE;if(!window.CUT||!window.DS_DEFAULT_EPISODE){document.body.innerHTML='<p style="padding:40px;font:14px monospace;color:#e7dbc0">The ship did not load. Open index.html from the Driftnaut Radio folder.</p>';return;}
 /* ---------- the project: one reading of a manifest, shared with the Director (episode.js) ---------- */
 let P,AL,TIMES,TOTAL,watch=null,events=null;
 /* the tapes (§38): six named mixes of the same engine; the player picks one from the pause menu, the story may duck it */
@@ -49,7 +49,7 @@ function msStart(){if(!('mediaSession' in navigator))return;try{if(!MS.a){const 
       H('nexttrack',()=>stationNext(3));H('previoustrack',()=>stationNext(3,-1));}
     MS.a.play().catch(()=>{});navigator.mediaSession.playbackState=prefs.sound?'playing':'paused';msMeta();}catch(e){}}
 function msMeta(id){if(!('mediaSession' in navigator)||!window.MediaMetadata)return;try{const T=DEEP.TAPES[DEEP.tapeOf(id||(watch&&(watch.tape||curTapeId()))||'soft-orbit')];
-  navigator.mediaSession.metadata=new MediaMetadata({title:T.name.charAt(0)+T.name.slice(1).toLowerCase(),artist:'Adrift FM',album:'Aboard the Halcyon',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'},{src:'icon-192.png',sizes:'192x192',type:'image/png'}]});}catch(e){}}
+  navigator.mediaSession.metadata=new MediaMetadata({title:T.name.charAt(0)+T.name.slice(1).toLowerCase(),artist:'Driftnaut Radio',album:'Aboard the Halcyon',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'},{src:'icon-192.png',sizes:'192x192',type:'image/png'}]});}catch(e){}}
 setInterval(()=>{try{if(!watch){STN.next=0;STN.t0=0;return;}if(!STN.t0)STN.t0=performance.now();
   if(state==='watch'&&!prefs.tipGame&&performance.now()-STN.t0>15*60000){prefs.tipGame=1;savePrefs();toast('LIKE IT HERE? PRESS GAME ▸ TO DRIFT THROUGH THE SHIP YOURSELF',8);}
   if(FOC.phase){try{focusTick(now());paintFocus(now());}catch(e){}}
@@ -412,7 +412,7 @@ function focusTick(t){if(FOC.phase==='focus'&&!FOC.k9&&t-FOC.start>480){FOC.k9=t
   if(FOC.phase==='focus'){try{band.setState('quiet',20);}catch(e){}focusStart(FOC.len,true);}
   else{try{band.setState(NW.ACTIVITY[watch.cfg.activity].state,20);}catch(e){}focusStart(FOC.len);}}
 function paintFocus(t){const el=$('wFocus');{const b=$('wFocus25');if(b){b.textContent=FOC.phase&&watch?'STOP TIMER':'FOCUS · 25 MIN';b.classList.toggle('on',!!(FOC.phase&&watch));}}if(!FOC.phase||!watch){el.hidden=true;try{if(document.title!==TITLE0)document.title=TITLE0;}catch(e){}return;}t=t==null?now():t;const left=Math.max(0,FOC.end-t),lab=prefs.nw.objective?' · '+prefs.nw.objective.toUpperCase():'';
-  el.hidden=false;el.classList.toggle('brk',FOC.phase==='break');el.textContent=(FOC.phase==='focus'?'FOCUS · ':'BREAK · ')+mmss(left);try{document.title=mmss(left)+' · '+(FOC.phase==='focus'?'FOCUS':'BREAK')+' — Adrift FM';}catch(e){}}
+  el.hidden=false;el.classList.toggle('brk',FOC.phase==='break');el.textContent=(FOC.phase==='focus'?'FOCUS · ':'BREAK · ')+mmss(left);try{document.title=mmss(left)+' · '+(FOC.phase==='focus'?'FOCUS':'BREAK')+' — Driftnaut Radio';}catch(e){}}
 /* ---------- PHOTO: the frame exactly as the ship draws it (640 × 360), scaled by whole pixels, with nothing on top ---------- */
 const PHOTO_K=[1,2,3,4,6];let photoFrom=null;
 function photoOn(){if(!['pause','watch','play'].includes(state))return;if(state==='play'&&!watch){enter('pause');}photoFrom=state;
@@ -432,7 +432,7 @@ async function beginWatch(o){o=o||{};ensureAudio();if(!o.play)try{master.gain.ca
   const cfg={era:'2291',solo:true,scene:nw.scene,view:'full-ship',activity:SCN.pace||'routine',music:'soft-orbit',duration_minutes:360, /* r42: no setup: the whole ship, endless, the last scene and tape */seed:watchSeed||22910000+Math.floor(Math.random()*89999)};
   const man=NW.manifest(cfg);watch={cfg,man,seed:cfg.seed};session++;show('setup',false);show('title',false);show('opts',false); /* r28: a watch can start straight from the title */$('veil').classList.remove('clear');await wait(700);
   loadWorld(man);if(BC&&BCQ.get('intro')==='0'&&P.brand){P.brand.intro=false;extT0=0;CUT.exterior(null);}if(o.play&&P.brand){P.brand.intro=false;extT0=0;CUT.exterior(null);} /* PLAY: no hull opening, straight in (r53: and the hull really opens: it was left closed) */SP.on=false;SP.cmds.length=0;SP.cams.length=0;me='commander';held=null;endingSoon=false;
-  $('wName').textContent='ADRIFT FM · '+SCN.name;document.body.classList.add('watching');state='watch';show('hud',false);fit();
+  $('wName').textContent='DRIFTNAUT RADIO · '+SCN.name;document.body.classList.add('watching');state='watch';show('hud',false);fit();
   startBand(0);msStart();setTimeout(()=>{if(watch)nowPlaying(watch.tape||curTapeId());},600);if(AMB){AMB.setMood(cfg.activity);AMB.start(actx,ambT(),prefs.mix,{mood:cfg.activity});ambT().gain.value=AMBV[prefs.nw.ambience]||1;}paintBeds();if(o.play)musicBus.gain.value=musicLevel();else{const n=actx.currentTime;musicBus.gain.cancelScheduledValues(n);musicBus.gain.setValueAtTime(0,n);musicBus.gain.setTargetAtTime(musicLevel(),n+.5,.9);} /* r88: the music comes up as soon as the ship is on screen (it used to wait 2.6 s for the engines) */ /* r67: a beat of quiet, then the music comes up with the engines */ambT().gain.value=SOUNDP[prefs.nw.sound||'balanced'].amb;if(!o.play&&focusA){const n=actx.currentTime;focusA.gain.cancelScheduledValues(n);focusA.gain.setValueAtTime(.08,n);focusA.gain.setTargetAtTime(1,n+2.6,1.7);} /* the ship's own hum still rises with the engines */if(!o.play){const n=actx.currentTime,m=outVol();master.gain.cancelScheduledValues(n);master.gain.setValueAtTime(0,n);master.gain.setValueAtTime(0,n+.3);master.gain.linearRampToValueAtTime(m,n+1.5);setTimeout(()=>{try{master.gain.cancelScheduledValues(0);master.gain.value=outVol();}catch(e){}},1700);} /* r70: then it opens once, after the quieter levels above are already in place */ /* r69: the ship's own sound starts as low as its engines and rises with them: one swell, no separate engine effect */
   keepAwake(true);setDim(prefs.dim&&cfg.activity==='quiet',true);SLP=null;sleeper=null;if(window.__town)__town.sleep('commander',false);$('dim').style.opacity='';if(sleepReq)setTimeout(()=>sleepStart(30),50);FOC.n=0;focusStart(0);paintWatch();wStart=performance.now();$('veil').classList.add('clear');wake();if(o.play)setTimeout(()=>enterPlay(),400);}
 function paintWatch(){/* full labels on a big screen; on a small one the words in <em> drop and an active button just turns amber */
@@ -614,7 +614,7 @@ function load(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');retur
 async function end(){state='end';for(const d in keys)keys[d]=false;sayClear();$('veil').classList.remove('clear');await wait(1800);stopBand();if(AMB)AMB.stop();
   const F=story?story.flags:{},mem=['first_memory_seen','eng_memory_seen','signal_layer_seen','past_deadscout_seen','signal_arrives_seen','final_eva_seen','k9_memory_seen','last_walk_seen','signal_source_known'].filter(k=>F[k]).length,disc=['found_photo','found_nav','found_patch','found_trace','found_eva'].filter(k=>F[k]).length;
   const first=!prefs.second;prefs.second=true;prefs.best=Math.max(prefs.best||0,mem+disc);savePrefs();
-  show('cards',true);for(const [l,ms,cls] of [['ADRIFT FM',3200,'year'],['TRANSMISSION COMPLETE',3000,''],[hhmm(playT),3000,'alt'],['MEMORIES FOUND   '+mem+' / 9',3200,''],['DISCOVERIES   '+disc+' / 5',3200,''],[first?'SECOND TRANSMISSION UNLOCKED':'THE SIGNAL REPEATS',3600,'alt']]){$('cards').innerHTML='';const p=document.createElement('p');p.textContent=l;p.className=cls;p.style.animationDuration=(ms/1000)+'s';$('cards').appendChild(p);await wait(ms-150);}
+  show('cards',true);for(const [l,ms,cls] of [['DRIFTNAUT RADIO',3200,'year'],['TRANSMISSION COMPLETE',3000,''],[hhmm(playT),3000,'alt'],['MEMORIES FOUND   '+mem+' / 9',3200,''],['DISCOVERIES   '+disc+' / 5',3200,''],[first?'SECOND TRANSMISSION UNLOCKED':'THE SIGNAL REPEATS',3600,'alt']]){$('cards').innerHTML='';const p=document.createElement('p');p.textContent=l;p.className=cls;p.style.animationDuration=(ms/1000)+'s';$('cards').appendChild(p);await wait(ms-150);}
   show('cards',false);try{localStorage.removeItem(SAVE);}catch(e){}if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
 /* a watch ends the way a night does: four minutes of settling, the music away, the ship dark, then the title */
 async function endOfWatch(){state='end';const endless=watch.cfg.duration_minutes>=300;$('veil').classList.remove('clear');await wait(endless?1200:3000);
@@ -622,7 +622,7 @@ async function endOfWatch(){state='end';const endless=watch.cfg.duration_minutes
   if(recording)await toggleRecord();enter('title');$('veil').classList.add('clear');}
 /* ---------- recording a take ---------- */
 async function toggleRecord(o){o=o||{};if(recording){const R=recording;recording=null;fit();let blob=null;try{blob=await R.stop();}catch(e){}$('hRec').hidden=true;$('tRec').hidden=true;paintMenus();
-    if(blob&&blob.size){const u=URL.createObjectURL(blob),a=$('takeLink');a.href=u;a.download='adriftfm-take.'+(R.ext||'webm');a.textContent='⤓ SAVE THE TAKE · '+LR.fmtBytes(blob.size);a.hidden=false;}return;}
+    if(blob&&blob.size){const u=URL.createObjectURL(blob),a=$('takeLink');a.href=u;a.download='driftnaut-take.'+(R.ext||'webm');a.textContent='⤓ SAVE THE TAKE · '+LR.fmtBytes(blob.size);a.hidden=false;}return;}
   if(!LR||(!window.VideoEncoder&&!(stage.captureStream&&window.MediaRecorder))){$('mRecord').textContent='THIS BROWSER CAN\'T RECORD';return;}
   ensureAudio();LCV.setSize(1920,1080); /* the take records 1080p; the display keeps its size in the housing */
   try{const vbr=o.vbr||8e6;recording=await LR.record({canvas:stage,ctx:actx,source:master,fps:30,vbr,expectBytes:(vbr+192000)/8*Math.min(TOTAL-now(),o.secs||1e9)*1.02});recording.long=!!o.vbr;}catch(e){recording=null;fit();$('mRecord').textContent='THE RECORDING DIDN\'T START';return;}
@@ -741,7 +741,7 @@ async function floatWindow(){try{if(document.pictureInPictureElement){await docu
     pipV.addEventListener('leavepictureinpicture',()=>{pipRoute(false);paintWatch();});
     pipV.addEventListener('volumechange',()=>{if(!inPip())return;const on=!pipV.muted&&pipV.volume>0;if(on!==!!prefs.sound)setSound(on);});
     pipV.addEventListener('pause',()=>{if(!inPip())return;setSound(!prefs.sound);pipV.muted=!prefs.sound;pipV.play().catch(()=>{});}); /* the window's play/pause toggles the sound; the picture keeps running */
-    if(navigator.mediaSession){try{navigator.mediaSession.metadata=new MediaMetadata({title:'Adrift FM',artist:'Aboard the Halcyon'});}catch(e){}}}
+    if(navigator.mediaSession){try{navigator.mediaSession.metadata=new MediaMetadata({title:'Driftnaut Radio',artist:'Aboard the Halcyon'});}catch(e){}}}
   pipV.muted=!prefs.sound;await pipV.play();await pipV.requestPictureInPicture();}catch(e){note('FLOATING WINDOW · NOT AVAILABLE IN THIS BROWSER',4);}}
 /* r79: a double-click no longer goes full screen. Clicking twice on something is an ordinary thing to do aboard now; FULL in the bar is the way in */
 if(BC)broadcast();else{enter('title');}idle0=performance.now()/1000;requestAnimationFrame(frame);
