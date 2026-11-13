@@ -276,7 +276,7 @@ window.addEventListener('pointerup',()=>{clearTimeout(holdT);holdT=null;});
    pours, someone says hello for the time of day, K9 chirps. END OF SHIFT: the lights go out the same way, K9 goes to its dock. */
 const HELLO=h=>h<5?["Still up? Me too.","Quiet one tonight."]:h<12?["Morning, shift.","Coffee's on."]:h<18?["Afternoon watch. All quiet.","Good to see you."]:h<22?["Evening, shift.","Lights are warm tonight."]:["Late watch. Settle in.","Night shift. Take it slow."];
 let wasW=false,shiftTimers=[];const T=(s,f)=>shiftTimers.push(setTimeout(()=>{if(G.state==='watch'||G.state==='play')f();},s*1000));
-function startShift(){shiftTimers.forEach(clearTimeout);shiftTimers=[];const Ty=window.__toys;if(!Ty||!Ty.shift||document.body.classList.contains('bc'))return;
+function startShift(){shiftTimers.forEach(clearTimeout);shiftTimers=[];return; /* r93: retired. The lights come on once, in game/naut.js (waking). This put them out again at 6 s and relit them at 10.6, poured a coffee nobody drinks and had Scout chirp */const Ty=window.__toys;if(!Ty||!Ty.shift||document.body.classList.contains('bc'))return;
   T(6.2,()=>Ty.shift('dark'));T(10.6,()=>Ty.shift(true));
   T(13.4,()=>{play('pour',1780);steam(1780,458,8);});
   T(15.2,()=>{const r=CUT.report(G.P,G.TIMES,G.now()),who=['pilot','systems','commander'].filter(a=>r[a]&&r[a]!=='GONE');if(who.length)G.say(CREW[pick(who)],pick(HELLO(hour())),2.8);});

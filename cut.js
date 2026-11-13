@@ -469,21 +469,25 @@ function outside(t){const sky=skyMask();if(!sky)return;const ok=(X,Y)=>X>=0&&Y>=
     const best=(a,b2)=>R.filter(([y])=>y>=H*a&&y<=H*b2).sort((p,q)=>q[1]-p[1]).slice(0,4).map(r=>r[0]);O.top=best(0,.3);O.bot=best(.7,1);
     O.b=[0,0];for(let yy=.05;yy<.25&&!O.b[0];yy+=.01)for(let xx=.06;xx<.32;xx+=.01)if(ok(W*xx,H*yy)&&ok(W*xx+8*SS,H*yy+8*SS)&&ok(W*xx-8*SS,H*yy-8*SS)){O.b=[W*xx,H*yy];break;}}
   /* everything that moves is drawn on a scratch layer and cut by the sky, so it passes behind the hull */
-  const occl=fn=>{if(!O.sc){O.sc=document.createElement('canvas');O.sc.width=W;O.sc.height=H;}const g=O.sc.getContext('2d');g.globalCompositeOperation='source-over';g.clearRect(0,0,W,H);
-    const keep=x;x=g;try{fn();}finally{x=keep;}g.globalCompositeOperation='destination-in';g.imageSmoothingEnabled=false;g.drawImage(O.mask,0,0,W,H);x.drawImage(O.sc,0,0);};
-  O.occl=occl;if(BEHIND)occl(()=>{try{BEHIND(x,t,SS);}catch(e){}}); /* r65: the object, far behind the hull */
+  /* r93: bx = [x,y,w,h], the only part of the picture fn touches. Without it the whole ship is cleared, masked and copied (three fills of the full picture,
+     every frame a satellite or comet is up: most of the frame's cost). With it, only that small box is */
+  const occl=(fn,bx)=>{if(!O.sc){O.sc=document.createElement('canvas');O.sc.width=W;O.sc.height=H;}const g=O.sc.getContext('2d');let X0=0,Y0=0,BW=W,BH=H;
+    if(bx){X0=Math.max(0,Math.floor(bx[0]/8)*8);Y0=Math.max(0,Math.floor(bx[1]/8)*8);BW=Math.min(W,Math.ceil((bx[0]+bx[2])/8)*8)-X0;BH=Math.min(H,Math.ceil((bx[1]+bx[3])/8)*8)-Y0;if(BW<=0||BH<=0)return;}
+    g.save();g.beginPath();g.rect(X0,Y0,BW,BH);g.clip();g.globalCompositeOperation='source-over';g.clearRect(X0,Y0,BW,BH);
+    const keep=x;x=g;try{fn();}finally{x=keep;}g.globalCompositeOperation='destination-in';g.imageSmoothingEnabled=false;g.drawImage(O.mask,X0/8,Y0/8,BW/8,BH/8,X0,Y0,BW,BH);g.restore();x.drawImage(O.sc,X0,Y0,BW,BH,X0,Y0,BW,BH);};
+  O.occl=occl;if(BEHIND&&(!BEHIND.want||BEHIND.want(t)))occl( /* r93: the scratch layer is three whole-ship fills; only pay for it on the frames something is actually out there */()=>{try{BEHIND(x,t,SS);}catch(e){}}); /* r65: the object, far behind the hull */
   /* the beacon, far off, three slow blinks */
   {const [bx,by]=O.b;if(bx){const ph=t%9.6,on=ph<.15||(ph>.6&&ph<.75)||(ph>1.2&&ph<1.35);if(on){x.save();x.globalCompositeOperation='lighter';glow(bx,by,16*SS,'255,90,60',.45);x.restore();px(bx-SS,by-SS,2*SS,2*SS,'#ff8a5c');}}}
   /* a comet: a slow bright head and a long trail */
   {const P_=420,n=Math.floor(t/P_),u=(t-n*P_)/7.5;if(u>=0&&u<1&&hash(n,901)<.75){const y0=O.top.length?O.top[Math.floor(hash(n,902)*O.top.length)]:H*.04,dir=hash(n,903)<.5?1:-1,
     X=dir>0?-W*.05+W*1.1*u:W*1.05-W*1.1*u,Y=y0+H*.006*u;occl(()=>{for(let k=0;k<44;k++){const a=1-k/44,sz=k<3?2*SS:SS;px(Math.round(X-dir*k*5*SS-(dir>0?5*SS:0)),Math.round(Y-k*.22*SS),5*SS,sz,a>.8?'#f6efe4':a>.45?'#7ee3e5':'#446d75');}
-      x.save();x.globalCompositeOperation='lighter';glow(X,Y,14*SS,'200,250,255',.25);x.restore();});}}
+      x.save();x.globalCompositeOperation='lighter';glow(X,Y,14*SS,'200,250,255',.25);x.restore();},[X-250*SS,Y-30*SS,500*SS,60*SS]);}}
   /* a dead satellite, tumbling slowly across */
   {const P_=300,n=Math.floor(t/P_),u=(t-n*P_)/55;if(u>=0&&u<1&&hash(n,911)<.7){const pool=O.top.slice().reverse(),Y=pool.length?pool[Math.floor(hash(n,912)*pool.length)]:H*.05,X=W*(1.02-1.04*u),r=Math.floor(t*1.3)%4,q=2*SS;
-    occl(()=>{px(X,Y,3*q,2*q,'#9a9897');px(X,Y,3*q,SS,'#c6ab92');if(r%2){px(X-4*q,Y+SS,4*q,SS,'#6b6a6e');px(X+3*q,Y+SS,4*q,SS,'#6b6a6e');}else{px(X+q,Y-3*q,SS,3*q,'#6b6a6e');px(X+q,Y+2*q,SS,3*q,'#6b6a6e');}if(Math.floor(t*2)%5===0)px(X+q,Y+SS,SS,SS,'#d0442e');});}}
+    occl(()=>{px(X,Y,3*q,2*q,'#9a9897');px(X,Y,3*q,SS,'#c6ab92');if(r%2){px(X-4*q,Y+SS,4*q,SS,'#6b6a6e');px(X+3*q,Y+SS,4*q,SS,'#6b6a6e');}else{px(X+q,Y-3*q,SS,3*q,'#6b6a6e');px(X+q,Y+2*q,SS,3*q,'#6b6a6e');}if(Math.floor(t*2)%5===0)px(X+q,Y+SS,SS,SS,'#d0442e');},[X-12*SS,Y-10*SS,34*SS,26*SS]);}}
   /* very rarely: another ship, far away, crossing in the dark */
   {const P_=1380,n=Math.floor(t/P_),u=(t-n*P_)/120;if(u>=0&&u<1&&hash(n,921)<.8&&LX&&ready(LX)){const w=W*.08,h=w*H/W,X=W*(1.02-1.1*u),Y=Math.max(4,(O.top.length?Math.min(...O.top):H*.03)-h*.45);
-    occl(()=>{x.save();x.globalAlpha=.55*Math.sin(Math.PI*u);x.filter='brightness(.45) saturate(.5)';x.drawImage(LX,0,0,W,H,X,Y,w,h);x.restore();});}}}
+    occl(()=>{x.save();x.globalAlpha=.55*Math.sin(Math.PI*u);x.filter='brightness(.45) saturate(.5)';x.drawImage(LX,0,0,W,H,X,Y,w,h);x.restore();},[X-8,Y-8,w+16,h+16]);}}}
 function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!ready(L0)){if(ready(LX)){c.save();c.setTransform(1,0,0,1,0,0);c.imageSmoothingEnabled=false;c.drawImage(LX,0,0,LX.naturalWidth,LX.naturalHeight,Math.round(box.x*scale),Math.round(box.y*scale),Math.round(box.w*scale),Math.round(box.h*scale));c.restore();}return false;}
   const Wv={};for(const k in WORLD)Wv[k]=worldAt(C,k,t);const pw=clamp(Wv.ship_power,0,1),total=times.length?times[times.length-1].end:3600,prog=clamp(t/total,0,1),era=eraAt(C,t),present=era==='present';
   evNow=null;for(const e of C.events){if(t>=e.at-1.2&&t<e.at+4)evNow={type:e.type,local:t-e.at+1.2};if(e.at>t+5)break;}
@@ -615,7 +619,7 @@ function render(c,P,times,t,box,scale){layers();const C=compile(P,times);if(!rea
     else{x.globalAlpha=ea;x.drawImage(LX,0,0,W,H);x.globalAlpha=1;}
     /* depth: three layers of stars drift past at three speeds, only where the art is open sky */
     const SK=skyMask();if(SK){for(let L_=0;L_<3;L_++){const n=[70,40,18][L_],v=[1.2,3.4,8][L_],a0=[.35,.55,.85][L_];for(let i=0;i<n;i++){const sx=((hash(i,800+L_)*W+t*v)%W+W)%W,sy=hash(i,820+L_)*H;if(!SK(sx,sy))continue;const tw=.6+.4*Math.sin(t*(.4+hash(i,840))+i);x.fillStyle=L_===2?`rgba(230,224,204,${a0*tw*ea})`:`rgba(120,140,190,${a0*tw*ea})`;x.fillRect(Math.round(sx),Math.round(sy),L_===2?SS:SS/2*2,SS);}}}
-    if(BEHIND&&outside.occl){x.globalAlpha=ea;outside.occl(()=>{try{BEHIND(x,t,SS);}catch(e){}});x.globalAlpha=1;} /* r65: the object is out there in this view too */
+    if(BEHIND&&outside.occl&&(!BEHIND.want||BEHIND.want(t))){x.globalAlpha=ea;outside.occl(()=>{try{BEHIND(x,t,SS);}catch(e){}});x.globalAlpha=1;} /* r65: the object is out there in this view too */
     if(!present||TITLE){/* alive: thin ion streams from the stern nozzles, dashes running aft, fading with distance *//* the beams are drawn once, by engineWash */
       /* running lights: a slow red/green pair on the hull */const nl=Math.floor(t*.9)%3===0;if(nl){x.save();x.globalCompositeOperation='lighter';for(const [nx,ny,c] of NAVL)glow(nx,ny,10*SS,c,.5*ea);x.restore();}}
     else{x.fillStyle=`rgba(6,10,22,${.22*ea})`;x.fillRect(0,0,W,H);} /* dead: no trails, no lights, the whole picture a shade colder */

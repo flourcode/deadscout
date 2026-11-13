@@ -181,7 +181,7 @@
   <h2><i class="ic ic-helmet" aria-hidden="true"></i><span>GOOD TO KNOW</span></h2>
   <dl class="ab-keys">
    <dt>SOUND</dt><dd>The speaker opens volume, mute, ship sounds and tap sounds. Turn the last two off for music alone. Your keyboard’s and phone’s media keys work too</dd>
-   <dt>ROAM</dt><dd>Tap outside the hull for a spacewalk, and back inside to come home. Drag to lead the astronaut; the arrow keys work too. The rest of the ship’s machinery is there to find</dd>
+   <dt>ROAM</dt><dd>Tap outside the hull for a spacewalk. Out there, tap any part of the ship to fly over to it. To come home, tap the back deck, then the airlock door. Drag to lead the astronaut; the arrow keys work too. The rest of the ship’s machinery is there to find</dd>
    <dt>KEYS</dt><dd>N skips the track · M mutes · Tab steps through Scout, the tank and the cabin lamp</dd>
   </dl>
   <p class="ab-foot">HALCYON · DSV-0417 &nbsp;·&nbsp; <a href="https://www.youtube.com/@driftnaut" target="_blank" rel="noopener">YOUTUBE · @DRIFTNAUT</a> &nbsp;·&nbsp; <a href="privacy.html">PRIVACY &amp; TERMS</a></p>
@@ -193,7 +193,12 @@
 <script src="deep.js?v=16"></script>
 <script src="assets-core.js?v=27"></script>
 <script src="pix.js?v=11"></script>
-<script src="cut.js?v=68"></script>
+<script>/* r93 · EASY ON A PHONE. On a touch device the picture is drawn 30 times a second instead of 60: pixel art at this size looks the same, and the
+   phone does half the work, so it runs cooler and the battery lasts. Every animation loop on the page goes through this (a broadcast link is left alone) */
+(()=>{try{if(!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)||/[?&]broadcast=1/.test(location.search))return;const raf=window.requestAnimationFrame.bind(window);let q=new Map(),id=0,last=0,on=false;
+  function pump(t){if(t-last<30){raf(pump);return;}last=t;const run=q;q=new Map();on=false;for(const f of run.values()){try{f(t);}catch(e){setTimeout(()=>{throw e;});}}if(q.size&&!on){on=true;raf(pump);}}
+  window.requestAnimationFrame=f=>{const k=++id;q.set(k,f);if(!on){on=true;raf(pump);}return k;};window.cancelAnimationFrame=k=>{q.delete(k);};window.__raf30=true;}catch(e){}})();</script>
+<script src="cut.js?v=69"></script>
 <script src="episode.js?v=3"></script>
 <script src="story/halcyon.js?v=13"></script>
 <script src="watch.js?v=22"></script>
@@ -213,12 +218,12 @@
 <script src="game/toys.js?v=26"></script>
 <script src="game/clock.js?v=8"></script>
 <script src="game/k9nav.js?v=1"></script>
-<script src="game/joy.js?v=7"></script>
+<script src="game/joy.js?v=8"></script>
 <script src="game/town.js?v=9"></script>
-<script src="game/naut.js?v=16"></script>
+<script src="game/naut.js?v=18"></script>
 <script src="game/life.js?v=7"></script>
 <script src="game/feel.js?v=2"></script>
-<script src="game/tap.js?v=2"></script>
+<script src="game/tap.js?v=3"></script>
 <script src="game/fm.js?v=3"></script>
 <script>if(/[?&]studio\b/.test(location.search))document.body.classList.add('studio');</script>
 <script>/* the boot screen (r27): the rest of the ship (the cutaway master and its overlays, then the crew) is fetched with its
