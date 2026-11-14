@@ -667,7 +667,9 @@ function camTarget(t){if(!(document.body.classList.contains('phone')||document.b
   if(state==='play'&&!CAM.wide){let s=null;try{s=window.__eva||CUT.actorAt(P,TIMES,t,me);}catch(e){}if(!s)return null;const w=W/(por?2.3:1.8),h=w*asp;
     return [Math.max(0,Math.min(W-w,s.x-w/2)),Math.max(0,Math.min(H-h,s.y-40-h/2)),w,h];}
   if(state==='watch'&&document.body.classList.contains('tall')){const gh=window.__ghost,a=stage.height/stage.width||16/9;
-    if(CAM.wide){const w=W,h=w*a;return [0,H/2-h/2,w,h];} /* pinched out: the whole ship, with sky above and below */
+    /* r94: the opening on an upright screen is an establishing shot: the whole ship, from outside, while the hull is closed; then a straight push in to the cabin as it opens */
+    const est=!!(P&&P.brand&&P.brand.intro!==false&&window.LC&&t<LC.HAL);
+    if(CAM.wide||est){const w=W,h=w*a;return [0,H/2-h/2,w,h];} /* pinched out: the whole ship, with sky above and below */
     /* r88 · ROOM VIEW: close enough to see and touch what is in the room (Scout is about 60 px across on a phone), and steady: the picture is centred on the
        astronaut's room and only slides when the astronaut nears its edge, so nothing moves under a finger. Outside, it follows the astronaut */
     const w=Math.min(W,a>1.6?400:560),h=Math.min(w*a,H*1.2),gx=gh&&gh.on?gh.x:820,gy=gh&&gh.on?gh.y:700;let R=null;try{const N=window.__naut,r=gh&&gh.on&&!gh.space&&N.api.roomAt(gx,gy-34);R=r&&N.api.RINFO[r];}catch(e){}
@@ -679,7 +681,11 @@ function camTarget(t){if(!(document.body.classList.contains('phone')||document.b
   return null;}
 function camTick(t){const pn=performance.now(),dt=Math.min(.1,(pn-(camT||pn))/1000);camT=pn;const tg=camTarget(t);
   if(!tg){if(!CAMV)return;const B=CUT.view(P,TIMES,t);CAMV=CAMV.map((v,i)=>v+(B[i]-v)*Math.min(1,dt*3));if(CAMV.every((v,i)=>Math.abs(v-B[i])<1))CAMV=null;return;}
-  if(!CAMV)CAMV=CUT.view(P,TIMES,t).slice();const k=Math.min(1,dt*(state==='play'?3:1.2));CAMV=CAMV.map((v,i)=>v+(tg[i]-v)*k);
+  /* r94 · NO ACCORDION. The camera used to start from the engine's 16:9 whole-ship view and ease its width and height separately toward the upright view,
+     so for four seconds the ship was drawn squashed and then stretched out. Now it starts ON its target, and whenever it moves it keeps the screen's shape:
+     the centre and the width ease, the height always follows the width. A zoom is a zoom, never a stretch */
+  if(!CAMV){CAMV=tg.slice();return;}const k=Math.min(1,dt*(state==='play'?3:1.2)),ar=tg[3]/tg[2],cx=CAMV[0]+CAMV[2]/2,cy=CAMV[1]+CAMV[3]/2,tx=tg[0]+tg[2]/2,ty=tg[1]+tg[3]/2;
+  const w=CAMV[2]+(tg[2]-CAMV[2])*k,h=w*ar,nx=cx+(tx-cx)*k,ny=cy+(ty-cy)*k;CAMV=[nx-w/2,ny-h/2,w,h];
   if(state==='play'&&!CAM.tip&&!(prefs.camTip>1)){CAM.tip=true;prefs.camTip=(prefs.camTip||0)+1;savePrefs();setTimeout(()=>{if(state==='play')toast('PINCH OR DOUBLE-TAP TO SEE THE WHOLE SHIP',5);},7500);}}
 /* pinch and double-tap */
 {const pts=new Map();let d0=0,lastTap=0;
